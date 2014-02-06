@@ -1,8 +1,14 @@
 package org.hifly.geomapviewer.domain;
 
 import com.j256.ormlite.field.DatabaseField;
+import org.hifly.geomapviewer.domain.gps.Coordinate;
+import org.hifly.geomapviewer.domain.gps.SlopeSegment;
+import org.hifly.geomapviewer.domain.gps.WaypointKm;
+import org.hifly.geomapviewer.utility.TimeUtility;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author
@@ -17,8 +23,35 @@ public class Track {
     protected Date startDate;
     @DatabaseField(canBeNull = false)
     protected Date endDate;
+    @DatabaseField(canBeNull = false)
+    protected double totalDistance;
+    @DatabaseField(canBeNull = false)
+    protected double calculatedAvgSpeed;
+    @DatabaseField(canBeNull = false)
+    protected double effectiveAvgSpeed;
+    @DatabaseField(canBeNull = false)
+    protected double maxSpeed;
+    @DatabaseField(canBeNull = false)
+    protected double calculatedElevation;
+    @DatabaseField(canBeNull = false)
+    protected double realElevation;
+    @DatabaseField(canBeNull = false)
+    protected double calculatedDescent;
+    @DatabaseField(canBeNull = false)
+    protected double realDescent;
+    @DatabaseField(canBeNull = false)
+    protected long realTime;
+    @DatabaseField(canBeNull = false)
+    protected long effectiveTime;
+    @DatabaseField(canBeNull = true)
+    protected long calories;
     @DatabaseField(canBeNull = false, foreign = true)
     protected Author author;
+
+    //calculated elements from a gps document
+    protected List<SlopeSegment> slopes;
+    protected List<Coordinate> coordinates;
+    protected Map<String,WaypointKm> coordinatesNewKm;
 
     public int getId() {
         return id;
@@ -60,8 +93,130 @@ public class Track {
         this.endDate = endDate;
     }
 
-    public String toString() {
-        return "[Track] --> "+id+","+name+","+author;
+    public double getTotalDistance() {
+        return totalDistance;
     }
 
+    public void setTotalDistance(double totalDistance) {
+        this.totalDistance = totalDistance;
+    }
+
+    public double getEffectiveAvgSpeed() {
+        return effectiveAvgSpeed;
+    }
+
+    public void setEffectiveAvgSpeed(double effectiveAvgSpeed) {
+        this.effectiveAvgSpeed = effectiveAvgSpeed;
+    }
+
+    public double getMaxSpeed() {
+        return maxSpeed;
+    }
+
+    public void setMaxSpeed(double maxSpeed) {
+        this.maxSpeed = maxSpeed;
+    }
+
+
+    public long getRealTime() {
+        return realTime;
+    }
+
+    public void setRealTime(long realTime) {
+        this.realTime = realTime;
+    }
+
+    public long getEffectiveTime() {
+        return effectiveTime;
+    }
+
+    public void setEffectiveTime(long effectiveTime) {
+        this.effectiveTime = effectiveTime;
+    }
+
+    public double getCalculatedAvgSpeed() {
+        return calculatedAvgSpeed;
+    }
+
+    public void setCalculatedAvgSpeed(double calculatedAvgSpeed) {
+        this.calculatedAvgSpeed = calculatedAvgSpeed;
+    }
+
+    public double getRealElevation() {
+        return realElevation;
+    }
+
+    public void setRealElevation(double realElevation) {
+        this.realElevation = realElevation;
+    }
+
+    public double getCalculatedElevation() {
+        return calculatedElevation;
+    }
+
+    public void setCalculatedElevation(double calculatedElevation) {
+        this.calculatedElevation = calculatedElevation;
+    }
+
+    public long getCalories() {
+        return calories;
+    }
+
+    public void setCalories(long calories) {
+        this.calories = calories;
+    }
+
+    public double getCalculatedDescent() {
+        return calculatedDescent;
+    }
+
+    public void setCalculatedDescent(double calculatedDescent) {
+        this.calculatedDescent = calculatedDescent;
+    }
+
+    public double getRealDescent() {
+        return realDescent;
+    }
+
+    public void setRealDescent(double realDescent) {
+        this.realDescent = realDescent;
+    }
+
+    public List<SlopeSegment> getSlopes() {
+        return slopes;
+    }
+
+    public void setSlopes(List<SlopeSegment> slopes) {
+        this.slopes = slopes;
+    }
+
+    public List<Coordinate> getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(List<Coordinate> coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public Map<String, WaypointKm> getCoordinatesNewKm() {
+        return coordinatesNewKm;
+    }
+
+    public void setCoordinatesNewKm(Map<String, WaypointKm> coordinatesNewKm) {
+        this.coordinatesNewKm = coordinatesNewKm;
+    }
+
+
+    public String toString() {
+        return "[Track]\n"+id+","+name+
+                "\nDate:"+startDate+"\n"+endDate+"\n"+ TimeUtility.toStringFromTimeDiff(realTime)+"\n"+TimeUtility.toStringFromTimeDiff(effectiveTime)+"\n"+
+                "Distance:"+totalDistance+
+                "\nCalculated Speed:"+calculatedAvgSpeed+"\nEffective Speed:"+effectiveAvgSpeed+"\nMax Speed:"+maxSpeed+
+                "\nCalculated Elevation:"+calculatedElevation+"\nReal Elevation:"+realElevation+
+                "\nCalculated Descent:"+calculatedDescent+"\nReal Descent:"+realDescent
+                +"\nCalories:"+calories+"\n"+
+                "Slopes:"+slopes+"\n"+
+                "Waypoint KM:"+coordinatesNewKm+"\n"+
+                author;
+    }
 }

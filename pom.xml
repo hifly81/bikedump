@@ -43,9 +43,34 @@
             <version>2.6.0</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        <dependency>
             <groupId>com.topografix.gpx</groupId>
             <artifactId>gpxmodel</artifactId>
             <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.garmin.xmlschemas.trainingCenterDatabase</groupId>
+            <artifactId>tcxmodel</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openstreetmap.gui.jmapviewer</groupId>
+            <artifactId>jmapviewer</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jdesktop</groupId>
+            <artifactId>appframework</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>jfree</groupId>
+            <artifactId>jcommon</artifactId>
+            <version>1.0.15</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
