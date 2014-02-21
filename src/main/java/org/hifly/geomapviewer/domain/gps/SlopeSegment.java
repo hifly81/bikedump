@@ -137,10 +137,10 @@ public class SlopeSegment {
     }
 
     public String toString() {
-        return "[SlopeSegment]\n"+distance+" km,"+startDistance+" km - "+endDistance+" km,"
-                +elevation+" m,"+startElevation+" m - "+endElevation+" m,"
-                +gradient+" %,"
-                +avgSpeed+" km/h,"
+        return "[SlopeSegment]<br>"+distance+" km,"+startDistance+" km - "+endDistance+" km,<br>"
+                +elevation+" m,"+startElevation+" m - "+endElevation+" m,<br>"
+                +gradient+" %,<br>"
+                +avgSpeed+" km/h,<br>"
                 + TimeUtility.toStringFromTimeDiff(endDate.getTime()-startDate.getTime());
     }
 }

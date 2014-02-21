@@ -54,7 +54,7 @@ public class Author {
     }
 
     public String toString() {
-        return "[Author]\n"+id+","+name+","+email+"\n"+
+        return "[Author]<br>"+id+","+name+","+email+"<br>"+
                 (tracks==null?"":tracks.size());
     }
 

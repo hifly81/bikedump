@@ -20,6 +20,8 @@ public class Track {
     @DatabaseField(canBeNull = false)
     protected String name;
     @DatabaseField(canBeNull = false)
+    protected String fileName;
+    @DatabaseField(canBeNull = false)
     protected Date startDate;
     @DatabaseField(canBeNull = false)
     protected Date endDate;
@@ -52,6 +54,8 @@ public class Track {
     protected List<SlopeSegment> slopes;
     protected List<Coordinate> coordinates;
     protected Map<String,WaypointKm> coordinatesNewKm;
+    protected Map<String,WaypointKm> statsNewKm;
+
 
     public int getId() {
         return id;
@@ -206,17 +210,35 @@ public class Track {
         this.coordinatesNewKm = coordinatesNewKm;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public Map<String, WaypointKm> getStatsNewKm() {
+        return statsNewKm;
+    }
+
+    public void setStatsNewKm(Map<String, WaypointKm> statsNewKm) {
+        this.statsNewKm = statsNewKm;
+    }
+
 
     public String toString() {
-        return "[Track]\n"+id+","+name+
-                "\nDate:"+startDate+"\n"+endDate+"\n"+ TimeUtility.toStringFromTimeDiff(realTime)+"\n"+TimeUtility.toStringFromTimeDiff(effectiveTime)+"\n"+
+        return "[Track]<br>"+id+","+name+","+fileName+
+                "<br>Date:"+startDate+"<br>"+endDate+"<br>"+ TimeUtility.toStringFromTimeDiff(realTime)+
+                "<br>"+TimeUtility.toStringFromTimeDiff(effectiveTime)+"<br>"+
                 "Distance:"+totalDistance+
-                "\nCalculated Speed:"+calculatedAvgSpeed+"\nEffective Speed:"+effectiveAvgSpeed+"\nMax Speed:"+maxSpeed+
-                "\nCalculated Elevation:"+calculatedElevation+"\nReal Elevation:"+realElevation+
-                "\nCalculated Descent:"+calculatedDescent+"\nReal Descent:"+realDescent
-                +"\nCalories:"+calories+"\n"+
-                "Slopes:"+slopes+"\n"+
-                "Waypoint KM:"+coordinatesNewKm+"\n"+
+                "<br>Calculated Speed:"+calculatedAvgSpeed+"<br>Effective Speed:"+effectiveAvgSpeed+
+                "<br>Max Speed:"+maxSpeed+
+                "<br>Calculated Elevation:"+calculatedElevation+"<br>Real Elevation:"+realElevation+
+                "<br>Calculated Descent:"+calculatedDescent+"<br>Real Descent:"+realDescent
+                +"<br>Calories:"+calories+"<br>"+
+                "Slopes:"+slopes+"<br>"+
+                "Waypoint KM:"+coordinatesNewKm+"<br>"+
                 author;
     }
 }

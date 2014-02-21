@@ -70,19 +70,27 @@ public class GpsUtility {
     }
 
     public static Map<String, WaypointKm> extractInfoFromWaypoints(List<Waypoint> waypoints, double totalDistance) {
-        Map<String, WaypointKm> mapKm = new HashMap();
+        //TODO extarct these values in a useful data structure
+        double limitHighestPoint = 0;
+        double limitLowestPoint = 1000000;
+
+
+        Map<String, WaypointKm> mapKm = new LinkedHashMap();
 
         int kmTotalDistance = (int) totalDistance;
         int[] elements = new int[kmTotalDistance];
         for (int i = 0; i < kmTotalDistance; i++) {
             elements[i] = i;
         }
-        int index = 0;
+        int index = 1;
+        int indexArray = 0;
         WaypointKm waypointKmLast = null;
         Waypoint waypointFirst = waypoints.get(0);
         WaypointKm waypointKmFirst = new WaypointKm();
         waypointKmFirst.setEleGained(waypointFirst.getEle());
-        waypointKmFirst.setTimeSpent(waypointFirst.getDateRelevation().getTime());
+        waypointKmFirst.setEle(waypointFirst.getEle());
+        waypointKmFirst.setTimeSpent(waypointFirst.getDateRelevation());
+        waypointKmFirst.setTimeIncrement(waypointFirst.getDateRelevation().getTime());
         for (Waypoint waypoint : waypoints) {
             String coordinate = waypoint.getLat() + "-" + waypoint.getLon();
             double newKm = waypoint.getDistanceFromStartingPoint();
@@ -90,29 +98,95 @@ public class GpsUtility {
                 WaypointKm waypointKm = new WaypointKm();
                 waypointKm.setKm(index);
                 if(waypointKmLast==null) {
-                    waypointKm.setEleGained(waypoint.getEle()-waypointKmFirst.getEleGained());
-                    waypointKm.setTimeSpent(waypoint.getDateRelevation().getTime()-waypointKmFirst.getTimeSpent());
+                    waypointKm.setEleGained(waypoint.getEle()-waypointKmFirst.getEle());
+                    waypointKm.setEle(waypoint.getEle());
+                    waypointKm.setTimeSpent(waypoint.getDateRelevation());
+                    waypointKm.setTimeIncrement(waypoint.getDateRelevation().getTime()-waypointKmFirst.getTimeSpent().getTime());
                     Calendar cal = Calendar.getInstance();
-                    cal.setTimeInMillis(waypointKmFirst.getTimeSpent());
+                    cal.setTime(waypointKmFirst.getTimeSpent());
                     Calendar cal2 = Calendar.getInstance();
                     cal2.setTime(waypoint.getDateRelevation());
                     waypointKm.setAvgSpeed(waypoint.getDistanceFromStartingPoint()/TimeUtility.getTimeDiff(cal,cal2));
                 }
                 else {
-                    waypointKm.setEleGained(waypoint.getEle()-waypointKmLast.getEleGained());
-                    waypointKm.setTimeSpent(waypoint.getDateRelevation().getTime()-waypointKmLast.getTimeSpent());
+                    waypointKm.setEleGained(waypoint.getEle()-waypointKmLast.getEle());
+                    waypointKm.setEle(waypoint.getEle());
+                    waypointKm.setTimeSpent(waypoint.getDateRelevation());
+                    waypointKm.setTimeIncrement(waypoint.getDateRelevation().getTime()-waypointKmLast.getTimeSpent().getTime());
                     Calendar cal = Calendar.getInstance();
-                    cal.setTimeInMillis(waypointKmLast.getTimeSpent());
+                    cal.setTime(waypointKmLast.getTimeSpent());
                     Calendar cal2 = Calendar.getInstance();
                     cal2.setTime(waypoint.getDateRelevation());
-                    waypointKm.setAvgSpeed(waypoint.getDistanceFromStartingPoint()/TimeUtility.getTimeDiff(cal,cal2));
+                    waypointKm.setAvgSpeed((waypoint.getDistanceFromStartingPoint()-waypointKmLast.getKm())/TimeUtility.getTimeDiff(cal,cal2));
                 }
                 mapKm.put(coordinate, waypointKm);
                 waypointKmLast = waypointKm;
                 index++;
             }
+            //last element
+            else if(index>totalDistance && indexArray==waypoints.size()-1) {
+                WaypointKm waypointKm = new WaypointKm();
+                waypointKm.setKm(index);
+                waypointKm.setEleGained(waypoint.getEle()-waypointKmLast.getEle());
+                waypointKm.setEle(waypoint.getEle());
+                waypointKm.setTimeSpent(waypoint.getDateRelevation());
+                waypointKm.setTimeIncrement(waypoint.getDateRelevation().getTime()-waypointKmLast.getTimeSpent().getTime());
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(waypointKmLast.getTimeSpent());
+                Calendar cal2 = Calendar.getInstance();
+                cal2.setTime(waypoint.getDateRelevation());
+                waypointKm.setAvgSpeed((waypoint.getDistanceFromStartingPoint()-waypointKmLast.getKm())/TimeUtility.getTimeDiff(cal,cal2));
+                mapKm.put(coordinate, waypointKm);
+            }
+            indexArray++;
         }
         return mapKm;
+    }
+
+    public static HashMap<String,WaypointKm> calculateStatsFromKm(Map<String, WaypointKm> waypoints) {
+        HashMap<String,WaypointKm> mapResult = new HashMap(6);
+
+        double limitFastestKm = 0;
+        double limitSlowestKm = 1000;
+        double limitLongestKm = 0;
+        double limitShortestKm = 1000000000;
+        double limitMostElevated = 0;
+        double limitLessElevated = 1000000;
+
+        for (Map.Entry<String, WaypointKm> entry : waypoints.entrySet()) {
+            WaypointKm waypoint = entry.getValue();
+
+            if(waypoint.getAvgSpeed()>limitFastestKm) {
+                mapResult.put("Fastest",waypoint);
+                limitFastestKm = waypoint.getAvgSpeed();
+            }
+
+            if(waypoint.getAvgSpeed()<limitSlowestKm) {
+                mapResult.put("Slowest",waypoint);
+                limitSlowestKm = waypoint.getAvgSpeed();
+            }
+
+            if(waypoint.getTimeIncrement()<limitShortestKm) {
+                mapResult.put("Shortest",waypoint);
+                limitShortestKm = waypoint.getTimeIncrement();
+            }
+
+            if(waypoint.getTimeIncrement()>limitLongestKm) {
+                mapResult.put("Longest",waypoint);
+                limitLongestKm = waypoint.getTimeIncrement();
+            }
+
+            if(waypoint.getEleGained()<limitLessElevated) {
+                mapResult.put("Less Elevated",waypoint);
+                limitLessElevated = waypoint.getEleGained();
+            }
+
+            if(waypoint.getEleGained()>limitMostElevated) {
+                mapResult.put("Most Elevated",waypoint);
+                limitMostElevated = waypoint.getEleGained();
+            }
+        }
+        return mapResult;
     }
 
     public static List<SlopeSegment> extractSlope(List<Waypoint> waypoints) {
@@ -166,7 +240,7 @@ public class GpsUtility {
                         double timeDiffInHour = TimeUtility.getTimeDiff(calLast, calFirst);
                         double speed = Math.abs(accDistance / timeDiffInHour);
                         slope.setElevation(elevation);
-                        slope.setDistance(accDistance);
+                        slope.setDistance(gradientLast.getDistanceFromStartingPoint()-gradientFirst.getDistanceFromStartingPoint());
                         slope.setGradient(GpsUtility.gradientPercentage(elevation, accDistance));
                         slope.setEndLatitude(gradientLast.getLat());
                         slope.setEndLongitude(gradientLast.getLon());

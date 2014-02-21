@@ -3,7 +3,6 @@ package org.hifly.geomapviewer.gps;
 import com.topografix.gpx.x1.x1.*;
 import org.hifly.geomapviewer.domain.Author;
 import org.hifly.geomapviewer.domain.Track;
-import org.hifly.geomapviewer.gui.GeoMapViewer;
 import org.hifly.geomapviewer.utility.GpsUtility;
 import org.hifly.geomapviewer.utility.TimeUtility;
 
@@ -52,13 +51,14 @@ public class GPXDocument extends GPSDocument {
                 }
 
             }
-            result.add(createTrack(track, gpx));
+            result.add(createTrack(track, gpx, gpsFile));
         }
         return result;
     }
 
-    private Track createTrack(TrkType track, GpxType gpx) {
+    private Track createTrack(TrkType track, GpxType gpx, String fileName) {
         Track resultTrack = new Track();
+        resultTrack.setFileName(fileName);
         startTime = track.getTrksegArray(0).getTrkptArray(0).getTime().getTime();
         TrksegType lastSegment = track.getTrksegArray(track.getTrksegArray().length - 1);
         endTime = lastSegment.getTrkptArray(lastSegment.getTrkptArray().length - 1).getTime().getTime();
@@ -78,15 +78,22 @@ public class GPXDocument extends GPSDocument {
         resultTrack.setCalculatedDescent(totalCalculatedDescent);
         resultTrack.setRealDescent(totalDescent);
         Author author = new Author();
-        author.setName(gpx.getMetadata().getAuthor() == null ? "" : gpx.getMetadata().getAuthor().getName());
-        author.setEmail(gpx.getMetadata().getAuthor() == null ? "" :
-                gpx.getMetadata().getAuthor().getEmail().getId()
+        if(gpx.getMetadata()!=null) {
+            if(gpx.getMetadata().getAuthor()!=null) {
+                author.setName(gpx.getMetadata().getAuthor().getName());
+            }
+            if(gpx.getMetadata().getAuthor()!=null && gpx.getMetadata().getAuthor().getEmail()!=null) {
+                author.setEmail(
+                    gpx.getMetadata().getAuthor().getEmail().getId()
                         + "@"
                         + gpx.getMetadata().getAuthor().getEmail().getDomain());
+            }
+        }
         resultTrack.setAuthor(author);
         resultTrack.setSlopes(GpsUtility.extractSlope(waypoints));
         resultTrack.setCoordinates(coordinates);
         resultTrack.setCoordinatesNewKm(GpsUtility.extractInfoFromWaypoints(waypoints, totalDistance));
+        resultTrack.setStatsNewKm(GpsUtility.calculateStatsFromKm(resultTrack.getCoordinatesNewKm()));
 
         return resultTrack;
     }

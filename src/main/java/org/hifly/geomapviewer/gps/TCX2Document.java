@@ -2,10 +2,7 @@ package org.hifly.geomapviewer.gps;
 
 import com.garmin.xmlschemas.trainingCenterDatabase.v2.*;
 import org.hifly.geomapviewer.domain.Author;
-import org.hifly.geomapviewer.domain.gps.Coordinate;
-import org.hifly.geomapviewer.domain.gps.Waypoint;
 import org.hifly.geomapviewer.domain.Track;
-import org.hifly.geomapviewer.gui.GeoMapViewer;
 import org.hifly.geomapviewer.utility.GpsUtility;
 import org.hifly.geomapviewer.utility.TimeUtility;
 import org.slf4j.Logger;
@@ -63,14 +60,15 @@ public class TCX2Document extends GPSDocument {
                 }
                 last = current;
             }
-            result.add(createTrack());
+            result.add(createTrack(gpsFile));
 
         }
         return result;
     }
 
-    private Track createTrack() {
+    private Track createTrack(String fileName) {
         Track resultTrack = new Track();
+        resultTrack.setFileName(fileName);
         resultTrack.setStartDate(startTime);
         resultTrack.setEndDate(endTime);
         resultTrack.setName("");
@@ -92,6 +90,8 @@ public class TCX2Document extends GPSDocument {
         resultTrack.setSlopes(GpsUtility.extractSlope(waypoints));
         resultTrack.setCoordinates(coordinates);
         resultTrack.setCoordinatesNewKm(GpsUtility.extractInfoFromWaypoints(waypoints, totalDistance));
+        resultTrack.setStatsNewKm(GpsUtility.calculateStatsFromKm(resultTrack.getCoordinatesNewKm()));
+
         result.add(resultTrack);
 
         return resultTrack;

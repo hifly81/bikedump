@@ -3,14 +3,17 @@ package org.hifly.geomapviewer.domain.gps;
 import java.util.Date;
 
 /**
- * @author Giovanni Marigi <g.marigi at beeweeb.com>
+ * @author
  * @date 05/02/14
  */
+//TODO consider even miles
 public class WaypointKm {
     private int km;
-    private long timeSpent;
+    private Date timeSpent;
+    private long timeIncrement;
     private double avgSpeed;
     private double eleGained;
+    private double ele;
 
     public int getKm() {
         return km;
@@ -20,11 +23,11 @@ public class WaypointKm {
         this.km = km;
     }
 
-    public long getTimeSpent() {
+    public Date getTimeSpent() {
         return timeSpent;
     }
 
-    public void setTimeSpent(long timeSpent) {
+    public void setTimeSpent(Date timeSpent) {
         this.timeSpent = timeSpent;
     }
 
@@ -44,7 +47,23 @@ public class WaypointKm {
         this.eleGained = eleGained;
     }
 
+    public double getEle() {
+        return ele;
+    }
+
+    public void setEle(double ele) {
+        this.ele = ele;
+    }
+
+    public long getTimeIncrement() {
+        return timeIncrement;
+    }
+
+    public void setTimeIncrement(long timeIncrement) {
+        this.timeIncrement = timeIncrement;
+    }
+
     public String toString() {
-        return "[WaypointKm]\n"+km+" km.,"+timeSpent+" millis,"+avgSpeed+" km/h,"+eleGained+" m.\n";
+        return "[WaypointKm]<br>"+km+" km.))) Time Spent:"+timeSpent+" - Time increment:"+timeIncrement+"<br> Avg speed:"+avgSpeed+" km/h -<br> Ele gained:"+eleGained+" m.";
     }
 }
