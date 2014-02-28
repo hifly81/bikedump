@@ -6,8 +6,8 @@ import java.util.Date;
  * @author
  * @date 05/02/14
  */
-//TODO consider even miles
-public class WaypointKm {
+public class WaypointSegment {
+    //TODO consider even miles; this class must be renamed
     private int km;
     private Date timeSpent;
     private long timeIncrement;
@@ -64,6 +64,6 @@ public class WaypointKm {
     }
 
     public String toString() {
-        return "[WaypointKm]<br>"+km+" km.))) Time Spent:"+timeSpent+" - Time increment:"+timeIncrement+"<br> Avg speed:"+avgSpeed+" km/h -<br> Ele gained:"+eleGained+" m.";
+        return "[WaypointSegment]<br>"+km+" km.))) Time Spent:"+timeSpent+" - Time increment:"+timeIncrement+"<br> Avg speed:"+avgSpeed+" km/h -<br> Ele gained:"+eleGained+" m.";
     }
 }

@@ -1,7 +1,6 @@
 package org.hifly.geomapviewer.gui;
 
-import org.hifly.geomapviewer.domain.gps.Waypoint;
-import org.hifly.geomapviewer.domain.gps.WaypointKm;
+import org.hifly.geomapviewer.domain.gps.WaypointSegment;
 import org.hifly.geomapviewer.gui.marker.CircleMarker;
 import org.hifly.geomapviewer.gui.marker.LineMarker;
 import org.hifly.geomapviewer.storage.GPSStorage;
@@ -9,16 +8,16 @@ import org.hifly.geomapviewer.utility.GpsUtility;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
 import org.openstreetmap.gui.jmapviewer.interfaces.ICoordinate;
-import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
-import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author
@@ -27,11 +26,11 @@ import java.util.List;
 public class MapViewer extends JMapViewer implements MouseListener {
     protected Logger log = LoggerFactory.getLogger(MapViewer.class);
 
-    public Map<String, WaypointKm> mapCircleCoordinates = new HashMap();
+    public Map<String, WaypointSegment> mapCircleCoordinates = new HashMap();
 
     public MapViewer(
             List<List<ICoordinate>> coordinates,
-            List<Map<String, WaypointKm>> coordinatesNewKm,
+            List<Map<String, WaypointSegment>> coordinatesNewKm,
             int zoomLevel) {
         super();
 
@@ -45,7 +44,7 @@ public class MapViewer extends JMapViewer implements MouseListener {
         int indexMap = 0;
         for (List<ICoordinate> listCoordinates : coordinates) {
             List<ICoordinate> listTemp = new ArrayList<>();
-            Map<String, WaypointKm> tempMap = coordinatesNewKm.get(indexMap);
+            Map<String, WaypointSegment> tempMap = coordinatesNewKm.get(indexMap);
             for (int i = 0; i < listCoordinates.size(); i++) {
                 String key = GpsUtility.getKeyForCoordinatesMap(
                         String.valueOf(listCoordinates.get(i).getLat()) + "-" + String.valueOf(listCoordinates.get(i).getLon()));
@@ -117,7 +116,7 @@ public class MapViewer extends JMapViewer implements MouseListener {
                         + "-"
                         +
                         String.valueOf(listCoordinates.get(i).getLon());
-                WaypointKm waypoint = tempMap.get(key);
+                WaypointSegment waypoint = tempMap.get(key);
                 if (waypoint != null) {
                     CircleMarker c = new CircleMarker(
                             listCoordinates.get(i).getLat(),
@@ -163,14 +162,14 @@ public class MapViewer extends JMapViewer implements MouseListener {
         System.out.println(me.getXOnScreen() + "-" + me.getYOnScreen());
         System.out.println(me.getPoint().getX() + "-" + me.getPoint().getY());
 
-        WaypointKm waypoint = this.mapCircleCoordinates.get(screenX + "-" + screenY);
+        WaypointSegment waypoint = this.mapCircleCoordinates.get(screenX + "-" + screenY);
         if (waypoint != null) {
             System.out.println("found screen(X,Y) for marker:" + waypoint.getKm() + " -->" + screenX + "," + screenY);
         } else {
             int distance = 10000;
-            WaypointKm found = null;
+            WaypointSegment found = null;
             //find nearest
-            for (Map.Entry<String, WaypointKm> entry : this.mapCircleCoordinates.entrySet()) {
+            for (Map.Entry<String, WaypointSegment> entry : this.mapCircleCoordinates.entrySet()) {
                 int sizex = Integer.valueOf(entry.getKey().split("-")[0]);
                 int sizey = Integer.valueOf(entry.getKey().split("-")[1]);
                 int diffx = screenX;

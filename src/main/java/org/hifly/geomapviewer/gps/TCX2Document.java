@@ -2,6 +2,7 @@ package org.hifly.geomapviewer.gps;
 
 import com.garmin.xmlschemas.trainingCenterDatabase.v2.*;
 import org.hifly.geomapviewer.domain.Author;
+import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.utility.GpsUtility;
 import org.hifly.geomapviewer.utility.TimeUtility;
@@ -19,6 +20,10 @@ import java.util.List;
  */
 public class TCX2Document extends GPSDocument {
     private Logger log = LoggerFactory.getLogger(TCX2Document.class);
+
+    public TCX2Document(ProfileSetting profileSetting) {
+        super(profileSetting);
+    }
 
     @Override
     public List<Track> extractTrack(String gpsFile) throws Exception {
@@ -71,7 +76,8 @@ public class TCX2Document extends GPSDocument {
         resultTrack.setFileName(fileName);
         resultTrack.setStartDate(startTime);
         resultTrack.setEndDate(endTime);
-        resultTrack.setName("");
+        //TODO check if TCX can provide a name
+        resultTrack.setName(fileName);
         resultTrack.setCalories(calories);
         resultTrack.setRealTime((long) (totalTime * 1000));
         resultTrack.setEffectiveTime(totalTimeDiff);
@@ -87,9 +93,15 @@ public class TCX2Document extends GPSDocument {
         author.setName("");
         author.setEmail("");
         resultTrack.setAuthor(author);
-        resultTrack.setSlopes(GpsUtility.extractSlope(waypoints));
+        resultTrack.setSlopes(GpsUtility.extractSlope(waypoints,profileSetting));
         resultTrack.setCoordinates(coordinates);
-        resultTrack.setCoordinatesNewKm(GpsUtility.extractInfoFromWaypoints(waypoints, totalDistance));
+        GpsUtility.GpsStats stats = GpsUtility.extractInfoFromWaypoints(waypoints, totalDistance);
+        resultTrack.setCoordinatesNewKm(stats.getWaypointsKm());
+        resultTrack.setMaxAltitude(stats.getMaxAltitude());
+        resultTrack.setMinAltitude(stats.getMinAltitude());
+        resultTrack.setClimbingSpeed(stats.getClimbingSpeed());
+        resultTrack.setClimbingTimeMillis(stats.getClimbingTime());
+        resultTrack.setClimbingDistance(stats.getClimbingDistance());
         resultTrack.setStatsNewKm(GpsUtility.calculateStatsFromKm(resultTrack.getCoordinatesNewKm()));
 
         result.add(resultTrack);

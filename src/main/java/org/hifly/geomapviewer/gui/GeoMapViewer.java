@@ -3,20 +3,24 @@ package org.hifly.geomapviewer.gui;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.hifly.geomapviewer.controller.GPSController;
+import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.domain.gps.Coordinate;
-import org.hifly.geomapviewer.domain.gps.SlopeSegment;
-import org.hifly.geomapviewer.domain.gps.WaypointKm;
+import org.hifly.geomapviewer.domain.gps.WaypointSegment;
+import org.hifly.geomapviewer.graph.WaypointAvgSpeedGraph;
+import org.hifly.geomapviewer.graph.WaypointElevationGainedGraph;
+import org.hifly.geomapviewer.graph.WaypointElevationGraph;
+import org.hifly.geomapviewer.graph.WaypointTimeGraph;
+import org.hifly.geomapviewer.gui.dialog.SettingDialog;
 import org.hifly.geomapviewer.gui.dialog.TipOfTheDay;
+import org.hifly.geomapviewer.gui.frame.AggregateDetailViewer;
+import org.hifly.geomapviewer.gui.frame.DetailViewer;
 import org.hifly.geomapviewer.gui.frame.GraphViewer;
 import org.hifly.geomapviewer.gui.menu.GeoFileChooser;
 import org.hifly.geomapviewer.gui.menu.GeoFolderChooser;
 import org.hifly.geomapviewer.gui.menu.GeoMapMenu;
 import org.hifly.geomapviewer.gui.menu.GeoToolbar;
-import org.hifly.geomapviewer.gui.tree.DateCatalogTree;
-import org.hifly.geomapviewer.gui.tree.EmptyCatalogTree;
 import org.hifly.geomapviewer.utility.GUIUtility;
-import org.hifly.geomapviewer.utility.TimeUtility;
 import org.openstreetmap.gui.jmapviewer.OsmFileCacheTileLoader;
 import org.openstreetmap.gui.jmapviewer.OsmTileLoader;
 import org.openstreetmap.gui.jmapviewer.events.JMVCommandEvent;
@@ -30,7 +34,8 @@ import org.openstreetmap.gui.jmapviewer.tilesources.MapQuestOsmTileSource;
 import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource;
 
 import javax.swing.*;
-import javax.swing.tree.TreePath;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -42,15 +47,18 @@ import java.util.List;
  * @author
  * @date 07/02/14
  */
+//TODO use resource bundles i18n
 public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
 
+    private ProfileSetting profileSetting = new ProfileSetting();
     private GeoMapViewer currentFrame = this;
+    private SettingDialog settingDialog;
     protected MapViewer mapViewer;
     private JSplitPane mainPanel = new JSplitPane();
     private JLabel zoomLabel, zoomValue, measureLabel, measureValue;
     private Map.Entry<Integer, Integer> dimension;
-    private List<List<WaypointKm>> waypointsCalculated;
-    private final Map<String,String> trackFileNames = new HashMap();
+    private List<List<WaypointSegment>> waypointsCalculated;
+    private final Map<String, String> trackFileNames = new HashMap();
 
 
     public GeoMapViewer() {
@@ -60,18 +68,28 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
         setSize(dimension.getKey(), dimension.getValue());
         //layout
         setLayout(new BorderLayout());
-
+        //exit behaviour
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        //define dialogs
+        settingDialog = new SettingDialog(currentFrame, profileSetting);
+        settingDialog.pack();
 
         //create toolbar
         GeoToolbar toolBar = new GeoToolbar();
         toolBar.getGraphButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                GraphViewer graphViewer = new GraphViewer(currentFrame,waypointsCalculated);
+                WaypointElevationGraph waypointElevationGraph = new WaypointElevationGraph(waypointsCalculated);
+                WaypointAvgSpeedGraph waypointAvgSpeedGraph = new WaypointAvgSpeedGraph(waypointsCalculated);
+                WaypointTimeGraph waypointTimeGraph = new WaypointTimeGraph(waypointsCalculated);
+                WaypointElevationGainedGraph waypointElevationGainedGraph = new WaypointElevationGainedGraph(waypointsCalculated);
+                GraphViewer graphViewer =
+                        new GraphViewer(currentFrame,
+                                Arrays.asList(waypointElevationGraph, waypointAvgSpeedGraph, waypointTimeGraph, waypointElevationGainedGraph));
             }
         });
-        add(toolBar,BorderLayout.PAGE_START);
+        add(toolBar, BorderLayout.PAGE_START);
 
         //create menu and its events
         GeoMapMenu mainMenu = new GeoMapMenu();
@@ -102,37 +120,48 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                     //TODO refactor this!
                     Collection files = FileUtils.listFiles(root, null, true);
                     List<List<Coordinate>> coordinates = new ArrayList();
-                    List<Map<String, WaypointKm>> waypoint = new ArrayList();
+                    List<Map<String, WaypointSegment>> waypoint = new ArrayList();
                     waypointsCalculated = new ArrayList();
                     List<Track> tracks = new ArrayList();
-                    for (Iterator iterator = files.iterator(); iterator.hasNext();) {
+                    for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {
                         File file = (File) iterator.next();
                         String ext = FilenameUtils.getExtension(file.getAbsolutePath());
-                        //TODO extend to other extensions
+                        Track track = null;
                         if (ext.equalsIgnoreCase("gpx")) {
-                            Track track = GPSController.extractTrackFromGpx(file.getAbsolutePath());
-                            if (track != null) {
-                                //add to map
-                                trackFileNames.put(track.getName(),track.getFileName());
-                                coordinates.add(track.getCoordinates());
-                                waypoint.add(track.getCoordinatesNewKm());
-                                tracks.add(track);
-                                List<WaypointKm> listWaypoints =
-                                        new ArrayList(track.getCoordinatesNewKm().values());
-                                waypointsCalculated.add(listWaypoints);
-                            }
-
-
+                            track = GPSController.extractTrackFromGpx(file.getAbsolutePath(),profileSetting);
+                        } else if (ext.equalsIgnoreCase("tcx")) {
+                            track = GPSController.extractTrackFromTcx(file.getAbsolutePath(),profileSetting);
+                        }
+                        if (track != null) {
+                            //add to map
+                            trackFileNames.put(track.getName(), track.getFileName());
+                            coordinates.add(track.getCoordinates());
+                            waypoint.add(track.getCoordinatesNewKm());
+                            tracks.add(track);
+                            List<WaypointSegment> listWaypoints =
+                                    new ArrayList(track.getCoordinatesNewKm().values());
+                            waypointsCalculated.add(listWaypoints);
                         }
                     }
 
-                    JScrollPane mapScrollViewer = createMapViewer(coordinates,waypoint);
-                    JScrollPane detailViewer = createDetailsViewer(tracks);
+                    JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint);
+                    JScrollPane detailViewer = new AggregateDetailViewer(tracks,currentFrame);
                     JScrollPane treeViewer = createTreeTracksViewer(tracks);
 
-                    repaintPanels(treeViewer,mapScrollViewer,detailViewer);
+                    repaintPanels(treeViewer, mapScrollViewer, detailViewer);
 
                 }
+            }
+        });
+
+        //profile setting menu item
+        JMenuItem itemProfileSetting = mainMenu.getItemOptionsSetting();
+        itemProfileSetting.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                settingDialog.setLocationRelativeTo(currentFrame);
+                settingDialog.setVisible(true);
+
             }
         });
 
@@ -148,11 +177,11 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
             JScrollPane mapScrollViewer,
             JScrollPane detailViewer) {
 
-        JSplitPane split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,treeViewer,mapScrollViewer);
-        split1.setDividerLocation(dimension.getKey()/6);
-        JSplitPane split2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,detailViewer,null);
-        JSplitPane split3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,split1,split2);
-        split3.setDividerLocation(dimension.getKey()-350);
+        JSplitPane split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeViewer, mapScrollViewer);
+        split1.setDividerLocation(dimension.getKey() / 6);
+        JSplitPane split2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, detailViewer, null);
+        JSplitPane split3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, split1, split2);
+        split3.setDividerLocation(dimension.getKey() - 350);
 
 
         split1.setOneTouchExpandable(true);
@@ -160,7 +189,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
         split3.setOneTouchExpandable(true);
 
         remove(mainPanel);
-        add(split3,BorderLayout.CENTER);
+        add(split3, BorderLayout.CENTER);
 
         validate();
         repaint();
@@ -170,208 +199,73 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
 
     private void reloadTrackPanels(File file) {
         String ext = FilenameUtils.getExtension(file.getAbsolutePath());
-        //TODO extend to other extensions
+        Track track = null;
         if (ext.equalsIgnoreCase("gpx")) {
-            Track track = GPSController.extractTrackFromGpx(file.getAbsolutePath());
-            if (track != null) {
-                //add to map
-                trackFileNames.put(track.getName(),track.getFileName());
-                List<List<Coordinate>> coordinates = new ArrayList();
-                List<Map<String, WaypointKm>> waypoint = new ArrayList();
-                List<Track> tracks = new ArrayList(1);
-                tracks.add(track);
-                coordinates.add(track.getCoordinates());
-                waypoint.add(track.getCoordinatesNewKm());
-                waypointsCalculated  = new ArrayList(1);
-                List<WaypointKm> listWaypoints = new ArrayList(track.getCoordinatesNewKm().values());
-                waypointsCalculated.add(listWaypoints);
+            track = GPSController.extractTrackFromGpx(file.getAbsolutePath(),profileSetting);
+        }
+        else if (ext.equalsIgnoreCase("tcx")) {
+            track = GPSController.extractTrackFromTcx(file.getAbsolutePath(),profileSetting);
+        }
+        if (track != null) {
+            //add to map
+            trackFileNames.put(track.getName(), track.getFileName());
+            List<List<Coordinate>> coordinates = new ArrayList();
+            List<Map<String, WaypointSegment>> waypoint = new ArrayList();
+            List<Track> tracks = new ArrayList(1);
+            tracks.add(track);
+            coordinates.add(track.getCoordinates());
+            waypoint.add(track.getCoordinatesNewKm());
+            waypointsCalculated = new ArrayList(1);
+            List<WaypointSegment> listWaypoints = new ArrayList(track.getCoordinatesNewKm().values());
+            waypointsCalculated.add(listWaypoints);
 
-                JScrollPane mapScrollViewer = createMapViewer(coordinates,waypoint);
-                JScrollPane detailViewer = createDetailsViewer(track);
-                JScrollPane treeViewer = createTreeTracksViewer(tracks);
+            JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint);
+            JScrollPane detailViewer = new DetailViewer(track, currentFrame);
+            JScrollPane treeViewer = createTreeTracksViewer(tracks);
 
-                repaintPanels(treeViewer,mapScrollViewer,detailViewer);
-
-            }
+            repaintPanels(treeViewer, mapScrollViewer, detailViewer);
 
         }
 
     }
+
 
     private JScrollPane createTreeTracksViewer(List<Track> tracks) {
         JScrollPane panel = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        JPanel treeViewer = new JPanel();
-        List<String> trackNames = new ArrayList(tracks.size());
-        for(Track track:tracks) {
-            trackNames.add(track.getName());
-        }
-        final JTree treeEmptyTracks = new JTree(
-                EmptyCatalogTree.createNodes(trackNames));
-        final JTree treeDateTracks = new JTree(
-                DateCatalogTree.createNodes(tracks));
+        final TrackTable table = new TrackTable(tracks);
+        table.getSelectionModel().addListSelectionListener(
+                //TODO if track is already selected dont'load again
+                //TODO if a list of track is shown, when load the single track don't redraw the table list
+                new ListSelectionListener() {
+                    public void valueChanged(ListSelectionEvent event) {
+                        if (event.getValueIsAdjusting()) {
+                            return;
+                        }
+                        List<String> trackNamesTemp = new ArrayList(table.getSelectedRowCount());
+                        for (int c : table.getSelectedRows()) {
+                            Object fileKey = table.getValueAt(c, 1);
+                            if (fileKey != null) {
+                                trackNamesTemp.add(fileKey.toString());
+                            }
 
-        //listener to tree nodes
-        MouseListener ml = new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
-                int selRow = treeEmptyTracks.getRowForLocation(e.getX(), e.getY());
-                TreePath selPath = treeEmptyTracks.getPathForLocation(e.getX(), e.getY());
-                if(selRow != -1) {
-                    if(e.getClickCount() == 1) {
-                        //TODO single click
+                        }
+                        //TODO reload more than one file
+                        if (trackNamesTemp.size() == 1) {
+                            reloadTrackPanels(new File(trackFileNames.get(trackNamesTemp.get(0))));
+                        }
+
+
                     }
-                    else if(e.getClickCount() == 2) {
-                        String fileKey = selPath.getLastPathComponent().toString();
-                        reloadTrackPanels(new File(trackFileNames.get(fileKey)));
-                    }
-                }
-            }
-        };
-        treeEmptyTracks.addMouseListener(ml);
+                });
 
-        treeViewer.add(treeEmptyTracks);
-        treeViewer.add(treeDateTracks);
 
-        panel.getViewport().add(treeViewer);
-        return panel;
-    }
-
-    private JScrollPane createDetailsViewer(List<Track> tracks) {
-        JScrollPane panel = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        JTextPane textPane = new JTextPane();
-        textPane.setContentType("text/html");
-
-        double totalDistance = 0;
-        double totalCalories = 0;
-        double totalDeviceElevation = 0;
-        double totalRealElevation = 0;
-        double totalDeviceDescent = 0;
-        double totalRealDescent = 0;
-        double totalCalculatedSpeed = 0;
-        double totalEffectiveSpeed = 0;
-        long totalRealTime = 0;
-        long totalEffectiveTime = 0;
-
-        String text = "<p><font face=\"arial\" size=\"2\">Number of tracks:"+tracks.size()+"<br>";
-        for(Track track:tracks) {
-             //TODO report details
-            totalDistance+=track.getTotalDistance();
-            totalCalories+=track.getCalories();
-            totalDeviceElevation+=track.getCalculatedElevation();
-            totalRealElevation+=track.getRealElevation();
-            totalDeviceDescent+=track.getCalculatedDescent();
-            totalRealDescent+=track.getRealDescent();
-            totalCalculatedSpeed+=track.getCalculatedAvgSpeed();
-            totalEffectiveSpeed+=track.getEffectiveAvgSpeed();
-            totalRealTime+=track.getRealTime();
-            totalEffectiveTime+=track.getEffectiveTime();
-        }
-        text+= "Total distance:"+totalDistance+"<br>";
-        text+= "Avg distance:"+totalDistance/tracks.size()+"<br>";
-        text+= "Total calories:"+totalCalories+"<br>";
-        text+= "Avg calories:"+totalCalories/tracks.size()+"<br>";
-        text+= "<br><br>";
-        text+= "Total duration:"+TimeUtility.toStringFromTimeDiff(totalRealTime)+"<br>";
-        text+= "Total effective duration:"+TimeUtility.toStringFromTimeDiff(totalEffectiveTime)+"<br>";
-        text+= "Avg duration:"+TimeUtility.toStringFromTimeDiff(totalRealTime/tracks.size())+"<br>";
-        text+= "Avg effective duration:"+TimeUtility.toStringFromTimeDiff(totalEffectiveTime/tracks.size())+"<br>";
-        text+= "<br><br>";
-        text+= "Avg calculated speed:"+totalCalculatedSpeed/tracks.size()+"<br>";
-        text+= "Avg effective speed:"+totalEffectiveSpeed/tracks.size()+"<br>";
-        text+= "<br><br>";
-        text+= "Total device elevation:"+totalDeviceElevation+"<br>";
-        text+= "Total real elevation:"+totalRealElevation+"<br>";
-        text+= "Total device descent:"+totalDeviceDescent+"<br>";
-        text+= "Total real descent:"+totalRealDescent+"<br>";
-        text+= "<br><br>";
-        text+= "Avg device elevation:"+totalDeviceElevation/tracks.size()+"<br>";
-        text+= "Avg real elevation:"+totalRealElevation/tracks.size()+"<br>";
-        text+= "Avg device descent:"+totalDeviceDescent/tracks.size()+"<br>";
-        text+= "Avg real descent:"+totalRealDescent/tracks.size()+"<br>";
-        text+= "</font></p></font></p><hr>";
-
-        textPane.setText(text);
-        panel.getViewport().add(textPane);
-        return panel;
-
-    }
-
-    private JScrollPane createDetailsViewer(Track track) {
-        JScrollPane panel = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        JTextPane textPane = new JTextPane();
-        textPane.setContentType("text/html");
-
-        String text = "<p><font face=\"arial\" size=\"2\"><b>"+track.getName()+"</b><br>";
-        text+= track.getStartDate()+"&nbsp;"+track.getEndDate()+"<br>";
-        text+= "Duration:"+TimeUtility.toStringFromTimeDiff(track.getRealTime())+"<br>";
-        text+= "Effective duration:"+TimeUtility.toStringFromTimeDiff(track.getEffectiveTime())+"<br>";
-        text+= "<br><br>";
-        text+= "Distance:"+track.getTotalDistance()+"<br>";
-        text+= "Calories:"+track.getCalories()+"<br>";
-        text+= "<br><br>";
-        text+= "Calculated Speed:"+track.getCalculatedAvgSpeed()+"<br>";
-        text+= "Effective Speed:"+track.getEffectiveAvgSpeed()+"<br>";
-        text+= "Max Speed:"+track.getMaxSpeed()+"<br>";
-        text+= "<br><br>";
-        text+= "Device elevation:"+track.getCalculatedElevation()+"<br>";
-        text+= "Real elevation:"+track.getRealElevation()+"<br>";
-        text+= "Device descent:"+track.getCalculatedDescent()+"<br>";
-        text+= "Real descent:"+track.getRealDescent()+"<br>";
-        text+= "<br><br>";
-        WaypointKm fastest = track.getStatsNewKm().get("Fastest");
-        WaypointKm slowest = track.getStatsNewKm().get("Slowest");
-        WaypointKm shortest = track.getStatsNewKm().get("Shortest");
-        WaypointKm longest = track.getStatsNewKm().get("Longest");
-        WaypointKm lessElevated = track.getStatsNewKm().get("Less Elevated");
-        WaypointKm mostElevated = track.getStatsNewKm().get("Most Elevated");
-        text+= "Fastest Lap:"+fastest.getKm()+" - " + fastest.getAvgSpeed()+"<br>";
-        text+= "Slowest Lap:"+slowest.getKm()+" - " + slowest.getAvgSpeed()+"<br>";
-        text+= "Shortest Lap:"+shortest.getKm()+" - " + TimeUtility.toStringFromTimeDiff(shortest.getTimeIncrement())+"<br>";
-        text+= "Longest Lap:"+longest.getKm()+" - " + TimeUtility.toStringFromTimeDiff(longest.getTimeIncrement())+"<br>";
-        text+= "Most elevated Lap:"+mostElevated.getKm()+" - " + mostElevated.getEleGained()+"<br>";
-        text+= "Less elevated Lap:"+lessElevated.getKm()+" - " + lessElevated.getEleGained()+"<br>";
-        text+= "<br><br></font></p><hr>";
-        text+= "<p><font face=\"arial\" size=\"2\"><b>Slopes"+"("+track.getSlopes().size()+")</b><br><br>";
-        for(SlopeSegment slope:track.getSlopes()) {
-            text+= "Distance:"+slope.getDistance()+" km<br>";
-            text+= "Start km:"+slope.getStartDistance()+" km<br>";
-            text+= "End km:"+slope.getEndDistance()+" km<br>";
-            text+= "Duration:"+TimeUtility.toStringFromTimeDiff(slope.getEndDate().getTime()-slope.getStartDate().getTime())+"<br>";
-            text+= "Elevation:"+slope.getElevation()+" m<br>";
-            text+= "Gradient:"+slope.getGradient()+" %<br>";
-            text+= "Start elevetion m:"+slope.getStartElevation()+" m<br>";
-            text+= "End elevation km:"+slope.getEndElevation()+" m<br>";
-            text+= "Avg speed:"+slope.getAvgSpeed()+" km/h<br>";
-            text+= "<br><br>";
-        }
-        text+= "</font></p></font></p><hr>";
-        text+= "<p><font face=\"arial\" size=\"2\"><b>Details for km.</b><br><br>";
-        int km = 1;
-        for (Map.Entry<String, WaypointKm> entry : track.getCoordinatesNewKm().entrySet()) {
-            text+= km+")<br>";
-            text+= "Time relevation:"+entry.getValue().getTimeSpent()+"<br>";
-            text+= "Time lap:"+TimeUtility.toStringFromTimeDiff(entry.getValue().getTimeIncrement())+"<br>";
-            text+= "Avg speed:"+entry.getValue().getAvgSpeed()+" km/h<<br>";
-            String fontElevation = "<font face=\"arial\" size=\"2\" color=\"red\">";
-            String fontDescent = "<font face=\"arial\" size=\"2\" color=\"green\">";
-            if(entry.getValue().getEleGained()>0) {
-                text+= "Elevation gained:"+fontElevation+entry.getValue().getEleGained()+" m</font><br>";
-            }
-            else {
-                text+= "Elevation gained:"+fontDescent+entry.getValue().getEleGained()+" m</font><br>";
-            }
-            text+= "<br><br>";
-            km++;
-        }
-        text+= "</font></p></font></p><hr>";
-
-        textPane.setText(text);
-        panel.getViewport().add(textPane);
+        panel.getViewport().add(table);
         return panel;
     }
 
     private JScrollPane createMapViewer(
             List<List<Coordinate>> coordinates,
-            List<Map<String, WaypointKm>> waypoints) {
+            List<Map<String, WaypointSegment>> waypoints) {
         JScrollPane scrollPanel = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         JPanel panel = new JPanel();
 

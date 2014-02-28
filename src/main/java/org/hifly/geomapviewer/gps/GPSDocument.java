@@ -1,5 +1,6 @@
 package org.hifly.geomapviewer.gps;
 
+import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.gps.Waypoint;
 import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.domain.gps.Coordinate;
@@ -18,6 +19,7 @@ import java.util.Map;
  * @author
  * @date 26/01/14
  */
+//TODO define xmlbean for kml
 public abstract class GPSDocument {
 
     protected Logger log = LoggerFactory.getLogger(GPSDocument.class);
@@ -26,6 +28,7 @@ public abstract class GPSDocument {
     protected List<Waypoint> waypoints = new ArrayList();
     protected Map<String, Double> elevationMap = GPSStorage.gpsElevationMap;
     protected Date startTime, endTime = null;
+    protected ProfileSetting profileSetting;
 
     protected double totalDistance,
            totalDistanceCalculated,
@@ -38,7 +41,7 @@ public abstract class GPSDocument {
     protected long totalTimeDiff = 0;
 
 
-    public GPSDocument() {
+    public GPSDocument(ProfileSetting profileSetting) {
         totalDistance = totalDistanceCalculated =
         totalSpeed = totalEffectiveSpeed =
         totalElevation = totalCalculatedElevation =
@@ -46,6 +49,7 @@ public abstract class GPSDocument {
         maxSpeed =
         totalTime = 0;
         totalEffectiveSpeedPoints = totalCalculatedSpeedPoints = calories = 0;
+        this.profileSetting = profileSetting;
     }
 
     protected void addSpeedElement(double currentLat, double currentLon, double distance, double timeDiffInHour) {
@@ -73,7 +77,10 @@ public abstract class GPSDocument {
     }
 
     protected void addGPSElement(double currentLat, double currentLon, double lastLat, double lastLon, double distance, BigDecimal currentCalcEle, BigDecimal lastCalcEle, Date currentTime, Date lastTime) {
-        long diffMillis = currentTime.getTime() - lastTime.getTime();
+        long diffMillis = 0;
+        if(currentTime!=null && lastTime!=null) {
+            diffMillis = currentTime.getTime() - lastTime.getTime();
+        }
         Double eleCurrent = elevationMap.get(GpsUtility.getKeyForCoordinatesMap(currentLat + "-" + currentLon));
         if (currentLat != lastLat && currentLon != lastLon) {
             totalTimeDiff += diffMillis;

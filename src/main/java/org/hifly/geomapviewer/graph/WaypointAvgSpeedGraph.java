@@ -1,9 +1,13 @@
 package org.hifly.geomapviewer.graph;
 
-import org.hifly.geomapviewer.domain.gps.WaypointKm;
+import org.hifly.geomapviewer.domain.gps.WaypointSegment;
+import org.hifly.geomapviewer.utility.GpsUtility;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -16,7 +20,7 @@ import java.util.List;
  */
 public class WaypointAvgSpeedGraph extends WaypointGraph {
 
-    public WaypointAvgSpeedGraph(List<List<WaypointKm>> waypoints) {
+    public WaypointAvgSpeedGraph(List<List<WaypointSegment>> waypoints) {
         super(waypoints);
     }
 
@@ -36,6 +40,18 @@ public class WaypointAvgSpeedGraph extends WaypointGraph {
                 false
         );
 
+        TextTitle subtitle1 = new TextTitle("This plot shows the average speed in relation with the distance");
+        chart.addSubtitle(subtitle1);
+
+
+        // get a reference to the plot for further customisation...
+        XYPlot plot = (XYPlot) chart.getPlot();
+        XYLineAndShapeRenderer renderer
+                = (XYLineAndShapeRenderer) plot.getRenderer();
+        renderer.setShapesVisible(true);
+        renderer.setShapesFilled(true);
+
+
         return chart;
     }
 
@@ -44,12 +60,12 @@ public class WaypointAvgSpeedGraph extends WaypointGraph {
         List<XYSeries> series = new ArrayList(waypoints.size());
         //TODO real name
         int index = 0;
-        for(List<WaypointKm> waypoint:waypoints) {
+        for(List<WaypointSegment> waypoint:waypoints) {
             XYSeries series1 = new XYSeries(index);
-            for(WaypointKm km:waypoint) {
-                series1.add(km.getKm(),km.getAvgSpeed());
-                series.add(series1);
+            for(WaypointSegment km:waypoint) {
+                series1.add(km.getKm(), GpsUtility.roundDoubleStat(km.getAvgSpeed()));
             }
+            series.add(series1);
             index++;
         }
 

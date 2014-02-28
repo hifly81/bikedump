@@ -1,6 +1,6 @@
 package org.hifly.geomapviewer.gps;
 
-import com.topografix.gpx.x1.x1.*;
+import com.topografix.gpx.x1.x0.*;
 import org.hifly.geomapviewer.domain.Author;
 import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.Track;
@@ -16,27 +16,31 @@ import java.util.List;
  * @author
  * @date 30/01/14
  */
-public class GPXDocument extends GPSDocument {
+public class GPX10Document extends GPSDocument {
 
-    public GPXDocument(ProfileSetting profileSetting) {
+
+    public GPX10Document(ProfileSetting profileSetting) {
         super(profileSetting);
     }
 
     @Override
     public List<Track> extractTrack(String gpsFile) throws Exception {
         GpxDocument doc = GpxDocument.Factory.parse(new File(gpsFile));
-        GpxType gpx = doc.getGpx();
-        for (TrkType track : gpx.getTrkArray()) {
-            WptType last = null;
-            for (TrksegType segment : track.getTrksegArray()) {
-                WptType[] trackPoints = segment.getTrkptArray();
+        GpxDocument.Gpx gpx = doc.getGpx();
+        for (GpxDocument.Gpx.Trk  track : gpx.getTrkArray()) {
+            GpxDocument.Gpx.Trk.Trkseg.Trkpt last = null;
+            for (GpxDocument.Gpx.Trk.Trkseg  segment : track.getTrksegArray()) {
+                GpxDocument.Gpx.Trk.Trkseg.Trkpt[] trackPoints = segment.getTrkptArray();
                 for (int i = 0; i < trackPoints.length; i++) {
-                    WptType current = segment.getTrkptArray(i);
+                    GpxDocument.Gpx.Trk.Trkseg.Trkpt current = segment.getTrkptArray(i);
                     double currentLat = current.getLat().doubleValue();
                     double currentLon = current.getLon().doubleValue();
                     //add coordinate element
                     addCoordinateElement(currentLat, currentLon);
-                    Date currentTime = current.getTime().getTime();
+                    Date currentTime = null;
+                    if(current.getTime()!=null)  {
+                        current.getTime().getTime();
+                    }
                     if (last != null) {
                         double lastLat = last.getLat().doubleValue();
                         double lastLon = last.getLon().doubleValue();
@@ -45,7 +49,10 @@ public class GPXDocument extends GPSDocument {
                         //need to be objects since could be nullable
                         BigDecimal currentCalcEle = current.getEle();
                         BigDecimal lastCalcEle = last.getEle();
-                        Date lastTime = last.getTime().getTime();
+                        Date lastTime = null;
+                        if(last.getTime()!=null) {
+                            last.getTime().getTime();
+                        }
                         //add basic gps elements
                         addGPSElement(currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime);
                         //calculate speed between points
@@ -61,13 +68,20 @@ public class GPXDocument extends GPSDocument {
         return result;
     }
 
-    private Track createTrack(TrkType track, GpxType gpx, String fileName) {
+    private Track createTrack(GpxDocument.Gpx.Trk track, GpxDocument.Gpx gpx, String fileName) {
         Track resultTrack = new Track();
         resultTrack.setFileName(fileName);
-        startTime = track.getTrksegArray(0).getTrkptArray(0).getTime().getTime();
-        TrksegType lastSegment = track.getTrksegArray(track.getTrksegArray().length - 1);
-        endTime = lastSegment.getTrkptArray(lastSegment.getTrkptArray().length - 1).getTime().getTime();
-        long diffStartEndTime = endTime.getTime() - startTime.getTime();
+        if(track.getTrksegArray(0).getTrkptArray(0).getTime()!=null) {
+            startTime = track.getTrksegArray(0).getTrkptArray(0).getTime().getTime();
+        }
+        GpxDocument.Gpx.Trk.Trkseg lastSegment = track.getTrksegArray(track.getTrksegArray().length - 1);
+        if(lastSegment.getTrkptArray(lastSegment.getTrkptArray().length - 1).getTime()!=null) {
+            endTime = lastSegment.getTrkptArray(lastSegment.getTrkptArray().length - 1).getTime().getTime();
+        }
+        long diffStartEndTime = 0;
+        if(endTime!=null && startTime!=null) {
+            diffStartEndTime = endTime.getTime() - startTime.getTime();
+        }
 
         resultTrack.setStartDate(startTime);
         resultTrack.setEndDate(endTime);
@@ -83,16 +97,11 @@ public class GPXDocument extends GPSDocument {
         resultTrack.setCalculatedDescent(totalCalculatedDescent);
         resultTrack.setRealDescent(totalDescent);
         Author author = new Author();
-        if(gpx.getMetadata()!=null) {
-            if(gpx.getMetadata().getAuthor()!=null) {
-                author.setName(gpx.getMetadata().getAuthor().getName());
-            }
-            if(gpx.getMetadata().getAuthor()!=null && gpx.getMetadata().getAuthor().getEmail()!=null) {
-                author.setEmail(
-                    gpx.getMetadata().getAuthor().getEmail().getId()
-                        + "@"
-                        + gpx.getMetadata().getAuthor().getEmail().getDomain());
-            }
+        if(gpx.getAuthor()!=null) {
+            author.setName(gpx.getAuthor());
+        }
+        if(gpx.getEmail()!=null) {
+                author.setEmail(gpx.getEmail());
         }
         resultTrack.setAuthor(author);
         resultTrack.setSlopes(GpsUtility.extractSlope(waypoints,profileSetting));

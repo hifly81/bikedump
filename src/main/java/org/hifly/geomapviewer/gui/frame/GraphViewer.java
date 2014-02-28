@@ -1,6 +1,5 @@
 package org.hifly.geomapviewer.gui.frame;
 
-import org.hifly.geomapviewer.domain.gps.WaypointKm;
 import org.hifly.geomapviewer.graph.*;
 import org.hifly.geomapviewer.utility.GUIUtility;
 import org.jfree.chart.ChartPanel;
@@ -9,7 +8,7 @@ import org.jfree.chart.JFreeChart;
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,9 +20,15 @@ public class GraphViewer extends JFrame {
 
     private Map.Entry<Integer, Integer> dimension;
 
-    public GraphViewer(final JFrame rootFrame, List<List<WaypointKm>> waypoints) {
+    public GraphViewer(final JFrame rootFrame, List<WaypointGraph> graphs) {
         super();
 
+        initGUI(rootFrame,graphs);
+
+    }
+
+
+    private void initGUI(final JFrame rootFrame,  List<WaypointGraph> graphs) {
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 rootFrame.setEnabled(true);
@@ -41,67 +46,61 @@ public class GraphViewer extends JFrame {
         setVisible(true);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
-        JSplitPane panel = createGraphViewer(waypoints);
+        JSplitPane panel = createGraphViewer(graphs);
 
         add(panel);
+    }
+
+    private JSplitPane createGraphViewer(List<WaypointGraph> graphs) {
+        return arrangePanel(graphs);
 
     }
 
-    private JSplitPane createGraphViewer(List<List<WaypointKm>> waypoints) {
-        JScrollPane scrollPanel = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        JPanel panel = new JPanel();
-        WaypointElevationGraph waypointElevationGraph = new WaypointElevationGraph(waypoints);
-        JFreeChart wpChart = waypointElevationGraph.createGraph();
-        ChartPanel wpGraph = new ChartPanel(wpChart);
-        wpGraph.setMouseWheelEnabled(true);
-        panel.add(wpGraph);
-        panel.validate();
-        scrollPanel.getViewport().add(panel);
+    private JSplitPane arrangePanel(List<WaypointGraph> graphs) {
+        JSplitPane splitPaneMain = null;
+        List<JScrollPane> listTemp = new ArrayList(graphs.size());
+        for(WaypointGraph  graph:graphs) {
+            JScrollPane scrollPanel =
+                    new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+            JPanel panel = new JPanel();
+            JFreeChart wpChart = graph.createGraph();
+            ChartPanel wpGraph = new ChartPanel(wpChart);
+            wpGraph.setMouseWheelEnabled(true);
+            panel.add(wpGraph);
+            panel.validate();
+            scrollPanel.getViewport().add(panel);
+            listTemp.add(scrollPanel);
+        }
 
-        JScrollPane scrollPanel2 = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        JPanel panel2 = new JPanel();
-        WaypointAvgSpeedGraph waypointAvgSpeedGraph = new WaypointAvgSpeedGraph(waypoints);
-        JFreeChart wp2Chart = waypointAvgSpeedGraph.createGraph();
-        ChartPanel wp2Graph = new ChartPanel(wp2Chart);
-        wp2Graph.setMouseWheelEnabled(true);
-        panel2.add(wp2Graph);
-        panel2.validate();
-        scrollPanel2.getViewport().add(panel2);
-
-        JScrollPane scrollPanel3 = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        JPanel panel3 = new JPanel();
-        WaypointTimeGraph waypointTimeGraph = new WaypointTimeGraph(waypoints);
-        JFreeChart wp3Chart = waypointTimeGraph.createGraph();
-        ChartPanel wp3Graph = new ChartPanel(wp3Chart);
-        wp3Graph.setMouseWheelEnabled(true);
-        panel3.add(wp3Graph);
-        panel3.validate();
-        scrollPanel3.getViewport().add(panel3);
-
-        JScrollPane scrollPanel4 = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        JPanel panel4 = new JPanel();
-        WaypointElevationGainedGraph waypointElevationGainedGraph = new WaypointElevationGainedGraph(waypoints);
-        JFreeChart wp4Chart = waypointElevationGainedGraph.createGraph();
-        ChartPanel wp4Graph = new ChartPanel(wp4Chart);
-        wp4Graph.setMouseWheelEnabled(true);
-        panel4.add(wp4Graph);
-        panel4.validate();
-        scrollPanel4.getViewport().add(panel4);
+        //number of container panel
+        int numberOfSplitPanel = listTemp.size()/2 + listTemp.size()%2;
+        List<JSplitPane> listTempSplit = new ArrayList(numberOfSplitPanel);
+        for(int i=0;i<graphs.size();i+=2) {
+            JSplitPane splitPane = new JSplitPane(
+                    JSplitPane.HORIZONTAL_SPLIT,listTemp.get(i),
+                    i+1>=graphs.size()?null:listTemp.get(i+1));
+            splitPane.setOneTouchExpandable(true);
+            listTempSplit.add(splitPane);
+        }
 
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,scrollPanel,scrollPanel2);
-        JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,scrollPanel3,scrollPanel4);
-        JSplitPane splitPaneMain = new JSplitPane(JSplitPane.VERTICAL_SPLIT,splitPane,splitPane2);
+        //TODO 1 -2 - 4 -6 -8
+        if(graphs.size()<4) {
+            splitPaneMain = new JSplitPane(JSplitPane.VERTICAL_SPLIT,listTempSplit.get(0),null);
+            splitPaneMain.setOneTouchExpandable(true);
+            //TODO divider dimension
+        }
+        else if(graphs.size()==4) {
+            splitPaneMain = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                    listTempSplit.get(0),listTempSplit.get(1));
+            listTempSplit.get(0).setDividerLocation((dimension.getKey()-100)/2);
+            listTempSplit.get(1).setDividerLocation((dimension.getKey()-100)/2);
+            splitPaneMain.setOneTouchExpandable(true);
+            splitPaneMain.setDividerLocation(360);
 
-        splitPane.setDividerLocation(300);
-        splitPane2.setDividerLocation(300);
-        splitPaneMain.setDividerLocation(500);
-
-        splitPane.setOneTouchExpandable(true);
-        splitPane2.setOneTouchExpandable(true);
-        splitPaneMain.setOneTouchExpandable(true);
-
+        }
 
         return splitPaneMain;
+
     }
 }

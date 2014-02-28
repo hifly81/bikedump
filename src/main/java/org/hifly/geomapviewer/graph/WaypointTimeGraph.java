@@ -1,25 +1,14 @@
 package org.hifly.geomapviewer.graph;
 
-import org.hifly.geomapviewer.domain.gps.WaypointKm;
-import org.hifly.geomapviewer.utility.TimeUtility;
+import org.hifly.geomapviewer.domain.gps.WaypointSegment;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.time.Day;
-import org.jfree.data.time.Minute;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.RectangleInsets;
 
-import java.awt.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +18,7 @@ import java.util.List;
  */
 public class WaypointTimeGraph extends WaypointGraph {
 
-    public WaypointTimeGraph(List<List<WaypointKm>> waypoints) {
+    public WaypointTimeGraph(List<List<WaypointSegment>> waypoints) {
         super(waypoints);
     }
 
@@ -50,6 +39,9 @@ public class WaypointTimeGraph extends WaypointGraph {
                 false
         );
 
+        TextTitle subtitle1 = new TextTitle("This plot shows the time duration of each lap");
+        chart.addSubtitle(subtitle1);
+
         return chart;
     }
 
@@ -58,12 +50,12 @@ public class WaypointTimeGraph extends WaypointGraph {
         List<XYSeries> series = new ArrayList(waypoints.size());
         //TODO real name
         int index = 0;
-        for(List<WaypointKm> waypoint:waypoints) {
+        for(List<WaypointSegment> waypoint:waypoints) {
             XYSeries series1 = new XYSeries(index);
-            for(WaypointKm km:waypoint) {
+            for(WaypointSegment km:waypoint) {
                 series1.add(km.getKm(),km.getTimeIncrement());
-                series.add(series1);
             }
+            series.add(series1);
             index++;
         }
 

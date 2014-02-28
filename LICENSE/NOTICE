@@ -1,0 +1,13 @@
+geomapviewer use these external libraries:
+ - apache xml beans
+   http://xmlbeans.apache.org
+
+ - sunrisesunsetlib 
+   Author: Mike Reedell
+   https://github.com/mikereedell/sunrisesunsetlib-java
+   license: Apache 2.0
+   see Apache 2.0 LICENSE file
+
+ - jmapviewer
+   http://wiki.openstreetmap.org/wiki/JMapViewer
+   license: GPL

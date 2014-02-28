@@ -1,6 +1,14 @@
 package org.hifly.geomapviewer.utility;
 
+import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
+import com.luckycatlabs.sunrisesunset.dto.Location;
+
+import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
+
 
 /**
  * @author
@@ -9,6 +17,9 @@ import java.util.Calendar;
 public class TimeUtility {
 
     public static double getTimeDiff(Calendar first, Calendar second) {
+        if(first==null || second==null) {
+            return 0;
+        }
         final double millis = second.getTimeInMillis() - first.getTimeInMillis();
         return millis / (60 * 60 * 1000);
     }
@@ -22,4 +33,31 @@ public class TimeUtility {
         return diffDays2+"D,"+diffHours2+"H,"+diffMinutes2+"M,"+diffSeconds2+"S";
 
     }
+
+    public static String convertToString(String format,Date date) {
+        if(date==null) {
+            return "";
+        }
+        SimpleDateFormat df = new SimpleDateFormat(format);
+        return df.format(date);
+    }
+
+    public static Map.Entry<String,String> getSunriseSunsetTime(
+            double lat, double lon, Date date) {
+        if(date == null) {
+            return null;
+        }
+        Location location = new Location(lat, lon);
+        //TODO remove timezone constant
+        //TODO consider AM/PM
+        Calendar c1 = Calendar.getInstance();
+        c1.setTime(date);
+        SunriseSunsetCalculator calculator = new SunriseSunsetCalculator(location, "Europe/Rome");
+        String officialSunrise = calculator.getOfficialSunriseForDate(c1);
+        String officialSunset = calculator.getOfficialSunsetForDate(c1);
+        return new AbstractMap.SimpleImmutableEntry<String, String>(
+                officialSunrise, officialSunset);
+    }
+
+
 }

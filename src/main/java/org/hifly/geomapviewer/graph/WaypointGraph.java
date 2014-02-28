@@ -1,9 +1,9 @@
 package org.hifly.geomapviewer.graph;
 
-import org.hifly.geomapviewer.domain.gps.WaypointKm;
+import org.hifly.geomapviewer.domain.gps.Waypoint;
+import org.hifly.geomapviewer.domain.gps.WaypointSegment;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeriesCollection;
 
 import java.util.List;
 
@@ -13,10 +13,17 @@ import java.util.List;
  */
 public abstract class WaypointGraph {
 
-    protected List<List<WaypointKm>> waypoints;
+    protected List<List<WaypointSegment>> waypoints;
+    protected boolean detailGraph;
+    protected List<Waypoint> waypointDetails;
 
-    public WaypointGraph(List<List<WaypointKm>> waypoints) {
+    public WaypointGraph(List<List<WaypointSegment>> waypoints) {
         this.waypoints = waypoints;
+    }
+
+    public WaypointGraph(List<Waypoint> waypointDetails, boolean detailGraph) {
+        this.waypointDetails = waypointDetails;
+        this.detailGraph = true;
     }
 
     public abstract JFreeChart createGraph();

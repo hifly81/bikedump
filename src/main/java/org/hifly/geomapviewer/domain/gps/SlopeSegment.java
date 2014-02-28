@@ -3,6 +3,7 @@ package org.hifly.geomapviewer.domain.gps;
 import org.hifly.geomapviewer.utility.TimeUtility;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author
@@ -21,8 +22,12 @@ public class SlopeSegment {
     protected double startDistance;
     protected double endDistance;
     protected double avgSpeed;
+    protected double maximumGradient;
     protected Date startDate;
     protected Date endDate;
+    protected double power;
+
+    protected List<Waypoint> waypoints;
 
     public double getStartLatitude() {
         return startLatitude;
@@ -134,6 +139,30 @@ public class SlopeSegment {
 
     public void setAvgSpeed(double avgSpeed) {
         this.avgSpeed = avgSpeed;
+    }
+
+    public double getMaximumGradient() {
+        return maximumGradient;
+    }
+
+    public void setMaximumGradient(double maximumGradient) {
+        this.maximumGradient = maximumGradient;
+    }
+
+    public List<Waypoint> getWaypoints() {
+        return waypoints;
+    }
+
+    public void setWaypoints(List<Waypoint> waypoints) {
+        this.waypoints = waypoints;
+    }
+
+    public double getPower() {
+        return power;
+    }
+
+    public void setPower(double power) {
+        this.power = power;
     }
 
     public String toString() {

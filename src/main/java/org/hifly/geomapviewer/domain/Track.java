@@ -3,7 +3,7 @@ package org.hifly.geomapviewer.domain;
 import com.j256.ormlite.field.DatabaseField;
 import org.hifly.geomapviewer.domain.gps.Coordinate;
 import org.hifly.geomapviewer.domain.gps.SlopeSegment;
-import org.hifly.geomapviewer.domain.gps.WaypointKm;
+import org.hifly.geomapviewer.domain.gps.WaypointSegment;
 import org.hifly.geomapviewer.utility.TimeUtility;
 
 import java.util.Date;
@@ -53,8 +53,13 @@ public class Track {
     //calculated elements from a gps document
     protected List<SlopeSegment> slopes;
     protected List<Coordinate> coordinates;
-    protected Map<String,WaypointKm> coordinatesNewKm;
-    protected Map<String,WaypointKm> statsNewKm;
+    protected Map<String,WaypointSegment> coordinatesNewKm;
+    protected Map<String,WaypointSegment> statsNewKm;
+    protected double maxAltitude;
+    protected double minAltitude;
+    protected long climbingTimeMillis;
+    protected double climbingSpeed;
+    private double climbingDistance;
 
 
     public int getId() {
@@ -202,11 +207,11 @@ public class Track {
         this.coordinates = coordinates;
     }
 
-    public Map<String, WaypointKm> getCoordinatesNewKm() {
+    public Map<String, WaypointSegment> getCoordinatesNewKm() {
         return coordinatesNewKm;
     }
 
-    public void setCoordinatesNewKm(Map<String, WaypointKm> coordinatesNewKm) {
+    public void setCoordinatesNewKm(Map<String, WaypointSegment> coordinatesNewKm) {
         this.coordinatesNewKm = coordinatesNewKm;
     }
 
@@ -218,11 +223,11 @@ public class Track {
         this.fileName = fileName;
     }
 
-    public Map<String, WaypointKm> getStatsNewKm() {
+    public Map<String, WaypointSegment> getStatsNewKm() {
         return statsNewKm;
     }
 
-    public void setStatsNewKm(Map<String, WaypointKm> statsNewKm) {
+    public void setStatsNewKm(Map<String, WaypointSegment> statsNewKm) {
         this.statsNewKm = statsNewKm;
     }
 
@@ -240,5 +245,45 @@ public class Track {
                 "Slopes:"+slopes+"<br>"+
                 "Waypoint KM:"+coordinatesNewKm+"<br>"+
                 author;
+    }
+
+    public double getMaxAltitude() {
+        return maxAltitude;
+    }
+
+    public void setMaxAltitude(double maxAltitude) {
+        this.maxAltitude = maxAltitude;
+    }
+
+    public double getMinAltitude() {
+        return minAltitude;
+    }
+
+    public void setMinAltitude(double minAltitude) {
+        this.minAltitude = minAltitude;
+    }
+
+    public long getClimbingTimeMillis() {
+        return climbingTimeMillis;
+    }
+
+    public void setClimbingTimeMillis(long climbingTimeMillis) {
+        this.climbingTimeMillis = climbingTimeMillis;
+    }
+
+    public double getClimbingSpeed() {
+        return climbingSpeed;
+    }
+
+    public void setClimbingSpeed(double climbingSpeed) {
+        this.climbingSpeed = climbingSpeed;
+    }
+
+    public double getClimbingDistance() {
+        return climbingDistance;
+    }
+
+    public void setClimbingDistance(double climbingDistance) {
+        this.climbingDistance = climbingDistance;
     }
 }

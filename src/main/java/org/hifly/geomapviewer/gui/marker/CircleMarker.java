@@ -1,15 +1,10 @@
 package org.hifly.geomapviewer.gui.marker;
 
-import org.hifly.geomapviewer.domain.gps.WaypointKm;
+import org.hifly.geomapviewer.domain.gps.WaypointSegment;
 import org.hifly.geomapviewer.gui.MapViewer;
-import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author
@@ -18,10 +13,10 @@ import java.util.Map;
 //TODO find a method to link info to circle mouse click event
 public class CircleMarker extends MapMarkerDot  {
     protected String text=null;
-    protected WaypointKm waypoint;
+    protected WaypointSegment waypoint;
     protected MapViewer mapViewer;
 
-    public CircleMarker(double lat, double lon, WaypointKm waypoint,MapViewer viewer) {
+    public CircleMarker(double lat, double lon, WaypointSegment waypoint,MapViewer viewer) {
         super(lat,lon);
         this.text = String.valueOf(waypoint.getKm());
         this.waypoint = waypoint;

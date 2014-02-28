@@ -1,23 +1,15 @@
 package org.hifly.geomapviewer.graph;
 
-import org.hifly.geomapviewer.domain.gps.WaypointKm;
+import org.hifly.geomapviewer.domain.gps.WaypointSegment;
+import org.hifly.geomapviewer.utility.GpsUtility;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.time.Minute;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.RectangleInsets;
 
-import java.awt.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +19,7 @@ import java.util.List;
  */
 public class WaypointElevationGainedGraph extends WaypointGraph {
 
-    public WaypointElevationGainedGraph(List<List<WaypointKm>> waypoints) {
+    public WaypointElevationGainedGraph(List<List<WaypointSegment>> waypoints) {
         super(waypoints);
     }
 
@@ -48,6 +40,9 @@ public class WaypointElevationGainedGraph extends WaypointGraph {
                 false
         );
 
+        TextTitle subtitle1 = new TextTitle("This plot shows the elevation gained (+ or -) for every lap");
+        chart.addSubtitle(subtitle1);
+
 
         return chart;
     }
@@ -57,12 +52,12 @@ public class WaypointElevationGainedGraph extends WaypointGraph {
         List<XYSeries> series = new ArrayList(waypoints.size());
         //TODO real name
         int index = 0;
-        for(List<WaypointKm> waypoint:waypoints) {
+        for(List<WaypointSegment> waypoint:waypoints) {
             XYSeries series1 = new XYSeries(index);
-            for(WaypointKm km:waypoint) {
-                series1.add(km.getKm(),km.getEleGained());
-                series.add(series1);
+            for(WaypointSegment km:waypoint) {
+                series1.add(km.getKm(), GpsUtility.roundDoubleStat(km.getEleGained()));
             }
+            series.add(series1);
             index++;
         }
 
@@ -72,4 +67,5 @@ public class WaypointElevationGainedGraph extends WaypointGraph {
         }
         return dataset;
     }
+
 }
