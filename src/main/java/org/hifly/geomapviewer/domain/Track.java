@@ -49,6 +49,8 @@ public class Track {
     protected long calories;
     @DatabaseField(canBeNull = false, foreign = true)
     protected Author author;
+    //TODO evaluate if this can be an object
+    protected String sportType;
 
     //calculated elements from a gps document
     protected List<SlopeSegment> slopes;
@@ -285,5 +287,13 @@ public class Track {
 
     public void setClimbingDistance(double climbingDistance) {
         this.climbingDistance = climbingDistance;
+    }
+
+    public String getSportType() {
+        return sportType;
+    }
+
+    public void setSportType(String sportType) {
+        this.sportType = sportType;
     }
 }

@@ -13,13 +13,13 @@ import org.hifly.geomapviewer.graph.WaypointElevationGraph;
 import org.hifly.geomapviewer.graph.WaypointTimeGraph;
 import org.hifly.geomapviewer.gui.dialog.SettingDialog;
 import org.hifly.geomapviewer.gui.dialog.TipOfTheDay;
-import org.hifly.geomapviewer.gui.frame.AggregateDetailViewer;
-import org.hifly.geomapviewer.gui.frame.DetailViewer;
-import org.hifly.geomapviewer.gui.frame.GraphViewer;
+import org.hifly.geomapviewer.gui.events.PanelWindowAdapter;
+import org.hifly.geomapviewer.gui.panel.*;
 import org.hifly.geomapviewer.gui.menu.GeoFileChooser;
 import org.hifly.geomapviewer.gui.menu.GeoFolderChooser;
 import org.hifly.geomapviewer.gui.menu.GeoMapMenu;
 import org.hifly.geomapviewer.gui.menu.GeoToolbar;
+import org.hifly.geomapviewer.storage.GeoMapStorage;
 import org.hifly.geomapviewer.utility.GUIUtility;
 import org.openstreetmap.gui.jmapviewer.OsmFileCacheTileLoader;
 import org.openstreetmap.gui.jmapviewer.OsmTileLoader;
@@ -63,13 +63,14 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
 
     public GeoMapViewer() {
         super();
-        //frame dimension
+        //panel dimension
         dimension = GUIUtility.getScreenDimension();
         setSize(dimension.getKey(), dimension.getValue());
         //layout
         setLayout(new BorderLayout());
         //exit behaviour
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        addWindowListener(new PanelWindowAdapter());
+
 
         //define dialogs
         settingDialog = new SettingDialog(currentFrame, profileSetting);
@@ -92,7 +93,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
         add(toolBar, BorderLayout.PAGE_START);
 
         //create menu and its events
-        GeoMapMenu mainMenu = new GeoMapMenu();
+        GeoMapMenu mainMenu = new GeoMapMenu(currentFrame);
         final GeoFileChooser fileChooser = new GeoFileChooser();
         final GeoFolderChooser folderChooser = new GeoFolderChooser();
 
@@ -127,28 +128,52 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                         File file = (File) iterator.next();
                         String ext = FilenameUtils.getExtension(file.getAbsolutePath());
                         Track track = null;
+                        Map.Entry<Track, StringBuffer> resultTrack = null;
                         if (ext.equalsIgnoreCase("gpx")) {
-                            track = GPSController.extractTrackFromGpx(file.getAbsolutePath(),profileSetting);
+                            resultTrack = GPSController.extractTrackFromGpx(file.getAbsolutePath(), profileSetting);
                         } else if (ext.equalsIgnoreCase("tcx")) {
-                            track = GPSController.extractTrackFromTcx(file.getAbsolutePath(),profileSetting);
+                            resultTrack = GPSController.extractTrackFromTcx(file.getAbsolutePath(), profileSetting);
                         }
-                        if (track != null) {
-                            //add to map
-                            trackFileNames.put(track.getName(), track.getFileName());
-                            coordinates.add(track.getCoordinates());
-                            waypoint.add(track.getCoordinatesNewKm());
-                            tracks.add(track);
-                            List<WaypointSegment> listWaypoints =
-                                    new ArrayList(track.getCoordinatesNewKm().values());
-                            waypointsCalculated.add(listWaypoints);
+                        if (resultTrack.getValue().toString().equals("")) {
+                            track = resultTrack.getKey();
+                            if (track != null) {
+                                //add to map
+                                trackFileNames.put(track.getName(), track.getFileName());
+                                //add to opened files map
+                                if (GeoMapStorage.tracksLibrary == null) {
+                                    GeoMapStorage.tracksLibrary = new HashMap();
+                                }
+                                GeoMapStorage.tracksLibrary.put(track.getFileName(), track.getFileName());
+                                coordinates.add(track.getCoordinates());
+                                waypoint.add(track.getCoordinatesNewKm());
+                                tracks.add(track);
+                                List<WaypointSegment> listWaypoints =
+                                        new ArrayList(track.getCoordinatesNewKm().values());
+                                waypointsCalculated.add(listWaypoints);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(currentFrame,
+                                    resultTrack.getValue().toString(),
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE);
                         }
                     }
 
-                    JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint);
-                    JScrollPane detailViewer = new AggregateDetailViewer(tracks,currentFrame);
-                    JScrollPane treeViewer = createTreeTracksViewer(tracks);
+                    //sort tracks by dates
+                    Collections.sort(tracks, new Comparator<Track>() {
+                        public int compare(Track o1, Track o2) {
+                            if (o1.getStartDate() != null && o2.getStartDate() != null) {
+                                return o1.getStartDate().compareTo(o2.getStartDate());
+                            }
+                            return -1;
+                        }
+                    });
 
-                    repaintPanels(treeViewer, mapScrollViewer, detailViewer);
+                    JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint, true);
+                    JScrollPane detailViewer = new AggregateDetailViewer(tracks, currentFrame);
+                    JScrollPane tableViewer = createTableTracksViewer(tracks);
+
+                    repaintPanels(tableViewer, mapScrollViewer, detailViewer);
 
                 }
             }
@@ -168,6 +193,92 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
 
         //add menu
         setJMenuBar(mainMenu);
+
+        new SwingWorker<Void, String>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                //TODO saved elements
+                //load saved elements
+                if (GeoMapStorage.tracksLibrary != null) {
+                    //TODO refactor this
+                    List<List<Coordinate>> coordinates = new ArrayList();
+                    List<Map<String, WaypointSegment>> waypoint = new ArrayList();
+                    if (waypointsCalculated == null) {
+                        waypointsCalculated = new ArrayList();
+                    }
+                    List<Track> tracks = new ArrayList();
+                    for (Map.Entry<String, String> entry : GeoMapStorage.tracksLibrary.entrySet()) {
+                        File file = new File(entry.getKey());
+                        if (file.exists()) {
+                            String ext = FilenameUtils.getExtension(file.getAbsolutePath());
+                            Track track = null;
+                            Map.Entry<Track, StringBuffer> resultTrack = null;
+                            if (ext.equalsIgnoreCase("gpx")) {
+                                resultTrack = GPSController.extractTrackFromGpx(file.getAbsolutePath(), profileSetting);
+                            } else if (ext.equalsIgnoreCase("tcx")) {
+                                resultTrack = GPSController.extractTrackFromTcx(file.getAbsolutePath(), profileSetting);
+                            }
+                            if (resultTrack.getValue().toString().equals("")) {
+                                track = resultTrack.getKey();
+                                if (track != null) {
+                                    //add to map
+                                    trackFileNames.put(track.getName(), track.getFileName());
+                                    //add to opened files map
+                                    if (GeoMapStorage.tracksLibrary == null) {
+                                        GeoMapStorage.tracksLibrary = new HashMap();
+                                    }
+                                    GeoMapStorage.tracksLibrary.put(track.getFileName(), track.getFileName());
+                                    coordinates.add(track.getCoordinates());
+                                    waypoint.add(track.getCoordinatesNewKm());
+                                    tracks.add(track);
+                                    List<WaypointSegment> listWaypoints =
+                                            new ArrayList(track.getCoordinatesNewKm().values());
+                                    waypointsCalculated.add(listWaypoints);
+                                }
+                            } else {
+                                System.out.println("test!");
+                                JOptionPane.showMessageDialog(currentFrame,
+                                        resultTrack.getValue().toString(),
+                                        "Error",
+                                        JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    }
+
+                    //sort tracks by dates
+                    Collections.sort(tracks, new Comparator<Track>() {
+                        public int compare(Track o1, Track o2) {
+                            if (o1.getStartDate() != null && o2.getStartDate() != null) {
+                                return o1.getStartDate().compareTo(o2.getStartDate());
+                            }
+                            return -1;
+                        }
+                    });
+
+                    JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint, true);
+                    JScrollPane detailViewer = new AggregateDetailViewer(tracks, currentFrame);
+                    JScrollPane tableViewer = createTableTracksViewer(tracks);
+
+                    repaintPanels(tableViewer, mapScrollViewer, detailViewer);
+
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+
+            }
+        }.execute();
+
+        /*Thread t = new Thread() {
+            public void run() {
+
+            }
+        };
+        t.start();     */
+
+
 
 
     }
@@ -200,37 +311,45 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
     private void reloadTrackPanels(File file) {
         String ext = FilenameUtils.getExtension(file.getAbsolutePath());
         Track track = null;
+        Map.Entry<Track, StringBuffer> resultTrack = null;
         if (ext.equalsIgnoreCase("gpx")) {
-            track = GPSController.extractTrackFromGpx(file.getAbsolutePath(),profileSetting);
+            resultTrack = GPSController.extractTrackFromGpx(file.getAbsolutePath(), profileSetting);
+        } else if (ext.equalsIgnoreCase("tcx")) {
+            resultTrack = GPSController.extractTrackFromTcx(file.getAbsolutePath(), profileSetting);
         }
-        else if (ext.equalsIgnoreCase("tcx")) {
-            track = GPSController.extractTrackFromTcx(file.getAbsolutePath(),profileSetting);
-        }
-        if (track != null) {
-            //add to map
-            trackFileNames.put(track.getName(), track.getFileName());
-            List<List<Coordinate>> coordinates = new ArrayList();
-            List<Map<String, WaypointSegment>> waypoint = new ArrayList();
-            List<Track> tracks = new ArrayList(1);
-            tracks.add(track);
-            coordinates.add(track.getCoordinates());
-            waypoint.add(track.getCoordinatesNewKm());
-            waypointsCalculated = new ArrayList(1);
-            List<WaypointSegment> listWaypoints = new ArrayList(track.getCoordinatesNewKm().values());
-            waypointsCalculated.add(listWaypoints);
+        if (resultTrack.getValue().toString().equals("")) {
+            track = resultTrack.getKey();
+            if (track != null) {
+                //add to map
+                trackFileNames.put(track.getName(), track.getFileName());
+                List<List<Coordinate>> coordinates = new ArrayList();
+                List<Map<String, WaypointSegment>> waypoint = new ArrayList();
+                List<Track> tracks = new ArrayList(1);
+                tracks.add(track);
+                coordinates.add(track.getCoordinates());
+                waypoint.add(track.getCoordinatesNewKm());
+                waypointsCalculated = new ArrayList(1);
+                List<WaypointSegment> listWaypoints = new ArrayList(track.getCoordinatesNewKm().values());
+                waypointsCalculated.add(listWaypoints);
 
-            JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint);
-            JScrollPane detailViewer = new DetailViewer(track, currentFrame);
-            JScrollPane treeViewer = createTreeTracksViewer(tracks);
+                JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint, false);
+                JScrollPane detailViewer = new DetailViewer(track, currentFrame);
+                JScrollPane treeViewer = createTableTracksViewer(tracks);
 
-            repaintPanels(treeViewer, mapScrollViewer, detailViewer);
+                repaintPanels(treeViewer, mapScrollViewer, detailViewer);
 
+            }
+        } else {
+            JOptionPane.showMessageDialog(currentFrame,
+                    resultTrack.getValue().toString(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
 
     }
 
 
-    private JScrollPane createTreeTracksViewer(List<Track> tracks) {
+    private JScrollPane createTableTracksViewer(List<Track> tracks) {
         JScrollPane panel = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         final TrackTable table = new TrackTable(tracks);
         table.getSelectionModel().addListSelectionListener(
@@ -265,7 +384,8 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
 
     private JScrollPane createMapViewer(
             List<List<Coordinate>> coordinates,
-            List<Map<String, WaypointSegment>> waypoints) {
+            List<Map<String, WaypointSegment>> waypoints,
+            boolean multiple) {
         JScrollPane scrollPanel = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         JPanel panel = new JPanel();
 
@@ -286,7 +406,11 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
         }
 
         JScrollPane pane = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        mapViewer = new MapViewer(resultList, waypoints, 10);
+        if (multiple) {
+            mapViewer = new MapViewer(null, null, 10);
+        } else {
+            mapViewer = new MapViewer(resultList, waypoints, 10);
+        }
         pane.getViewport().add(mapViewer);
         mapViewer.addJMVListener(this);
 
@@ -431,8 +555,6 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
     }
 
     public static void main(String[] args) throws Exception {
-
-
         GeoMapViewer viewer = new GeoMapViewer();
         viewer.setVisible(true);
 

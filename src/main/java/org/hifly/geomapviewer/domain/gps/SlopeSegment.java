@@ -2,6 +2,7 @@ package org.hifly.geomapviewer.domain.gps;
 
 import org.hifly.geomapviewer.utility.TimeUtility;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  * @author
  * @date 03/02/14
  */
-public class SlopeSegment {
+public class SlopeSegment implements Serializable {
     protected double startLatitude;
     protected double endLatitude;
     protected double startLongitude;
@@ -23,9 +24,15 @@ public class SlopeSegment {
     protected double endDistance;
     protected double avgSpeed;
     protected double maximumGradient;
+    //watt
+    protected double power;
+    //m/h
+    protected double vam;
     protected Date startDate;
     protected Date endDate;
-    protected double power;
+    protected String name;
+    protected String description;
+
 
     protected List<Waypoint> waypoints;
 
@@ -163,6 +170,30 @@ public class SlopeSegment {
 
     public void setPower(double power) {
         this.power = power;
+    }
+
+    public double getVam() {
+        return vam;
+    }
+
+    public void setVam(double vam) {
+        this.vam = vam;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String toString() {

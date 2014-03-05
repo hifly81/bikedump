@@ -1,12 +1,13 @@
 package org.hifly.geomapviewer.domain.gps;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author
  * @date 02/02/14
  */
-public class Waypoint {
+public class Waypoint implements Serializable {
 
     private double distance = 0;
     private double gradient = 0;

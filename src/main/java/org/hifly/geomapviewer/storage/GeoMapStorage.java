@@ -1,17 +1,22 @@
 package org.hifly.geomapviewer.storage;
 
+import org.hifly.geomapviewer.domain.gps.SlopeSegment;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author
  * @date 02/02/14
  */
-public class GPSStorage {
+public class GeoMapStorage {
 
     public static Map<String, Double> gpsElevationMap;
+    public static List<SlopeSegment> savedClimbsList;
+    public static Map<String,String> tracksLibrary;
 
     static {
         FileInputStream streamIn = null;
@@ -19,6 +24,11 @@ public class GPSStorage {
             streamIn = new FileInputStream(System.getProperty("user.home")+"/.geomapviewer/storage_coordinates.db");
             ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
             gpsElevationMap = (Map<String, Double>) objectinputstream.readObject();
+
+            //load saved climbs
+            savedClimbsList = ClimbStorage.readSavedClimbs();
+            //load opened tracks
+            tracksLibrary = PrefStorage.readOpenedTracks();
         }
         catch (Exception e) {}
         finally {

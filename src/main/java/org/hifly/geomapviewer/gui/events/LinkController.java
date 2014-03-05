@@ -1,8 +1,11 @@
-package org.hifly.geomapviewer.gui.frame;
+package org.hifly.geomapviewer.gui.events;
 
+import org.hifly.geomapviewer.domain.gps.SlopeSegment;
 import org.hifly.geomapviewer.domain.gps.Waypoint;
 import org.hifly.geomapviewer.graph.WaypointElevationGraph;
 import org.hifly.geomapviewer.graph.WaypointGraph;
+import org.hifly.geomapviewer.gui.panel.GraphViewer;
+import org.hifly.geomapviewer.storage.ClimbStorage;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -25,8 +28,8 @@ import java.util.Map;
 public class LinkController extends MouseAdapter implements MouseMotionListener {
 
     private JFrame currentFrame;
-    protected List<List<Waypoint>> waypoints;
-    protected Map<Integer,List<List<Waypoint>>> trackWaypoints;
+    protected List<SlopeSegment> slopes;
+    protected Map<Integer,List<SlopeSegment>> mapSlopes;
 
     public LinkController(JFrame currentFrame) {
         super();
@@ -47,24 +50,44 @@ public class LinkController extends MouseAdapter implements MouseMotionListener 
                 String href = (String) a.getAttribute(HTML.Attribute.HREF);
                 if (href != null) {
                     try {
+                        SlopeSegment slope = null;
                         //get list of waypoints
                         List<Waypoint> slopeWaypoints = null;
-                        String indexWaypoint = href.substring(href.lastIndexOf("=")+1);
-                        if(trackWaypoints!=null) {
+                        String indexSlope = href.substring(href.lastIndexOf("=")+1);
+                        if(mapSlopes!=null) {
                             int index = href.lastIndexOf("trackIndex=");
                             String trackIndex = href.substring(index+11,index+12);
-                            slopeWaypoints = trackWaypoints.get(Integer.valueOf(trackIndex)).get(Integer.valueOf(indexWaypoint));
+                            slope =  mapSlopes.get(Integer.valueOf(trackIndex)).get(Integer.valueOf(indexSlope));
+                            slopeWaypoints =
+                                    slope.getWaypoints();
                         }
                         else {
+                            slope = slopes.get(Integer.valueOf(indexSlope));
                             //get list of waypoints
-                            slopeWaypoints = waypoints.get(Integer.valueOf(indexWaypoint));
+                            slopeWaypoints = slope.getWaypoints();
                         }
-                        //open graph
-                        WaypointGraph waypointElevationGraph =
-                                new WaypointElevationGraph(slopeWaypoints,true);
-                        GraphViewer graphViewer =
+
+                        if(href.contains("save")) {
+                            String climbName = (String)JOptionPane.showInputDialog(
+                                    currentFrame,
+                                    "Name for the climb",
+                                    "Save Climb",
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    null,
+                                    null,
+                                    "");
+                            //TODO verify climbname
+                            slope.setName(climbName);
+                            ClimbStorage.saveClimb(slope,climbName);
+                        }
+                        else {
+                            //open graph
+                            WaypointGraph waypointElevationGraph =
+                                new WaypointElevationGraph(slopeWaypoints,true,false);
+                            GraphViewer graphViewer =
                                 new GraphViewer(currentFrame,
                                         Arrays.asList(waypointElevationGraph));
+                        }
                     } catch (Exception ev) {
                         System.err.println(ev.getMessage());
                     }
@@ -73,19 +96,19 @@ public class LinkController extends MouseAdapter implements MouseMotionListener 
         }
     }
 
-    public List<List<Waypoint>> getWaypoints() {
-        return waypoints;
+    public List<SlopeSegment> getSlopes() {
+        return slopes;
     }
 
-    public void setWaypoints(List<List<Waypoint>> waypoints) {
-        this.waypoints = waypoints;
+    public void setSlopes(List<SlopeSegment> slopes) {
+        this.slopes = slopes;
     }
 
-    public Map<Integer, List<List<Waypoint>>> getTrackWaypoints() {
-        return trackWaypoints;
+    public Map<Integer, List<SlopeSegment>> getMapSlopes() {
+        return mapSlopes;
     }
 
-    public void setTrackWaypoints(Map<Integer, List<List<Waypoint>>> trackWaypoints) {
-        this.trackWaypoints = trackWaypoints;
+    public void setMapSlopes(Map<Integer, List<SlopeSegment>> mapSlopes) {
+        this.mapSlopes = mapSlopes;
     }
 }

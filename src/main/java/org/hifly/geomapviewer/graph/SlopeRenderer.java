@@ -12,33 +12,37 @@ import java.util.ArrayList;
  */
 public class SlopeRenderer extends XYAreaRenderer2 {
 
-    private XYSeriesCollection dataset;
-    private ArrayList<Color> mapSlopeColor = new ArrayList<Color>();
-    {
-        mapSlopeColor.add(new Color(0, 0, 127));
-        mapSlopeColor.add(new Color(0, 1, 178));
-        mapSlopeColor.add(new Color(0, 77, 233));
-        mapSlopeColor.add(new Color(0, 137, 252));
-        mapSlopeColor.add(new Color(0, 178, 254));
-        mapSlopeColor.add(new Color(0, 233, 232));
-        mapSlopeColor.add(new Color(0, 204, 125));
-        mapSlopeColor.add(new Color(152, 230, 0));
-        mapSlopeColor.add(new Color(254, 252, 0));
-        mapSlopeColor.add(new Color(254, 202, 0));
-        mapSlopeColor.add(new Color(254, 152, 0));
-        mapSlopeColor.add(new Color(254, 0, 0));
-        mapSlopeColor.add(new Color(151, 0, 0));
-        mapSlopeColor.add(new Color(77, 0, 0));
+    private boolean singleColor = false;
+
+    public SlopeRenderer(XYSeriesCollection dataset,boolean singleColor) {
+        this.dataset = dataset;
+        this.singleColor = singleColor;
     }
 
 
+    private XYSeriesCollection dataset;
+    private ArrayList<Color> mapSlopeColor = new ArrayList<Color>();
+    {
+        mapSlopeColor.add(new Color(152, 230, 0));
+        mapSlopeColor.add(new Color(0, 77, 233));
+        mapSlopeColor.add(new Color(254, 252, 0));
+        mapSlopeColor.add(new Color(254, 0, 0));
+        mapSlopeColor.add(new Color(77, 0, 0));
+    }
 
-    public SlopeRenderer(XYSeriesCollection dataset) {
-       this.dataset = dataset;
+    private ArrayList<Color> mapSlopeSingleColor = new ArrayList<Color>();
+
+    {
+        mapSlopeSingleColor.add(new Color(254, 0, 0));
     }
 
 
     public java.awt.Paint getItemPaint(int series, int item) {
+        if(singleColor) {
+            return mapSlopeSingleColor.get(0);
+        }
+
+
         double x1 = dataset.getXValue(series, item);
         double y1 = dataset.getYValue(series, item);
         if (Double.isNaN(y1)) {
@@ -59,8 +63,21 @@ public class SlopeRenderer extends XYAreaRenderer2 {
         double deltaDistance = (x2 - x1) * 1000;
         if (deltaHeight > 0) {
             int colorIndex = (int) (100 * (deltaHeight / deltaDistance));
-            int index = Math.min(colorIndex, mapSlopeColor.size() - 1);
-            result = mapSlopeColor.get(index);
+            if(colorIndex<=4) {
+                result = mapSlopeColor.get(0);
+            }
+            else if(colorIndex>4 && colorIndex<=8) {
+                result = mapSlopeColor.get(1);
+            }
+            else if(colorIndex>8 && colorIndex<=10) {
+                result = mapSlopeColor.get(2);
+            }
+            else if(colorIndex>10 && colorIndex<=15) {
+                result = mapSlopeColor.get(3);
+            }
+            else {
+                result = mapSlopeColor.get(4);
+            }
         }
 
         return result;

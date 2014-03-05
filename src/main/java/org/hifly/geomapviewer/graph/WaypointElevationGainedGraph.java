@@ -43,6 +43,9 @@ public class WaypointElevationGainedGraph extends WaypointGraph {
         TextTitle subtitle1 = new TextTitle("This plot shows the elevation gained (+ or -) for every lap");
         chart.addSubtitle(subtitle1);
 
+        //remove old legends
+        chart.removeLegend();
+
 
         return chart;
     }

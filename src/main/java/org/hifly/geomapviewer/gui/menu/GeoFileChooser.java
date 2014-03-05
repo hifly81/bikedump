@@ -16,7 +16,7 @@ public class GeoFileChooser extends JFileChooser {
     }
 
     private void init() {
-        this.setAcceptAllFileFilterUsed(false);
+        this.setAcceptAllFileFilterUsed(true);
         this.setMultiSelectionEnabled(false);
         FileFilter gpxType = new FileNameExtensionFilter("Gpx files (.gpx)", "gpx");
         FileFilter tcxType = new FileNameExtensionFilter("Tcx files (.tcx)", "tcx");

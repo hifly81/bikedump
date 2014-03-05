@@ -1,4 +1,4 @@
-package org.hifly.geomapviewer.gui.frame;
+package org.hifly.geomapviewer.gui.panel;
 
 import org.hifly.geomapviewer.graph.*;
 import org.hifly.geomapviewer.utility.GUIUtility;
@@ -37,7 +37,7 @@ public class GraphViewer extends JFrame {
 
         rootFrame.setEnabled(false);
 
-        //frame dimension
+        //panel dimension
         dimension = GUIUtility.getScreenDimension();
         setSize(dimension.getKey()-100, dimension.getValue()-100);
         setAlwaysOnTop(true);

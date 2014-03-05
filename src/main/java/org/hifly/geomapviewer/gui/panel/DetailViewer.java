@@ -1,9 +1,9 @@
-package org.hifly.geomapviewer.gui.frame;
+package org.hifly.geomapviewer.gui.panel;
 
 import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.domain.gps.SlopeSegment;
-import org.hifly.geomapviewer.domain.gps.Waypoint;
 import org.hifly.geomapviewer.domain.gps.WaypointSegment;
+import org.hifly.geomapviewer.gui.events.LinkController;
 import org.hifly.geomapviewer.utility.GpsUtility;
 import org.hifly.geomapviewer.utility.TimeUtility;
 
@@ -40,6 +40,7 @@ public class DetailViewer extends JScrollPane {
         textPane.addMouseListener(handler);
 
         String text = "<p><b>" + track.getName() + "</b><br>";
+        text+= "Sport type:"+track.getSportType()+"<br>";
         text += TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss",track.getStartDate()) + "&nbsp &nbsp;" + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getEndDate()) + "<br>";
         Map.Entry<String, String> sunTime = TimeUtility.getSunriseSunsetTime(
                 track.getCoordinates().get(0).getDecimalLatitude(),
@@ -70,7 +71,7 @@ public class DetailViewer extends JScrollPane {
         text += "Min altitude:" + GpsUtility.roundDoubleStat(track.getMinAltitude()) + "<br>";
         text += "Climbing distance:" + GpsUtility.roundDoubleStat(track.getClimbingDistance()) + "<br>";
         text += "Climbing time:" + TimeUtility.toStringFromTimeDiff(track.getClimbingTimeMillis()) + "<br>";
-        text += "Climbing speed:" + track.getClimbingSpeed() + "<br>";
+        text += "Climbing speed:" + GpsUtility.roundDoubleStat(track.getClimbingSpeed()) + "<br>";
         text += "<br><br>";
         WaypointSegment fastest = track.getStatsNewKm().get("Fastest");
         WaypointSegment slowest = track.getStatsNewKm().get("Slowest");
@@ -107,7 +108,7 @@ public class DetailViewer extends JScrollPane {
         text += "Most elevated Lap:" + mostElevated.getKm() + " - " + GpsUtility.roundDoubleStat(mostElevated.getEleGained()) + "<br>";
         text += "Less elevated Lap:" + lessElevated.getKm() + " - " + GpsUtility.roundDoubleStat(lessElevated.getEleGained()) + "<br>";
         text += "<br><br></p><hr>";
-        text += "<p><b>Slopes" + "(" + track.getSlopes().size() + ")</b><br><br>";
+        text += "<p><b>Climbs" + "(" + track.getSlopes().size() + ")</b><br><br>";
 
         //write
         textPane.append(null, text);
@@ -120,15 +121,22 @@ public class DetailViewer extends JScrollPane {
         double totalSlopeGradient = 0;
         double totalAvgSpeed = 0;
         double totalPower = 0;
+        double totalVam = 0;
 
-        List<List<Waypoint>> listWaypoint = new ArrayList();
+        List<SlopeSegment> listSlopes = new ArrayList();
         for (int z=0;z<track.getSlopes().size();z++) {
             SlopeSegment slope = track.getSlopes().get(z);
-            listWaypoint.add(slope.getWaypoints());
+            listSlopes.add(slope);
             try {
                 //TODO change URL format;
                 textPane.addHyperlink(
-                        new URL("http://geomapviewer.com?waypointIndex=" + z), "profile", Color.BLUE);
+                        new URL("http://geomapviewer.com?slopeIndex=" + z), "profile", Color.BLUE);
+                //write
+                text = "&nbsp;";
+                textPane.append(null, text);
+                text = "";
+                textPane.addHyperlink(
+                        new URL("http://geomapviewer.com/save/?slopeIndex=" + z), "save", Color.BLUE);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
@@ -148,6 +156,7 @@ public class DetailViewer extends JScrollPane {
             text += "End elevation km:" + GpsUtility.roundDoubleStat(slope.getEndElevation()) + " m<br>";
             text += "Avg speed:" + GpsUtility.roundDoubleStat(slope.getAvgSpeed()) + " km/h<br>";
             text += "Power:" + GpsUtility.roundDoubleStat(slope.getPower()) + " watt<br>";
+            text += "VAM:" + GpsUtility.roundDoubleStat(slope.getVam()) + " m/h<br>";
             text += "<br><br>";
             //write
             textPane.append(null, text);
@@ -157,11 +166,12 @@ public class DetailViewer extends JScrollPane {
             totalSlopeGradient += slope.getGradient();
             totalAvgSpeed += slope.getAvgSpeed();
             totalPower+= slope.getPower();
+            totalVam+= slope.getVam();
             if(slope.getEndDate()!=null) {
                 totalSlopeDuration += (slope.getEndDate().getTime() - slope.getStartDate().getTime());
             }
         }
-        handler.setWaypoints(listWaypoint);
+        handler.setSlopes(listSlopes);
 
         if (track.getSlopes().size() > 0) {
             text += "Total distance:" + GpsUtility.roundDoubleStat(totalSlopeDistance) + "<br>";
@@ -173,9 +183,10 @@ public class DetailViewer extends JScrollPane {
             text += "Avg gradient:" + GpsUtility.roundDoubleStat(totalSlopeGradient) / track.getSlopes().size() + "<br>";
             text += "Avg speed:" + GpsUtility.roundDoubleStat(totalAvgSpeed) / track.getSlopes().size() + "<br>";
             text += "Avg power:" + GpsUtility.roundDoubleStat(totalPower) / track.getSlopes().size() + "<br>";
+            text += "Avg vam:" + GpsUtility.roundDoubleStat(totalVam) / track.getSlopes().size() + "<br>";
         }
         text += "</p></p><hr>";
-        text += "<p><b>Details for km.</b><br><br>";
+        text += "<p><b>Details for lap</b><br><br>";
         int km = 1;
         for (Map.Entry<String, WaypointSegment> entry : track.getCoordinatesNewKm().entrySet()) {
             text += km + ")<br>";

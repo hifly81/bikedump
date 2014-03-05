@@ -43,8 +43,9 @@ public class WaypointAvgSpeedGraph extends WaypointGraph {
         TextTitle subtitle1 = new TextTitle("This plot shows the average speed in relation with the distance");
         chart.addSubtitle(subtitle1);
 
+        //remove old legends
+        chart.removeLegend();
 
-        // get a reference to the plot for further customisation...
         XYPlot plot = (XYPlot) chart.getPlot();
         XYLineAndShapeRenderer renderer
                 = (XYLineAndShapeRenderer) plot.getRenderer();

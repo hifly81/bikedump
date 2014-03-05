@@ -16,13 +16,22 @@ import java.util.Map;
  */
 public class TimeUtility {
 
-    public static double getTimeDiff(Calendar first, Calendar second) {
+    public static double getTimeDiffHour(Calendar first, Calendar second) {
         if(first==null || second==null) {
             return 0;
         }
         final double millis = second.getTimeInMillis() - first.getTimeInMillis();
         return millis / (60 * 60 * 1000);
     }
+
+    public static double getTimeDiffSecond(Calendar first, Calendar second) {
+        if(first==null || second==null) {
+            return 0;
+        }
+        final double millis = second.getTimeInMillis() - first.getTimeInMillis();
+        return Math.abs(millis / 1000);
+    }
+    
 
     public static String toStringFromTimeDiff(long value) {
         long diffSeconds2 = Math.abs(value / 1000 % 60);

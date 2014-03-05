@@ -1,4 +1,4 @@
-package org.hifly.geomapviewer.gui;
+package org.hifly.geomapviewer.gui.panel;
 
 import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.utility.TimeUtility;
@@ -24,8 +24,7 @@ public class TrackTable extends JTable {
             "Distance",
             "Duration",
             "Average Speed",
-            "Elevation",
-            "Descent"};
+            "Elevation"};
 
     public TrackTable(List<Track> tracks) {
         super();
@@ -50,7 +49,7 @@ public class TrackTable extends JTable {
 
     class TrackTableModel extends AbstractTableModel {
 
-        private String[] columnNames = {"Date","Name","Distance","Duration","Speed","Elevation","Descent"};
+        private String[] columnNames = {"Date","Name","Distance","Duration","Speed","Elevation"};
 
 
         public int getColumnCount() {
@@ -80,19 +79,16 @@ public class TrackTable extends JTable {
                 return track.getName();
             }
             else if(col==2) {
-                return String.format("%.2f", track.getTotalDistance());
+                return String.format("%.2f", Double.isNaN(track.getTotalDistance())?0:track.getTotalDistance());
             }
             else if(col==3) {
                 return TimeUtility.toStringFromTimeDiff(track.getRealTime());
             }
             else if(col==4) {
-                return String.format("%.2f", track.getCalculatedAvgSpeed());
+                return String.format("%.2f", Double.isNaN(track.getCalculatedAvgSpeed())?0:track.getCalculatedAvgSpeed());
             }
             else if(col==5) {
-                return String.format("%.2f", track.getRealElevation());
-            }
-            else if(col==6) {
-                return String.format("%.2f", track.getRealDescent());
+                return String.format("%.2f", Double.isNaN(track.getRealElevation())?0:track.getRealElevation());
             }
 
             return null;

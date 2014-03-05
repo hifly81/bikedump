@@ -1,12 +1,9 @@
-package org.hifly.geomapviewer.gui.frame;
+package org.hifly.geomapviewer.gui.panel;
 
 import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.text.html.HTML;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;

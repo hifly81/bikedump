@@ -1,7 +1,7 @@
 package org.hifly.geomapviewer.gui.marker;
 
 import org.hifly.geomapviewer.domain.gps.WaypointSegment;
-import org.hifly.geomapviewer.gui.MapViewer;
+import org.hifly.geomapviewer.gui.panel.MapViewer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
 
 import java.awt.*;
@@ -31,6 +31,7 @@ public class CircleMarker extends MapMarkerDot  {
     public void paint(Graphics g, Point position, int radio) {
 
 
+
         int size_h = radio;
         int size = size_h * 2;
 
@@ -55,13 +56,15 @@ public class CircleMarker extends MapMarkerDot  {
 
             //add to map
             mapViewer.mapCircleCoordinates.put(String.valueOf(position.x) + "-" + String.valueOf(position.y), this.waypoint);
+            //mapViewer.mapCircleCoordinates.put(String.valueOf(positionX) + "-" + String.valueOf(positionY), this.waypoint);
 
-            //mapViewer.mapCircleCoordinates.put(String.valueOf(position.x) + "-" + String.valueOf(position.y), this.waypoint);
 
 
         }
         g.setColor(getColor());
         g.drawOval(position.x - size_h, position.y - size_h, size, size);
+
+        //mapViewer.mapCircleCoordinates.put(String.valueOf(position.x) + "-" + String.valueOf(position.y), this.waypoint);
 
         if(getLayer()==null||getLayer().isVisibleTexts()) paintText(g, position);
 

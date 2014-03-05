@@ -42,6 +42,9 @@ public class WaypointTimeGraph extends WaypointGraph {
         TextTitle subtitle1 = new TextTitle("This plot shows the time duration of each lap");
         chart.addSubtitle(subtitle1);
 
+        //remove old legends
+        chart.removeLegend();
+
         return chart;
     }
 
@@ -53,7 +56,7 @@ public class WaypointTimeGraph extends WaypointGraph {
         for(List<WaypointSegment> waypoint:waypoints) {
             XYSeries series1 = new XYSeries(index);
             for(WaypointSegment km:waypoint) {
-                series1.add(km.getKm(),km.getTimeIncrement());
+                series1.add(km.getKm(),(km.getTimeIncrement()/1000));
             }
             series.add(series1);
             index++;

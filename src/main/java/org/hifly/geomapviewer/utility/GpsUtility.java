@@ -205,7 +205,7 @@ public class GpsUtility {
                         cal.setTime(waypointSegmentFirst.getTimeSpent());
                         Calendar cal2 = Calendar.getInstance();
                         cal2.setTime(waypoint.getDateRelevation());
-                        waypointSegment.setAvgSpeed(waypoint.getDistanceFromStartingPoint()/TimeUtility.getTimeDiff(cal,cal2));
+                        waypointSegment.setAvgSpeed(waypoint.getDistanceFromStartingPoint()/TimeUtility.getTimeDiffHour(cal, cal2));
                     }
                 }
                 else {
@@ -218,7 +218,7 @@ public class GpsUtility {
                         cal.setTime(waypointSegmentLast.getTimeSpent());
                         Calendar cal2 = Calendar.getInstance();
                         cal2.setTime(waypoint.getDateRelevation());
-                        waypointSegment.setAvgSpeed((waypoint.getDistanceFromStartingPoint()- waypointSegmentLast.getKm())/TimeUtility.getTimeDiff(cal,cal2));
+                        waypointSegment.setAvgSpeed((waypoint.getDistanceFromStartingPoint()- waypointSegmentLast.getKm())/TimeUtility.getTimeDiffHour(cal, cal2));
                     }
                 }
                 mapKm.put(coordinate, waypointSegment);
@@ -238,7 +238,7 @@ public class GpsUtility {
                     cal.setTime(waypointSegmentLast.getTimeSpent());
                     Calendar cal2 = Calendar.getInstance();
                     cal2.setTime(waypoint.getDateRelevation());
-                    waypointSegment.setAvgSpeed((waypoint.getDistanceFromStartingPoint()- waypointSegmentLast.getKm())/TimeUtility.getTimeDiff(cal,cal2));
+                    waypointSegment.setAvgSpeed((waypoint.getDistanceFromStartingPoint()- waypointSegmentLast.getKm())/TimeUtility.getTimeDiffHour(cal, cal2));
                 }
                 mapKm.put(coordinate, waypointSegment);
             }
@@ -303,231 +303,4 @@ public class GpsUtility {
         return mapResult;
     }
 
-    public static List<SlopeSegment> extractSlope(List<Waypoint> waypoints, ProfileSetting profile) {
-        List<SlopeSegment> list = new ArrayList();
-        double accumulatedDistance = 0;
-        double descentDistance = 0;
-        double limitDescent = 1.5;
-        double limitElevation = 1.5;
-        double gradientUp = 2;
-        Waypoint gradientFirst = null;
-        Waypoint gradientLast = null;
-
-        int waypointStartIndex = 0;
-        int waypointEndIndex = 0;
-
-        for (int i=0; i<waypoints.size(); i++) {
-            Waypoint waypoint = waypoints.get(i);
-
-            if (waypoint.getGradient() > 0) {
-                if (accumulatedDistance == 0) {
-                    gradientFirst = waypoint;
-                    waypointStartIndex = i;
-                }
-                else {
-                    if (descentDistance < limitDescent) {
-                        if (accumulatedDistance < descentDistance) {
-                            gradientFirst = waypoint;
-                            waypointStartIndex = i;
-                        }
-                        else {
-                            gradientLast = waypoint;
-                            waypointEndIndex = i;
-                        }
-                    }
-                    else {
-                        if (accumulatedDistance < descentDistance) {
-                            gradientFirst = waypoint;
-                            waypointStartIndex = i;
-                        }
-                    }
-                }
-                accumulatedDistance += waypoint.getDistance();
-
-            }
-            else {
-                descentDistance += waypoint.getDistance();
-                if (descentDistance >= limitDescent && accumulatedDistance < limitElevation) {
-                    accumulatedDistance = 0;
-                    descentDistance = 0;
-                    gradientFirst = null;
-                    gradientLast = null;
-                }
-                if (descentDistance >= limitDescent && accumulatedDistance >= limitElevation) {
-                    //check if a slope can be combined
-                    boolean combined = false;
-                    if(list!=null && !list.isEmpty()) {
-                        SlopeSegment lastSlope = list.get(list.size()-1);
-                        double lastSlopeEndDistance = lastSlope.getEndDistance();
-                        if((gradientFirst.getDistanceFromStartingPoint()-lastSlopeEndDistance) < 1) {
-                            //fix lastSlope
-                            combined = true;
-                            lastSlope.setElevation(lastSlope.getElevation()+(gradientLast.getEle() - gradientFirst.getEle()));
-                            lastSlope.setDistance(lastSlope.getDistance()+(gradientLast.getDistanceFromStartingPoint()-gradientFirst.getDistanceFromStartingPoint()));
-                            lastSlope.setGradient(GpsUtility.gradientPercentage(lastSlope.getElevation(), lastSlope.getDistance()));
-                            lastSlope.setEndLatitude(gradientLast.getLat());
-                            lastSlope.setEndLongitude(gradientLast.getLon());
-                            lastSlope.setEndDate(gradientLast.getDateRelevation());
-                            lastSlope.setEndElevation(gradientLast.getEle());
-                            lastSlope.setEndDistance(gradientLast.getDistanceFromStartingPoint());
-                            //calculate waypoint for slope
-                            List<Waypoint> waypointsTemp = new ArrayList();
-                            for(int z=waypointStartIndex;z<waypointEndIndex;z++) {
-                                waypointsTemp.add(waypoints.get(z));
-                            }
-                            //in case of combined a list of waypoints is already present
-                            List<Waypoint> currentWaypoints = lastSlope.getWaypoints();
-                            currentWaypoints.addAll(waypointsTemp);
-                            lastSlope.setWaypoints(currentWaypoints);
-
-                            Calendar calLast = Calendar.getInstance();
-                            if(gradientLast.getDateRelevation()!=null) {
-                                calLast.setTime(gradientLast.getDateRelevation());
-                            }
-                            Calendar calFirst = Calendar.getInstance();
-                            if(lastSlope.getStartDate()!=null) {
-                                calFirst.setTime(lastSlope.getStartDate());
-                            }
-                            double timeDiffInHour = TimeUtility.getTimeDiff(calLast, calFirst);
-                            double speed = Math.abs(lastSlope.getDistance() / timeDiffInHour);
-                            lastSlope.setAvgSpeed(speed);
-
-                            double power = PowerUtility.calculatePower(
-                                    profile.getWeight(),
-                                    profile.getBikeWeight(),
-                                    lastSlope.getDistance(),
-                                    lastSlope.getGradient(),
-                                    lastSlope.getAvgSpeed()
-                            );
-
-                            lastSlope.setPower(power);
-
-                        }
-                    }
-                    if(!combined) {
-                        createSlope(list, accumulatedDistance, gradientUp, gradientFirst, gradientLast, waypoints, waypointStartIndex, waypointEndIndex, profile);
-                    }
-                    accumulatedDistance = 0;
-                    descentDistance = 0;
-                    gradientFirst = null;
-                    gradientLast = null;
-                }
-            }
-        }
-
-        //last segment
-        if(accumulatedDistance >= limitElevation)  {
-            boolean combined = false;
-            if(list!=null && !list.isEmpty()) {
-                SlopeSegment lastSlope = list.get(list.size()-1);
-                double lastSlopeEndDistance = lastSlope.getEndDistance();
-                if((gradientFirst.getDistanceFromStartingPoint()-lastSlopeEndDistance) < 1) {
-                    //fix lastSlope
-                    combined = true;
-                    lastSlope.setElevation(lastSlope.getElevation()+(gradientLast.getEle() - gradientFirst.getEle()));
-                    lastSlope.setDistance(lastSlope.getDistance()+(gradientLast.getDistanceFromStartingPoint()-gradientFirst.getDistanceFromStartingPoint()));
-                    lastSlope.setGradient(GpsUtility.gradientPercentage(lastSlope.getElevation(), lastSlope.getDistance()));
-                    lastSlope.setEndLatitude(gradientLast.getLat());
-                    lastSlope.setEndLongitude(gradientLast.getLon());
-                    lastSlope.setEndDate(gradientLast.getDateRelevation());
-                    lastSlope.setEndElevation(gradientLast.getEle());
-                    lastSlope.setEndDistance(gradientLast.getDistanceFromStartingPoint());
-                    //calculate waypoint for slope
-                    List<Waypoint> waypointsTemp = new ArrayList();
-                    for(int z=waypointStartIndex;z<waypointEndIndex;z++) {
-                        waypointsTemp.add(waypoints.get(z));
-                    }
-                    //in case of combined a list of waypoints is already present
-                    List<Waypoint> currentWaypoints = lastSlope.getWaypoints();
-                    currentWaypoints.addAll(waypointsTemp);
-                    lastSlope.setWaypoints(currentWaypoints);
-
-                    Calendar calLast = Calendar.getInstance();
-                    calLast.setTime(gradientLast.getDateRelevation());
-                    Calendar calFirst = Calendar.getInstance();
-                    calFirst.setTime(lastSlope.getStartDate());
-                    double timeDiffInHour = TimeUtility.getTimeDiff(calLast, calFirst);
-                    double speed = Math.abs(lastSlope.getDistance() / timeDiffInHour);
-
-                    lastSlope.setAvgSpeed(speed);
-
-                    double power = PowerUtility.calculatePower(
-                            profile.getWeight(),
-                            profile.getBikeWeight(),
-                            lastSlope.getDistance(),
-                            lastSlope.getGradient(),
-                            lastSlope.getAvgSpeed()
-                    );
-
-                    lastSlope.setPower(power);
-
-                }
-            }
-            if(!combined) {
-                createSlope(list, accumulatedDistance, gradientUp, gradientFirst, gradientLast, waypoints, waypointStartIndex, waypointEndIndex, profile);
-            }
-
-        }
-
-        return list;
-    }
-
-    private static void createSlope(
-            List<SlopeSegment> list,
-            double accDistance,
-            double gradientUp,
-            Waypoint gradientFirst,
-            Waypoint gradientLast,
-            List<Waypoint> waypoints,
-            int waypointStartIndex,
-            int waypointEndIndex,
-            ProfileSetting profile) {
-        double gradient = ((gradientLast.getEle() - gradientFirst.getEle()) / (accDistance * 1000)) * 100;
-        if (gradient >= gradientUp) {
-            SlopeSegment slope = new SlopeSegment();
-            double elevation = gradientLast.getEle() - gradientFirst.getEle();
-            Calendar calLast = Calendar.getInstance();
-            if(gradientLast.getDateRelevation()!=null) {
-                calLast.setTime(gradientLast.getDateRelevation());
-            }
-            Calendar calFirst = Calendar.getInstance();
-            if(gradientFirst.getDateRelevation()!=null) {
-                calFirst.setTime(gradientFirst.getDateRelevation());
-            }
-            double timeDiffInHour = TimeUtility.getTimeDiff(calLast, calFirst);
-            double speed = Math.abs(accDistance / timeDiffInHour);
-            slope.setElevation(elevation);
-            slope.setDistance(gradientLast.getDistanceFromStartingPoint() - gradientFirst.getDistanceFromStartingPoint());
-            slope.setGradient(GpsUtility.gradientPercentage(elevation, accDistance));
-            slope.setEndLatitude(gradientLast.getLat());
-            slope.setEndLongitude(gradientLast.getLon());
-            slope.setStartLatitude(gradientFirst.getLat());
-            slope.setStartLongitude(gradientFirst.getLon());
-            slope.setStartDate(gradientFirst.getDateRelevation());
-            slope.setEndDate(gradientLast.getDateRelevation());
-            slope.setStartElevation(gradientFirst.getEle());
-            slope.setEndElevation(gradientLast.getEle());
-            slope.setStartDistance(gradientFirst.getDistanceFromStartingPoint());
-            slope.setEndDistance(gradientLast.getDistanceFromStartingPoint());
-            slope.setAvgSpeed(speed);
-
-            double power = PowerUtility.calculatePower(
-                    profile.getWeight(),
-                    profile.getBikeWeight(),
-                    slope.getDistance(),
-                    slope.getGradient(),
-                    slope.getAvgSpeed()
-            );
-
-            slope.setPower(power);
-
-            //calculate waypoint for slope
-            List<Waypoint> waypointsTemp = new ArrayList();
-            for(int z=waypointStartIndex;z<waypointEndIndex;z++) {
-                waypointsTemp.add(waypoints.get(z));
-            }
-            slope.setWaypoints(waypointsTemp);
-            list.add(slope);
-        }
-    }
 }

@@ -8,7 +8,9 @@ import org.hifly.geomapviewer.gps.GPX10Document;
 import org.hifly.geomapviewer.gps.GPXDocument;
 import org.hifly.geomapviewer.gps.TCX2Document;
 
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author
@@ -17,8 +19,9 @@ import java.util.List;
 public class GPSController {
 
 
-    public static Track extractTrackFromGpx(String filename, ProfileSetting profileSetting) {
+    public static Map.Entry<Track,StringBuffer> extractTrackFromGpx(String filename, ProfileSetting profileSetting) {
         Track track = null;
+        StringBuffer sb = new StringBuffer();
         List<Track> tracks = null;
         GPSDocument doc = null;
 
@@ -26,15 +29,28 @@ public class GPSController {
         try {
             doc = new GPXDocument(profileSetting);
             tracks = doc.extractTrack(filename);
-        } catch (Exception ex) {
+
+        }
+        catch(XmlException xe) {
             //TODO log exception message
-            ex.printStackTrace();
             doc = new GPX10Document(profileSetting);
             try {
                 tracks = doc.extractTrack(filename);
-            } catch (Exception ex2) {
-                ex2.printStackTrace();
             }
+            catch(XmlException xe2) {
+                //TODO log exception message
+                sb.append("["+filename+"] is not a gpx 1.0 or gpx 1.1 file");
+            }
+            catch (Exception ex2) {
+                ex2.printStackTrace();
+                //TODO log exception message
+                sb.append("Can't load ["+filename+"]"+ex2.getMessage());
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            //TODO log exception message
+            sb.append("Can't load ["+filename+"]"+ex.getMessage());
         }
 
 
@@ -42,23 +58,26 @@ public class GPSController {
         if (tracks != null && !tracks.isEmpty()) {
             track = tracks.get(0);
         }
-        return track;
+
+        return new AbstractMap.SimpleImmutableEntry<Track, StringBuffer>(track, sb);
     }
 
-    public static Track extractTrackFromTcx(String filename, ProfileSetting profileSetting) {
+    public static Map.Entry<Track,StringBuffer> extractTrackFromTcx(String filename, ProfileSetting profileSetting) {
         Track track = null;
+        StringBuffer sb = new StringBuffer();
         TCX2Document doc = new TCX2Document(profileSetting);
         List<Track> tracks = null;
         try {
             tracks = doc.extractTrack(filename);
-        } catch (Exception e) {
+        } catch (Exception ex) {
+            ex.printStackTrace();
             //TODO exception --> must be raised till GUI --> dialog popup
-            e.printStackTrace();
+            sb.append("Can't load ["+filename+"]"+ex.getMessage());
         }
         //TODO manage a list of tracks: a single file can contain multiple tracks
         if (tracks != null && !tracks.isEmpty()) {
             track = tracks.get(0);
         }
-        return track;
+        return new AbstractMap.SimpleImmutableEntry<Track, StringBuffer>(track, sb);
     }
 }

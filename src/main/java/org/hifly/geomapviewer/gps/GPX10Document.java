@@ -5,6 +5,7 @@ import org.hifly.geomapviewer.domain.Author;
 import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.utility.GpsUtility;
+import org.hifly.geomapviewer.utility.SlopeUtility;
 import org.hifly.geomapviewer.utility.TimeUtility;
 
 import java.io.File;
@@ -54,9 +55,9 @@ public class GPX10Document extends GPSDocument {
                             last.getTime().getTime();
                         }
                         //add basic gps elements
-                        addGPSElement(currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime);
+                        addGPSElement(currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, totalDistance);
                         //calculate speed between points
-                        double timeDiffInHour = TimeUtility.getTimeDiff(last.getTime(), current.getTime());
+                        double timeDiffInHour = TimeUtility.getTimeDiffHour(last.getTime(), current.getTime());
                         addSpeedElement(currentLat, currentLon, distance, timeDiffInHour);
                     }
                     last = current;
@@ -104,7 +105,7 @@ public class GPX10Document extends GPSDocument {
                 author.setEmail(gpx.getEmail());
         }
         resultTrack.setAuthor(author);
-        resultTrack.setSlopes(GpsUtility.extractSlope(waypoints,profileSetting));
+        resultTrack.setSlopes(SlopeUtility.extractSlope(waypoints,profileSetting));
         resultTrack.setCoordinates(coordinates);
         GpsUtility.GpsStats stats = GpsUtility.extractInfoFromWaypoints(waypoints, totalDistance);
         resultTrack.setCoordinatesNewKm(stats.getWaypointsKm());
