@@ -4,7 +4,7 @@ import org.hifly.geomapviewer.domain.gps.SlopeSegment;
 import org.hifly.geomapviewer.domain.gps.Waypoint;
 import org.hifly.geomapviewer.graph.WaypointElevationGraph;
 import org.hifly.geomapviewer.graph.WaypointGraph;
-import org.hifly.geomapviewer.gui.panel.GraphViewer;
+import org.hifly.geomapviewer.gui.dialog.GraphViewer;
 import org.hifly.geomapviewer.storage.ClimbStorage;
 
 import javax.swing.*;
@@ -25,13 +25,13 @@ import java.util.Map;
  * @author
  * @date 25/02/14
  */
-public class LinkController extends MouseAdapter implements MouseMotionListener {
+public class LinkAdapter extends MouseAdapter implements MouseMotionListener {
 
     private JFrame currentFrame;
     protected List<SlopeSegment> slopes;
     protected Map<Integer,List<SlopeSegment>> mapSlopes;
 
-    public LinkController(JFrame currentFrame) {
+    public LinkAdapter(JFrame currentFrame) {
         super();
         this.currentFrame = currentFrame;
     }

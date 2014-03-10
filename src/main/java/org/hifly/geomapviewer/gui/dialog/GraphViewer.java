@@ -1,4 +1,4 @@
-package org.hifly.geomapviewer.gui.panel;
+package org.hifly.geomapviewer.gui.dialog;
 
 import org.hifly.geomapviewer.graph.*;
 import org.hifly.geomapviewer.utility.GUIUtility;
@@ -16,7 +16,7 @@ import java.util.Map;
  * @author
  * @date 20/02/14
  */
-public class GraphViewer extends JFrame {
+public class GraphViewer extends JDialog {
 
     private Map.Entry<Integer, Integer> dimension;
 

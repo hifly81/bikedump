@@ -3,7 +3,7 @@ package org.hifly.geomapviewer.gui.panel;
 import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.domain.gps.SlopeSegment;
 import org.hifly.geomapviewer.domain.gps.WaypointSegment;
-import org.hifly.geomapviewer.gui.events.LinkController;
+import org.hifly.geomapviewer.gui.events.LinkAdapter;
 import org.hifly.geomapviewer.utility.GpsUtility;
 import org.hifly.geomapviewer.utility.TimeUtility;
 
@@ -36,7 +36,7 @@ public class AggregateDetailViewer extends JScrollPane {
 
     private void createDetailsViewer() {
         HTMLEditorPanel textPane = new HTMLEditorPanel();
-        LinkController handler = new LinkController(currentFrame);
+        LinkAdapter handler = new LinkAdapter(currentFrame);
         textPane.addMouseListener(handler);
 
         double totalDistance = 0;

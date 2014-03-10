@@ -3,7 +3,7 @@ package org.hifly.geomapviewer.gui.menu;
 import org.hifly.geomapviewer.domain.gps.SlopeSegment;
 import org.hifly.geomapviewer.graph.WaypointElevationGraph;
 import org.hifly.geomapviewer.graph.WaypointGraph;
-import org.hifly.geomapviewer.gui.panel.GraphViewer;
+import org.hifly.geomapviewer.gui.dialog.GraphViewer;
 import org.hifly.geomapviewer.storage.GeoMapStorage;
 import org.hifly.geomapviewer.utility.SlopeUtility;
 

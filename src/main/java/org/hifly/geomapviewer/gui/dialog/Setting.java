@@ -1,6 +1,8 @@
 package org.hifly.geomapviewer.gui.dialog;
 
+import org.hifly.geomapviewer.domain.Bike;
 import org.hifly.geomapviewer.domain.ProfileSetting;
+import org.hifly.geomapviewer.storage.GeoMapStorage;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -8,6 +10,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -15,17 +19,21 @@ import java.awt.event.*;
  * @date 27/02/14
  */
 //TODO should allow to define a list of profiles
-public class SettingDialog extends JDialog  {
+public class Setting extends JDialog  {
+     private Setting currentFrame = this;
+     private Frame externalFrame = null;
+     private BikeSelection bikeSelectionDialog;
      private JSpinner spinnerWeight,spinnerHeight,spinnerBikeWeight = null;
      private JComboBox bikeBrandsCombo,bikeTypesCombo = null;
-     private JTextField bikeModelField = null;
+     private JTextField bikeNameField,bikeModelField = null;
      private ProfileSetting profileSetting;
 
 
 
-    public SettingDialog(Frame frame, final ProfileSetting profileSetting) {
+    public Setting(Frame frame, final ProfileSetting profileSetting) {
         super(frame, true);
 
+        this.externalFrame = frame;
         this.profileSetting = profileSetting;
 
         setTitle("Geomapviewer options");
@@ -40,12 +48,8 @@ public class SettingDialog extends JDialog  {
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent we) {
-
-                profileSetting.setWeight((Double)spinnerWeight.getValue());
-                profileSetting.setHeight((Double) spinnerHeight.getValue());
-                profileSetting.setBikeBrand((String)bikeBrandsCombo.getSelectedItem());
-                profileSetting.setBikeType((String) bikeTypesCombo.getSelectedItem());
-                profileSetting.setBikeModel(bikeModelField.getText());
+                //store bikes list in storage
+                GeoMapStorage.savedBikesList = getProfileSetting().getBikes();
             }
         });
 
@@ -88,9 +92,29 @@ public class SettingDialog extends JDialog  {
     public JPanel createBikeSettingPanel() {
         JPanel panel = new JPanel();
 
+        JPanel panel0 = new JPanel();
+        JLabel bikeList = new JLabel();
+        bikeList.setText("<html><a href=\"\">bike list</a></html>");
+        bikeList.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        bikeList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                //define dialogs
+                bikeSelectionDialog = new BikeSelection(externalFrame, getProfileSetting());
+                bikeSelectionDialog.pack();
+                bikeSelectionDialog.setLocationRelativeTo(currentFrame);
+                bikeSelectionDialog.setVisible(true);
+            }
+        });
+        panel0.add(bikeList);
+
         JPanel panel1 = new JPanel();
-        Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "Bike attributes");
+        Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "New Bike definition");
         panel1.setBorder(titleBorder);
+
+        bikeNameField = new JTextField(10);
+        JLabel bikeNameLabel = new JLabel("Name");
+        bikeNameLabel.setLabelFor(bikeNameField);
 
         //TODO load from external source
         String[] bikeBrands = { "Cannondale", "Scott", "Torpado", "Trek", "Wilier" };
@@ -119,6 +143,30 @@ public class SettingDialog extends JDialog  {
         spinnerBikeWeight = new JSpinner(bikeWeightSpinnerModel);
         bikeWeightLabel.setLabelFor(spinnerBikeWeight);
 
+        JButton buttonSave = new JButton("Add");
+        buttonSave.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                profileSetting.setWeight((Double) spinnerWeight.getValue());
+                profileSetting.setHeight((Double) spinnerHeight.getValue());
+                //TODO check if bike already exist
+                List<Bike> bikes = profileSetting.getBikes();
+                if(bikes == null) {
+                    bikes = new ArrayList();
+                }
+                Bike bike = new Bike();
+                bike.setBikeBrand(bikeBrandsCombo.getSelectedItem().toString());
+                bike.setBikeModel(bikeModelField.getText());
+                bike.setBikeName(bikeNameField.getText());
+                bike.setBikeType(bikeTypesCombo.getSelectedItem().toString());
+                bike.setBikeWeight((Double) spinnerBikeWeight.getValue());
+                bikes.add(bike);
+                profileSetting.setBikes(bikes);
+            }
+        });
+
+        panel1.add(bikeNameLabel);
+        panel1.add(bikeNameField);
         panel1.add(bikeBrandsLabel);
         panel1.add(bikeBrandsCombo);
         panel1.add(bikeModelLabel);
@@ -127,8 +175,10 @@ public class SettingDialog extends JDialog  {
         panel1.add(bikeTypesCombo);
         panel1.add(bikeWeightLabel);
         panel1.add(spinnerBikeWeight);
+        panel1.add(buttonSave);
 
         panel.add(panel1);
+        panel.add(panel0);
 
         return panel;
     }
@@ -158,6 +208,14 @@ public class SettingDialog extends JDialog  {
         panel.add(panel1);
 
         return panel;
+    }
+
+    public ProfileSetting getProfileSetting() {
+        return profileSetting;
+    }
+
+    public void setProfileSetting(ProfileSetting profileSetting) {
+        this.profileSetting = profileSetting;
     }
 
     class RadioListener implements ActionListener  {

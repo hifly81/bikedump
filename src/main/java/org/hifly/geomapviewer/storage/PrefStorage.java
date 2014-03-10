@@ -1,5 +1,7 @@
 package org.hifly.geomapviewer.storage;
 
+import org.hifly.geomapviewer.domain.Bike;
+
 import java.io.*;
 import java.util.List;
 import java.util.Map;
@@ -51,5 +53,29 @@ public class PrefStorage {
             }
         }
         return map;
+    }
+
+    public static List<Bike> readSavedBikes() {
+        File file = new File(System.getProperty("user.home") + "/.geomapviewer/preferences/bikes.pref");
+        FileInputStream streamIn = null;
+        List<Bike> bikes = null;
+        if (file != null && file.exists()) {
+            try {
+                streamIn = new FileInputStream(file);
+                ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
+                bikes = (List<Bike>) objectinputstream.readObject();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (streamIn != null) {
+                try {
+                    streamIn.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return bikes;
     }
 }

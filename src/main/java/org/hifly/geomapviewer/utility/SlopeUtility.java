@@ -143,9 +143,12 @@ public class SlopeUtility {
                             double speed = Math.abs(lastSlope.getDistance() / timeDiffInHour);
                             lastSlope.setAvgSpeed(speed);
 
+                            //TODO extarct bike details
+                            double bikeWeight = 9;
+
                             double power = PowerUtility.calculatePower(
                                     profile.getWeight(),
-                                    profile.getBikeWeight(),
+                                    bikeWeight,
                                     lastSlope.getDistance(),
                                     lastSlope.getGradient(),
                                     lastSlope.getAvgSpeed()
@@ -203,9 +206,12 @@ public class SlopeUtility {
 
                     lastSlope.setAvgSpeed(speed);
 
+                    //TODO extarct bike details
+                    double bikeWeight = 9;
+
                     double power = PowerUtility.calculatePower(
                             profile.getWeight(),
-                            profile.getBikeWeight(),
+                            bikeWeight,
                             lastSlope.getDistance(),
                             lastSlope.getGradient(),
                             lastSlope.getAvgSpeed()
@@ -264,9 +270,12 @@ public class SlopeUtility {
             slope.setEndDistance(gradientLast.getDistanceFromStartingPoint());
             slope.setAvgSpeed(speed);
 
+            //TODO extarct bike details
+            double bikeWeight = 9;
+
             double power = PowerUtility.calculatePower(
                     profile.getWeight(),
-                    profile.getBikeWeight(),
+                    bikeWeight,
                     slope.getDistance(),
                     slope.getGradient(),
                     slope.getAvgSpeed()
