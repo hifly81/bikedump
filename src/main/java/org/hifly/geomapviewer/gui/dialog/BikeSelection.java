@@ -21,6 +21,7 @@ import java.util.List;
 public class BikeSelection extends JDialog {
 
     private ProfileSetting profileSetting;
+    private JPanel panelRadio = null;
 
     public BikeSelection(Frame frame, final ProfileSetting profileSetting) {
         super(frame, true);
@@ -40,9 +41,9 @@ public class BikeSelection extends JDialog {
     public JPanel createBikeSelectionPanel() {
         JPanel panel = new JPanel();
 
-        JPanel panel1 = new JPanel();
+        panelRadio = new JPanel();
         Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "Bike list");
-        panel1.setBorder(titleBorder);
+        panelRadio.setBorder(titleBorder);
 
         RadioListener myListener = new RadioListener();
 
@@ -55,24 +56,19 @@ public class BikeSelection extends JDialog {
                 temp.setSelected(bike.isSelected());
                 temp.addActionListener(myListener);
                 group.add(temp);
-                //TODO delete button
+
                 JLabel bikeDelete = new JLabel();
                 bikeDelete.setText("<html><a href=\"\">delete</a></html>");
                 bikeDelete.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                bikeDelete.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                       //TODO delete action
-                    }
-                });
+                bikeDelete.addMouseListener(new BikeDeleteListener(bike));
 
-                panel1.add(temp);
-                panel1.add(bikeDelete);
+                panelRadio.add(temp);
+                panelRadio.add(bikeDelete);
             }
 
         }
 
-        panel.add(panel1);
+        panel.add(panelRadio);
 
         return panel;
     }
@@ -88,6 +84,39 @@ public class BikeSelection extends JDialog {
                 }
             }
 
+        }
+    }
+
+    class BikeDeleteListener extends MouseAdapter{
+        private Bike bike;
+
+        public BikeDeleteListener(Bike bike) {
+            super();
+            this.bike = bike;
+
+        }
+        public void mouseClicked(MouseEvent e) {
+            List<Bike> bikes = profileSetting.getBikes();
+            int bikeIndex = 0;
+            boolean foundBike = false;
+            for(Bike temp:bikes) {
+                if(temp.getBikeName().equalsIgnoreCase(bike.getBikeName())) {
+                    foundBike = true;
+                    break;
+                }
+                bikeIndex++;
+            }
+
+            if(foundBike) {
+                bikes.remove(bikeIndex);
+                panelRadio.remove(bikeIndex);
+                int bikeIndex2 = bikeIndex++;
+                panelRadio.remove(bikeIndex2);
+
+                validate();
+                repaint();
+
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ import java.util.Date;
  * @date 05/02/14
  */
 public class WaypointSegment {
-    //TODO consider even miles; this class must be renamed
+    //TODO consider even miles
     private int km;
     private Date timeSpent;
     private long timeIncrement;

@@ -76,7 +76,7 @@ public class LinkAdapter extends MouseAdapter implements MouseMotionListener {
                                     null,
                                     null,
                                     "");
-                            //TODO verify climbname
+                            //TODO verify climbname and verify if already exist
                             slope.setName(climbName);
                             ClimbStorage.saveClimb(slope,climbName);
                         }

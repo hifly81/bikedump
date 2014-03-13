@@ -23,6 +23,7 @@ import org.hifly.geomapviewer.gui.menu.GeoMapMenu;
 import org.hifly.geomapviewer.gui.menu.GeoToolbar;
 import org.hifly.geomapviewer.storage.GeoMapStorage;
 import org.hifly.geomapviewer.utility.GUIUtility;
+import org.hifly.geomapviewer.utility.TimeUtility;
 import org.openstreetmap.gui.jmapviewer.OsmFileCacheTileLoader;
 import org.openstreetmap.gui.jmapviewer.OsmTileLoader;
 import org.openstreetmap.gui.jmapviewer.events.JMVCommandEvent;
@@ -140,7 +141,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                     Collections.sort(tracks, new Comparator<Track>() {
                         public int compare(Track o1, Track o2) {
                             if (o1.getStartDate() != null && o2.getStartDate() != null) {
-                                return o1.getStartDate().compareTo(o2.getStartDate());
+                                return TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", o1.getStartDate()).compareTo(TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", o2.getStartDate()));
                             }
                             return -1;
                         }
@@ -193,7 +194,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                     Collections.sort(tracks, new Comparator<Track>() {
                         public int compare(Track o1, Track o2) {
                             if (o1.getStartDate() != null && o2.getStartDate() != null) {
-                                return o1.getStartDate().compareTo(o2.getStartDate());
+                                return TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", o1.getStartDate()).compareTo(TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", o2.getStartDate()));
                             }
                             return -1;
                         }
