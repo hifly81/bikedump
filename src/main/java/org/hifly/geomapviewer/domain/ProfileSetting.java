@@ -7,6 +7,7 @@ import java.util.List;
  * @date 27/02/14
  */
 public class ProfileSetting {
+    private String profileName;
     private double weight = 72;
     private double height = 180;
     private String unitSystem;
@@ -42,5 +43,13 @@ public class ProfileSetting {
 
     public void setBikes(List<Bike> bikes) {
         this.bikes = bikes;
+    }
+
+    public String getProfileName() {
+        return profileName;
+    }
+
+    public void setProfileName(String profileName) {
+        this.profileName = profileName;
     }
 }

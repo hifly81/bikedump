@@ -1,6 +1,7 @@
 package org.hifly.geomapviewer.gui.dialog;
 
 import org.hifly.geomapviewer.domain.Bike;
+import org.hifly.geomapviewer.domain.LibrarySetting;
 import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.storage.GeoMapStorage;
 
@@ -19,15 +20,15 @@ import java.util.List;
  * @date 27/02/14
  */
 //TODO should allow to define a list of profiles
-public class Setting extends JDialog  {
-     private Setting currentFrame = this;
-     private Frame externalFrame = null;
-     private BikeSelection bikeSelectionDialog;
-     private JSpinner spinnerWeight,spinnerHeight,spinnerBikeWeight = null;
-     private JComboBox bikeBrandsCombo,bikeTypesCombo = null;
-     private JTextField bikeNameField,bikeModelField = null;
-     private ProfileSetting profileSetting;
-
+public class Setting extends JDialog {
+    private Setting currentFrame = this;
+    private Frame externalFrame = null;
+    private BikeSelection bikeSelectionDialog;
+    private JSpinner spinnerWeight, spinnerHeight, spinnerBikeWeight = null;
+    private JComboBox bikeBrandsCombo, bikeTypesCombo = null;
+    private JTextField bikeNameField, bikeModelField = null;
+    private JCheckBox scanFoldersCheck = null;
+    private ProfileSetting profileSetting;
 
 
     public Setting(Frame frame, final ProfileSetting profileSetting) {
@@ -39,9 +40,10 @@ public class Setting extends JDialog  {
         setTitle("Geomapviewer options");
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("General", null, createGeneralSettingPanel(),"General settings");
-        tabbedPane.addTab("Conversion", null, createConversionSettingPanel(),"Conversion settings");
-        tabbedPane.addTab("Bike", null, createBikeSettingPanel(),"Bike settings");
+        tabbedPane.addTab("General", null, createGeneralSettingPanel(), "General settings");
+        tabbedPane.addTab("Conversion", null, createConversionSettingPanel(), "Conversion settings");
+        tabbedPane.addTab("Library", null, createLibrarySettingPanel(), "Library settings");
+        tabbedPane.addTab("Bike", null, createBikeSettingPanel(), "Bike settings");
 
         setContentPane(tabbedPane);
 
@@ -89,6 +91,24 @@ public class Setting extends JDialog  {
         return panel;
     }
 
+    public JPanel createLibrarySettingPanel() {
+        JPanel panel = new JPanel();
+
+        JPanel panel1 = new JPanel();
+        Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "Library");
+        panel1.setBorder(titleBorder);
+
+        scanFoldersCheck = new JCheckBox("Scan imported folders");
+        scanFoldersCheck.addItemListener(new CheckListener());
+        scanFoldersCheck.setSelected(GeoMapStorage.librarySetting==null?false:GeoMapStorage.librarySetting.isScanFolder());
+
+        panel1.add(scanFoldersCheck);
+
+        panel.add(panel1);
+
+        return panel;
+    }
+
     public JPanel createBikeSettingPanel() {
         JPanel panel = new JPanel();
 
@@ -117,7 +137,7 @@ public class Setting extends JDialog  {
         bikeNameLabel.setLabelFor(bikeNameField);
 
         //TODO load from external source
-        String[] bikeBrands = { "Cannondale", "Scott", "Torpado", "Trek", "Wilier" };
+        String[] bikeBrands = {"Cannondale", "Scott", "Torpado", "Trek", "Wilier"};
         bikeBrandsCombo = new JComboBox(bikeBrands);
         bikeBrandsCombo.setSelectedIndex(0);
         JLabel bikeBrandsLabel = new JLabel("Brand");
@@ -128,7 +148,7 @@ public class Setting extends JDialog  {
         bikeModelLabel.setLabelFor(bikeModelField);
 
         //TODO load from external source
-        String[] bikeTypes = { "BMX", "City", "Cross", "Downhill", "Electric", "Enduro", "MTB", "Road" };
+        String[] bikeTypes = {"BMX", "City", "Cross", "Downhill", "Electric", "Enduro", "MTB", "Road"};
         bikeTypesCombo = new JComboBox(bikeTypes);
         bikeTypesCombo.setSelectedIndex(0);
         JLabel bikeTypesLabel = new JLabel("Type");
@@ -151,7 +171,7 @@ public class Setting extends JDialog  {
                 profileSetting.setHeight((Double) spinnerHeight.getValue());
                 //TODO check if bike already exist
                 List<Bike> bikes = profileSetting.getBikes();
-                if(bikes == null) {
+                if (bikes == null) {
                     bikes = new ArrayList();
                 }
                 Bike bike = new Bike();
@@ -218,9 +238,30 @@ public class Setting extends JDialog  {
         this.profileSetting = profileSetting;
     }
 
-    class RadioListener implements ActionListener  {
+
+
+    class RadioListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             profileSetting.setUnitSystem(e.getActionCommand());
+
+        }
+    }
+
+    class CheckListener implements ItemListener {
+
+        public void itemStateChanged(ItemEvent e) {
+            Object source = e.getItemSelectable();
+
+            if (source == scanFoldersCheck) {
+                if(GeoMapStorage.librarySetting==null) {
+                    GeoMapStorage.librarySetting = new LibrarySetting();
+                }
+                if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    GeoMapStorage.librarySetting.setScanFolder(false);
+                } else {
+                    GeoMapStorage.librarySetting.setScanFolder(true);
+                }
+            }
 
         }
     }

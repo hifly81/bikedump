@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.hifly.geomapviewer.controller.GPSController;
 import org.hifly.geomapviewer.domain.Bike;
+import org.hifly.geomapviewer.domain.LibrarySetting;
 import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.domain.gps.Coordinate;
@@ -54,14 +55,16 @@ import java.util.List;
 public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
 
     private ProfileSetting profileSetting = new ProfileSetting();
+    private Setting settingDialog = null;
     private GeoMapViewer currentFrame = this;
-    private Setting settingDialog;
     protected MapViewer mapViewer;
     private JSplitPane mainPanel = new JSplitPane();
     private JLabel zoomLabel, zoomValue, measureLabel, measureValue;
     private Map.Entry<Integer, Integer> dimension;
     private List<List<WaypointSegment>> waypointsCalculated;
     private final Map<String, String> trackFileNames = new HashMap();
+    private JScrollPane folderMapScrollViewer,folderDetailViewer,folderTableViewer;
+
 
 
     public GeoMapViewer() {
@@ -74,10 +77,12 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
         //exit behaviour
         addWindowListener(new PanelWindowAdapter());
 
+        //saved pref
         List<Bike> bikes = GeoMapStorage.savedBikesList;
         if (bikes != null && !bikes.isEmpty()) {
             profileSetting.setBikes(bikes);
         }
+
 
         //define dialogs
         settingDialog = new Setting(currentFrame, profileSetting);
@@ -95,6 +100,14 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                 GraphViewer graphViewer =
                         new GraphViewer(currentFrame,
                                 Arrays.asList(waypointElevationGraph, waypointAvgSpeedGraph, waypointTimeGraph, waypointElevationGainedGraph));
+            }
+        });
+        toolBar.getBackButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                 if(folderDetailViewer!=null && folderMapScrollViewer!=null && folderTableViewer!=null) {
+                     repaintPanels(folderTableViewer, folderMapScrollViewer, folderDetailViewer);
+                 }
             }
         });
         add(toolBar, BorderLayout.PAGE_START);
@@ -147,11 +160,33 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                         }
                     });
 
+                    //add dir to library
+                    if(GeoMapStorage.librarySetting==null) {
+                        GeoMapStorage.librarySetting = new LibrarySetting();
+                    }
+                    if(GeoMapStorage.librarySetting.getScannedDirs()==null) {
+                        GeoMapStorage.librarySetting.setScannedDirs(new ArrayList<String>());
+                    }
+                    boolean foundDir = false;
+                    for(String dir:GeoMapStorage.librarySetting.getScannedDirs()) {
+                        if(dir.equalsIgnoreCase(directory.getAbsolutePath())) {
+                            foundDir = true;
+                            break;
+                        }
+                    }
+                    if(!foundDir) {
+                        GeoMapStorage.librarySetting.getScannedDirs().add(directory.getAbsolutePath());
+                    }
+
                     JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint, true);
                     JScrollPane detailViewer = new AggregateDetailViewer(tracks, currentFrame);
                     JScrollPane tableViewer = createTableTracksViewer(tracks);
 
                     repaintPanels(tableViewer, mapScrollViewer, detailViewer);
+
+                    folderMapScrollViewer = mapScrollViewer;
+                    folderDetailViewer = detailViewer;
+                    folderTableViewer = tableViewer;
                 }
             }
         });
@@ -190,6 +225,21 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                         addTrackToCache(coordinates, waypoint, tracks, file);
                     }
 
+                    //check new file
+                    if(GeoMapStorage.librarySetting!=null && GeoMapStorage.librarySetting.isScanFolder()) {
+                        if(GeoMapStorage.librarySetting.getScannedDirs()!=null && !GeoMapStorage.librarySetting.getScannedDirs().isEmpty()) {
+                            for(String directory:GeoMapStorage.librarySetting.getScannedDirs()) {
+                                Collection files = FileUtils.listFiles(new File(directory), null, true);
+                                for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {
+                                    File file = (File) iterator.next();
+                                    if(GeoMapStorage.tracksLibrary.get(file.getAbsolutePath())==null) {
+                                        addTrackToCache(coordinates, waypoint, tracks, file);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     //sort tracks by dates
                     Collections.sort(tracks, new Comparator<Track>() {
                         public int compare(Track o1, Track o2) {
@@ -205,6 +255,10 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                     JScrollPane tableViewer = createTableTracksViewer(tracks);
 
                     repaintPanels(tableViewer, mapScrollViewer, detailViewer);
+
+                    folderMapScrollViewer = mapScrollViewer;
+                    folderDetailViewer = detailViewer;
+                    folderTableViewer = tableViewer;
 
                 }
                 return null;

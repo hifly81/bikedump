@@ -44,13 +44,13 @@ public class GPSController {
             catch (Exception ex2) {
                 ex2.printStackTrace();
                 //TODO log exception message
-                sb.append("Can't load ["+filename+"]"+ex2.getMessage());
+                sb.append("Can't load ["+filename+"]");
             }
         }
         catch (Exception ex) {
             ex.printStackTrace();
             //TODO log exception message
-            sb.append("Can't load ["+filename+"]"+ex.getMessage());
+            sb.append("Can't load ["+filename+"]");
         }
 
 
@@ -72,7 +72,7 @@ public class GPSController {
         } catch (Exception ex) {
             ex.printStackTrace();
             //TODO exception --> must be raised till GUI --> dialog popup
-            sb.append("Can't load ["+filename+"]"+ex.getMessage());
+            sb.append("Can't load ["+filename+"]");
         }
         //TODO manage a list of tracks: a single file can contain multiple tracks
         if (tracks != null && !tracks.isEmpty()) {

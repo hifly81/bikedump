@@ -8,8 +8,10 @@ import javax.swing.*;
  */
 public class GeoToolbar extends JToolBar {
 
+    protected JButton backButton;
     protected JButton graphButton;
     protected JButton reportButton;
+
 
     public GeoToolbar() {
         super();
@@ -18,8 +20,10 @@ public class GeoToolbar extends JToolBar {
     }
 
     protected void addButtons() {
+        backButton = makeNavigationButton("Back", "Back","Back","Back");
         graphButton = makeNavigationButton("Graph", "Graph","Graph","Graph");
         reportButton = makeNavigationButton("Report", "Report","Report","Report");
+        add(backButton);
         add(graphButton);
         add(reportButton);
 
@@ -52,5 +56,13 @@ public class GeoToolbar extends JToolBar {
 
     public void setReportButton(JButton reportButton) {
         this.reportButton = reportButton;
+    }
+
+    public JButton getBackButton() {
+        return backButton;
+    }
+
+    public void setBackButton(JButton backButton) {
+        this.backButton = backButton;
     }
 }

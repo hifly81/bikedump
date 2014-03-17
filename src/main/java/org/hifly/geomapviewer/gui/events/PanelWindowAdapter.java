@@ -21,6 +21,9 @@ public class PanelWindowAdapter extends WindowAdapter {
         if(GeoMapStorage.savedBikesList!=null) {
             PrefStorage.savePref(GeoMapStorage.savedBikesList, "bikes");
         }
+        if(GeoMapStorage.librarySetting!=null) {
+            PrefStorage.savePref(GeoMapStorage.librarySetting, "library");
+        }
         System.exit(0);
     }
 

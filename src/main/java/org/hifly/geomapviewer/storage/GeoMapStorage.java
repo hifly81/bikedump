@@ -1,6 +1,7 @@
 package org.hifly.geomapviewer.storage;
 
 import org.hifly.geomapviewer.domain.Bike;
+import org.hifly.geomapviewer.domain.LibrarySetting;
 import org.hifly.geomapviewer.domain.gps.SlopeSegment;
 
 import java.io.FileInputStream;
@@ -19,6 +20,7 @@ public class GeoMapStorage {
     public static List<SlopeSegment> savedClimbsList;
     public static Map<String,String> tracksLibrary;
     public static List<Bike> savedBikesList;
+    public static LibrarySetting librarySetting;
 
     static {
         FileInputStream streamIn = null;
@@ -33,6 +35,8 @@ public class GeoMapStorage {
             tracksLibrary = PrefStorage.readOpenedTracks();
             //load saved bikes
             savedBikesList = PrefStorage.readSavedBikes();
+            //load saved library
+            librarySetting = PrefStorage.readLibrarySetting();
         }
         catch (Exception e) {}
         finally {

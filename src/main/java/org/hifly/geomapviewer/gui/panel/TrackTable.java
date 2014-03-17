@@ -34,6 +34,7 @@ public class TrackTable extends JTable {
         setAutoCreateRowSorter(true);
         setRowSelectionAllowed(true);
         setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        setFont(new Font("Arial", Font.PLAIN, 10));
     }
 
     protected JTableHeader createDefaultTableHeader() {
