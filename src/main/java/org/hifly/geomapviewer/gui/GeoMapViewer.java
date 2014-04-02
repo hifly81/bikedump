@@ -240,15 +240,6 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                         }
                     }
 
-                    //sort tracks by dates
-                    Collections.sort(tracks, new Comparator<Track>() {
-                        public int compare(Track o1, Track o2) {
-                            if (o1.getStartDate() != null && o2.getStartDate() != null) {
-                                return TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", o1.getStartDate()).compareTo(TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", o2.getStartDate()));
-                            }
-                            return -1;
-                        }
-                    });
 
                     JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint, true);
                     JScrollPane detailViewer = new AggregateDetailViewer(tracks, currentFrame);

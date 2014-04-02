@@ -116,7 +116,7 @@ public class GeoMapMenu extends JMenuBar {
         climbsItem4.setToolTipText("10% - 15%");
         addSavedClimbs(savedClimbs, climbsItem4);
 
-        JMenu climbsItem5 = new JMenu("10% - 15%");
+        JMenu climbsItem5 = new JMenu(">15%");
         climbsItem5.setToolTipText(">15%");
         addSavedClimbs(savedClimbs, climbsItem5);
 

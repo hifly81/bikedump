@@ -280,11 +280,6 @@ public class AggregateDetailViewer extends JScrollPane {
                     //TODO change URL format;
                     textPane.addHyperlink(
                             new URL("http://geomapviewer.com?trackIndex=" + k + "&slopeIndex=" + z), "profile", Color.BLUE);
-
-                    //write
-                    text = "&nbsp;";
-                    textPane.append(null, text);
-                    text = "";
                     textPane.addHyperlink(
                             new URL("http://geomapviewer.com/slope?trackIndex=" + k + "&slopeIndex=" + z), "save", Color.BLUE);
 

@@ -51,6 +51,12 @@ public class TimeUtility {
         return df.format(date);
     }
 
+    public static Date convertToDate(String format,String date) throws Exception {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        Date convertedDate = dateFormat.parse(date);
+        return convertedDate;
+    }
+
     public static Map.Entry<String,String> getSunriseSunsetTime(
             double lat, double lon, Date date) {
         if(date == null) {

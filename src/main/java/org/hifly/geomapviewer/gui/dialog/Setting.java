@@ -119,11 +119,19 @@ public class Setting extends JDialog {
         bikeList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                //define dialogs
-                bikeSelectionDialog = new BikeSelection(externalFrame, getProfileSetting());
-                bikeSelectionDialog.pack();
-                bikeSelectionDialog.setLocationRelativeTo(currentFrame);
-                bikeSelectionDialog.setVisible(true);
+                if(profileSetting.getBikes()==null || profileSetting.getBikes().isEmpty()) {
+                    JOptionPane.showMessageDialog(currentFrame,
+                            "No bikes",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+                else {
+                    //define dialogs
+                    bikeSelectionDialog = new BikeSelection(externalFrame, getProfileSetting());
+                    bikeSelectionDialog.pack();
+                    bikeSelectionDialog.setLocationRelativeTo(currentFrame);
+                    bikeSelectionDialog.setVisible(true);
+                }
             }
         });
         panel0.add(bikeList);
