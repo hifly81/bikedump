@@ -14,6 +14,7 @@ import org.hifly.geomapviewer.graph.WaypointElevationGainedGraph;
 import org.hifly.geomapviewer.graph.WaypointElevationGraph;
 import org.hifly.geomapviewer.graph.WaypointTimeGraph;
 import org.hifly.geomapviewer.gui.dialog.GraphViewer;
+import org.hifly.geomapviewer.gui.dialog.ScrollableDialog;
 import org.hifly.geomapviewer.gui.dialog.Setting;
 import org.hifly.geomapviewer.gui.dialog.TipOfTheDay;
 import org.hifly.geomapviewer.gui.events.PanelWindowAdapter;
@@ -63,8 +64,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
     private Map.Entry<Integer, Integer> dimension;
     private List<List<WaypointSegment>> waypointsCalculated;
     private final Map<String, String> trackFileNames = new HashMap();
-    private JScrollPane folderMapScrollViewer,folderDetailViewer,folderTableViewer;
-
+    private JScrollPane folderMapScrollViewer, folderDetailViewer, folderTableViewer;
 
 
     public GeoMapViewer() {
@@ -105,9 +105,9 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
         toolBar.getBackButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                 if(folderDetailViewer!=null && folderMapScrollViewer!=null && folderTableViewer!=null) {
-                     repaintPanels(folderTableViewer, folderMapScrollViewer, folderDetailViewer);
-                 }
+                if (folderDetailViewer != null && folderMapScrollViewer != null && folderTableViewer != null) {
+                    repaintPanels(folderTableViewer, folderMapScrollViewer, folderDetailViewer);
+                }
             }
         });
         add(toolBar, BorderLayout.PAGE_START);
@@ -145,9 +145,14 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                         waypointsCalculated = new ArrayList();
                     }
                     List<Track> tracks = new ArrayList();
+                    StringBuffer sb = new StringBuffer();
                     for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {
                         File file = (File) iterator.next();
-                        addTrackToCache(coordinates, waypoint, tracks, file);
+                        addTrackToCache(coordinates, waypoint, tracks, file, sb);
+                    }
+                    if (sb.length() > 0) {
+                        ScrollableDialog dialog = new ScrollableDialog(null, sb.toString(),dimension.getKey()/2,dimension.getValue()/2);
+                        dialog.showMessage();
                     }
 
                     //sort tracks by dates
@@ -161,20 +166,20 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                     });
 
                     //add dir to library
-                    if(GeoMapStorage.librarySetting==null) {
+                    if (GeoMapStorage.librarySetting == null) {
                         GeoMapStorage.librarySetting = new LibrarySetting();
                     }
-                    if(GeoMapStorage.librarySetting.getScannedDirs()==null) {
+                    if (GeoMapStorage.librarySetting.getScannedDirs() == null) {
                         GeoMapStorage.librarySetting.setScannedDirs(new ArrayList<String>());
                     }
                     boolean foundDir = false;
-                    for(String dir:GeoMapStorage.librarySetting.getScannedDirs()) {
-                        if(dir.equalsIgnoreCase(directory.getAbsolutePath())) {
+                    for (String dir : GeoMapStorage.librarySetting.getScannedDirs()) {
+                        if (dir.equalsIgnoreCase(directory.getAbsolutePath())) {
                             foundDir = true;
                             break;
                         }
                     }
-                    if(!foundDir) {
+                    if (!foundDir) {
                         GeoMapStorage.librarySetting.getScannedDirs().add(directory.getAbsolutePath());
                     }
 
@@ -208,9 +213,10 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
 
         new SwingWorker<Void, String>() {
             final JLabel label = new JLabel("Loading... ", JLabel.CENTER);
+
             @Override
             protected Void doInBackground() throws Exception {
-                add(label,BorderLayout.CENTER);
+                add(label, BorderLayout.CENTER);
                 label.setVisible(true);
                 //load saved elements
                 if (GeoMapStorage.tracksLibrary != null) {
@@ -220,24 +226,30 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                         waypointsCalculated = new ArrayList();
                     }
                     List<Track> tracks = new ArrayList();
+                    StringBuffer sb = new StringBuffer();
                     for (Map.Entry<String, String> entry : GeoMapStorage.tracksLibrary.entrySet()) {
                         File file = new File(entry.getKey());
-                        addTrackToCache(coordinates, waypoint, tracks, file);
+                        addTrackToCache(coordinates, waypoint, tracks, file, sb);
                     }
 
                     //check new file
-                    if(GeoMapStorage.librarySetting!=null && GeoMapStorage.librarySetting.isScanFolder()) {
-                        if(GeoMapStorage.librarySetting.getScannedDirs()!=null && !GeoMapStorage.librarySetting.getScannedDirs().isEmpty()) {
-                            for(String directory:GeoMapStorage.librarySetting.getScannedDirs()) {
+                    if (GeoMapStorage.librarySetting != null && GeoMapStorage.librarySetting.isScanFolder()) {
+                        if (GeoMapStorage.librarySetting.getScannedDirs() != null && !GeoMapStorage.librarySetting.getScannedDirs().isEmpty()) {
+                            for (String directory : GeoMapStorage.librarySetting.getScannedDirs()) {
                                 Collection files = FileUtils.listFiles(new File(directory), null, true);
                                 for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {
                                     File file = (File) iterator.next();
-                                    if(GeoMapStorage.tracksLibrary.get(file.getAbsolutePath())==null) {
-                                        addTrackToCache(coordinates, waypoint, tracks, file);
+                                    if (GeoMapStorage.tracksLibrary.get(file.getAbsolutePath()) == null) {
+                                        addTrackToCache(coordinates, waypoint, tracks, file, sb);
                                     }
                                 }
                             }
                         }
+                    }
+
+                    if (sb.length() > 0) {
+                        ScrollableDialog dialog = new ScrollableDialog(null, sb.toString(),dimension.getKey()/2,dimension.getValue()/2);
+                        dialog.showMessage();
                     }
 
 
@@ -336,17 +348,21 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
             List<List<Coordinate>> coordinates,
             List<Map<String, WaypointSegment>> waypoint,
             List<Track> tracks,
-            File file) {
+            File file,
+            StringBuffer sb) {
         if (file.exists()) {
             String ext = FilenameUtils.getExtension(file.getAbsolutePath());
             Track track = null;
             Map.Entry<Track, StringBuffer> resultTrack = null;
+            //TODO check not based on extension
             if (ext.equalsIgnoreCase("gpx")) {
                 resultTrack = GPSController.extractTrackFromGpx(file.getAbsolutePath(), profileSetting);
             } else if (ext.equalsIgnoreCase("tcx")) {
                 resultTrack = GPSController.extractTrackFromTcx(file.getAbsolutePath(), profileSetting);
+            } else {
+                return;
             }
-            if (resultTrack.getValue().toString().equals("")) {
+            if (resultTrack != null && resultTrack.getValue().toString().equals("")) {
                 track = resultTrack.getKey();
                 if (track != null) {
                     //add to map
@@ -364,10 +380,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                     waypointsCalculated.add(listWaypoints);
                 }
             } else {
-                JOptionPane.showMessageDialog(currentFrame,
-                        resultTrack.getValue().toString(),
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                sb.append(resultTrack.getValue().toString() + "\n");
             }
         }
     }

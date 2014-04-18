@@ -3,8 +3,10 @@ package org.hifly.geomapviewer.gui.panel;
 import org.hifly.geomapviewer.domain.gps.WaypointSegment;
 import org.hifly.geomapviewer.gui.marker.CircleMarker;
 import org.hifly.geomapviewer.gui.marker.LineMarker;
+import org.hifly.geomapviewer.gui.marker.TooltipMarker;
 import org.hifly.geomapviewer.storage.GeoMapStorage;
 import org.hifly.geomapviewer.utility.GpsUtility;
+import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
 import org.openstreetmap.gui.jmapviewer.interfaces.ICoordinate;
@@ -14,10 +16,8 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author
@@ -26,7 +26,9 @@ import java.util.Map;
 public class MapViewer extends JMapViewer implements MouseListener {
     protected Logger log = LoggerFactory.getLogger(MapViewer.class);
 
-    public Map<String, WaypointSegment> mapCircleCoordinates = new HashMap();
+    public Map<String,WaypointSegment>  mapCircleCoordinates = new Hashtable<>();
+    public TooltipMarker lastOpenedMarker = null;
+
 
     public MapViewer(
             List<List<ICoordinate>> coordinates,
@@ -125,6 +127,7 @@ public class MapViewer extends JMapViewer implements MouseListener {
                                 waypoint,
                                 this);
                         addMapMarker(c);
+                        mapCircleCoordinates.put(listCoordinates.get(i).getLat()+"-"+listCoordinates.get(i).getLon(),waypoint);
                     }
                 }
                 indexMap++;
@@ -154,46 +157,39 @@ public class MapViewer extends JMapViewer implements MouseListener {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    //TODO define a method for method clicked
     @Override
     public void mouseClicked(MouseEvent me) {
+        Coordinate position = getPosition(me.getPoint());
 
-
-
-        //abs position of screen
-        int screenX = me.getXOnScreen();
-        int screenY = me.getYOnScreen();
-
-        //relative pos of screen
-        //int screenX =(int)me.getPoint().getX();
-        //int screenY = (int)me.getPoint().getY();
-
-
-        System.out.println(screenX + "-" + screenY);
-        System.out.println(me.getPoint().getX() + "-" + me.getPoint().getY());
-
-        WaypointSegment waypoint = this.mapCircleCoordinates.get(screenX + "-" + screenY);
-        if (waypoint != null) {
-            System.out.println("found screen(X,Y) for marker:" + waypoint.getKm() + " -->" + screenX + "," + screenY);
-        } else {
-            int distance = 10000;
-            WaypointSegment found = null;
-            //find nearest
-            for (Map.Entry<String, WaypointSegment> entry : this.mapCircleCoordinates.entrySet()) {
-                int diffx = screenX;
-                int diffy = screenY;
-                int diff = diffx + diffy;
-
-                if(Math.min(diff,distance)==diff)
- {
-                    distance = diff;
-                    found = entry.getValue();
-                }
-
+        WaypointSegment waypoint = this.mapCircleCoordinates.get(position.getLat() + "-" + position.getLon());
+        if(waypoint == null) {
+            double distance = 1111111111;
+            for (Map.Entry<String, WaypointSegment> entry : mapCircleCoordinates.entrySet()) {
+                    double lat = Math.abs(position.getLat()-Double.valueOf(entry.getKey().split("-")[0]));
+                    double lon = Math.abs(position.getLon()-Double.valueOf(entry.getKey().split("-")[1]));
+                    double tot = lat+lon;
+                    if(tot<distance) {
+                        distance = tot;
+                        waypoint = entry.getValue();
+                    }
             }
-
-            System.out.println("found approx screen(X,Y) for marker:" + found.getKm() + " -->" + screenX + "," + screenY);
         }
+
+        System.out.println("found marker:" + waypoint.getKm());
+
+        if(lastOpenedMarker!=null) {
+           removeMapMarker(lastOpenedMarker);
+        }
+
+        TooltipMarker t = new TooltipMarker(
+                position.getLat(),
+                position.getLon(),
+                me.getPoint().getX(),
+                me.getPoint().getY(),
+                waypoint,
+                this);
+        addMapMarker(t);
+        lastOpenedMarker = t;
 
 
     }

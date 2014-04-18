@@ -1,6 +1,8 @@
 package org.hifly.geomapviewer.gui.menu;
 
 import javax.swing.*;
+import java.awt.*;
+import java.net.URL;
 
 /**
  * @author
@@ -20,23 +22,46 @@ public class GeoToolbar extends JToolBar {
     }
 
     protected void addButtons() {
-        backButton = makeNavigationButton("Back", "Back","Back","Back");
-        graphButton = makeNavigationButton("Graph", "Graph","Graph","Graph");
-        reportButton = makeNavigationButton("Report", "Report","Report","Report");
+        URL backImageUrl = getClass().getResource("/img/back.png");
+        ImageIcon backImageIcon = new ImageIcon(backImageUrl);
+        Image img = backImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        backImageIcon = new ImageIcon(img);
+        backButton = makeNavigationButton("Back","Back","Back",backImageIcon);
+        URL graphImageUrl = getClass().getResource("/img/bar-chart-icon.png");
+        ImageIcon graphImageIcon = new ImageIcon(graphImageUrl);
+        img = graphImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        graphImageIcon = new ImageIcon(img);
+        graphButton = makeNavigationButton("Graph","Graph","Graph",graphImageIcon);
+        URL reportImageUrl = getClass().getResource("/img/report.png");
+        ImageIcon reportImageIcon = new ImageIcon(reportImageUrl);
+        img = reportImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        reportImageIcon = new ImageIcon(img);
+        reportButton = makeNavigationButton("Report","Report","Report",reportImageIcon);
         add(backButton);
         add(graphButton);
         add(reportButton);
 
     }
 
-    protected JButton makeNavigationButton(String imageName,
+    protected JButton makeNavigationButton(
                                            String actionCommand,
                                            String toolTipText,
-                                           String altText) {
-        JButton button = new JButton();
+                                           String altText,
+                                           ImageIcon icon) {
+        JButton button = null;
+        if(icon!=null) {
+            button = new JButton(icon);
+        }
+        else {
+            button = new JButton();
+            button.setText(altText);
+        }
         button.setActionCommand(actionCommand);
         button.setToolTipText(toolTipText);
-        button.setText(altText);
+
 
         return button;
 

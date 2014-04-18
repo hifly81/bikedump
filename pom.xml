@@ -46,6 +46,16 @@
             <version>1.0</version>
         </dependency>
         <dependency>
+            <groupId>com.google.earth.kml</groupId>
+            <artifactId>x21</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.opengis.kml</groupId>
+            <artifactId>x22</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.openstreetmap.gui.jmapviewer</groupId>
             <artifactId>jmapviewer</artifactId>
             <version>1.0.2</version>

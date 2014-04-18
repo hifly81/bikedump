@@ -54,10 +54,6 @@ public class CircleMarker extends MapMarkerDot  {
             g.drawString(text,positionX,positionY);
             g2.setComposite(oldComposite);
 
-            //add to map
-            mapViewer.mapCircleCoordinates.put(String.valueOf(position.x) + "-" + String.valueOf(position.y), this.waypoint);
-            //mapViewer.mapCircleCoordinates.put(String.valueOf(positionX) + "-" + String.valueOf(positionY), this.waypoint);
-
 
 
         }

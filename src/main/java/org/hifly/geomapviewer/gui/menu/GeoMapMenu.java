@@ -8,9 +8,11 @@ import org.hifly.geomapviewer.storage.GeoMapStorage;
 import org.hifly.geomapviewer.utility.SlopeUtility;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,6 @@ import java.util.Map;
  * @author
  * @date 11/02/14
  */
-//TODO settings menu to insert metric/imperial - weight - bike weight -
 public class GeoMapMenu extends JMenuBar {
 
     private JMenuItem itemImportFile;
@@ -33,6 +34,13 @@ public class GeoMapMenu extends JMenuBar {
         this.add(createFileMenu());
         this.add(createSettingMenu());
         this.add(createLibraryMenu());
+        URL helpImageUrl = getClass().getResource("/img/help.png");
+        ImageIcon helpImageIcon = new ImageIcon(helpImageUrl);
+        Image img = helpImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        helpImageIcon = new ImageIcon(img);
+        JMenu help = new JMenu("Help");
+        help.setIcon(helpImageIcon);
         this.add(new JMenu("Help"));
     }
 
@@ -40,19 +48,40 @@ public class GeoMapMenu extends JMenuBar {
         JMenu file = new JMenu("File");
         file.setMnemonic(KeyEvent.VK_F);
 
+        URL importImageUrl = getClass().getResource("/img/import.png");
+        ImageIcon importImageIcon = new ImageIcon(importImageUrl);
+        Image img = importImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        importImageIcon = new ImageIcon(img);
         JMenu importMenu = new JMenu("Import");
+        importMenu.setIcon(importImageIcon);
         importMenu.setMnemonic(KeyEvent.VK_I);
 
-        JMenuItem importFile = new JMenuItem("Import from file...");
+        URL fileImageUrl = getClass().getResource("/img/file.png");
+        ImageIcon fileImageIcon = new ImageIcon(fileImageUrl);
+        img = fileImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        fileImageIcon = new ImageIcon(img);
+        JMenuItem importFile = new JMenuItem("Import from file...",fileImageIcon);
         importFile.setMnemonic(KeyEvent.VK_F);
         importFile.setToolTipText("Import from file...");
 
-        JMenuItem importFolder = new JMenuItem("Import from folder...");
+        URL folderImageUrl = getClass().getResource("/img/folder.png");
+        ImageIcon folderImageIcon = new ImageIcon(folderImageUrl);
+        img = folderImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        folderImageIcon = new ImageIcon(img);
+        JMenuItem importFolder = new JMenuItem("Import from folder...",folderImageIcon);
 
         importMenu.add(importFile);
         importMenu.add(importFolder);
 
-        JMenuItem exit = new JMenuItem("Exit");
+        URL exitImageUrl = getClass().getResource("/img/quit.png");
+        ImageIcon exitImageIcon = new ImageIcon(exitImageUrl);
+        img = exitImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        exitImageIcon = new ImageIcon(img);
+        JMenuItem exit = new JMenuItem("Exit",exitImageIcon);
         exit.setMnemonic(KeyEvent.VK_C);
         exit.setToolTipText("Exit application");
         exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,ActionEvent.CTRL_MASK));
@@ -78,7 +107,12 @@ public class GeoMapMenu extends JMenuBar {
         JMenu setting = new JMenu("Tool");
         setting.setMnemonic(KeyEvent.VK_S);
 
-        JMenuItem optionsItem = new JMenuItem("Options");
+        URL optionImageUrl = getClass().getResource("/img/option.png");
+        ImageIcon optionImageIcon = new ImageIcon(optionImageUrl);
+        Image img = optionImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        optionImageIcon = new ImageIcon(img);
+        JMenuItem optionsItem = new JMenuItem("Options",optionImageIcon);
         optionsItem.setMnemonic(KeyEvent.VK_P);
         optionsItem.setToolTipText("Setting options");
 
@@ -97,6 +131,12 @@ public class GeoMapMenu extends JMenuBar {
         library.setMnemonic(KeyEvent.VK_L);
 
         JMenu climbs = new JMenu("Climbs");
+        URL mountainImageUrl = getClass().getResource("/img/mountain.png");
+        ImageIcon mountainImageIcon = new ImageIcon(mountainImageUrl);
+        Image img = mountainImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        mountainImageIcon = new ImageIcon(img);
+        climbs.setIcon(mountainImageIcon);
         climbs.setMnemonic(KeyEvent.VK_C);
         climbs.setToolTipText("Climbs");
 

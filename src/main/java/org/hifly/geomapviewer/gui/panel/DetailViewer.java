@@ -9,6 +9,7 @@ import org.hifly.geomapviewer.utility.TimeUtility;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -39,6 +40,30 @@ public class DetailViewer extends JScrollPane {
         LinkAdapter handler = new LinkAdapter(currentFrame);
         textPane.addMouseListener(handler);
 
+
+        String imgMountain = null;
+        String imgSave = null;
+        String imgSun = null;
+        String imgSunset = null;
+        try {
+            URL imgMountainUrl = getClass().getResource("/img/mountain.png");
+            imgMountain =  imgMountainUrl.toExternalForm();
+
+            URL imgSaveUrl = getClass().getResource("/img/save.png");
+            imgSave =  imgSaveUrl.toExternalForm();
+
+            URL imgSunUrl = getClass().getResource("/img/sun.png");
+            imgSun =  imgSunUrl.toExternalForm();
+
+            URL imgSunsetUrl = getClass().getResource("/img/sunset.png");
+            imgSunset =  imgSunsetUrl.toExternalForm();
+
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+
+
         String text = "<p><b>" + track.getName() + "</b><br>";
         text+= "Sport type:"+track.getSportType()+"<br>";
         text += TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss",track.getStartDate()) + "&nbsp &nbsp;" + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getEndDate()) + "<br>";
@@ -47,12 +72,11 @@ public class DetailViewer extends JScrollPane {
                 track.getCoordinates().get(0).getDecimalLongitude(),
                 track.getStartDate());
         if(sunTime!=null) {
-            text += "Sunrise:" + sunTime.getKey() + "<br>";
-            text += "Sunset:" + sunTime.getValue() + "<br>";
-        }
-        else {
-            text += "Sunrise:<br>";
-            text += "Sunset:<br>";
+            //write
+            textPane.append(null, text);
+            text = "";
+            textPane.addImg(imgSun,sunTime.getKey());
+            textPane.addImg(imgSunset,sunTime.getValue());
         }
         text += "Duration:" + TimeUtility.toStringFromTimeDiff(track.getRealTime()) + "<br>";
         text += "Effective duration:" + TimeUtility.toStringFromTimeDiff(track.getEffectiveTime()) + "<br>";
@@ -128,11 +152,11 @@ public class DetailViewer extends JScrollPane {
             SlopeSegment slope = track.getSlopes().get(z);
             listSlopes.add(slope);
             try {
-                //TODO change URL format;
-                textPane.addHyperlink(
-                        new URL("http://geomapviewer.com?slopeIndex=" + z), "profile", Color.BLUE);
-                textPane.addHyperlink(
-                        new URL("http://geomapviewer.com/save/?slopeIndex=" + z), "save", Color.BLUE);
+                //TODO change URL format and include img;
+                textPane.addHyperlinkImg(
+                        new URL("http://geomapviewer.com?slopeIndex=" + z),imgMountain, Color.BLUE);
+                textPane.addHyperlinkImg(
+                        new URL("http://geomapviewer.com/save/?slopeIndex=" + z), imgSave, Color.BLUE);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
@@ -148,7 +172,7 @@ public class DetailViewer extends JScrollPane {
 
             text += "Elevation:" + GpsUtility.roundDoubleStat(slope.getElevation()) + " m<br>";
             text += "Gradient:" + GpsUtility.roundDoubleStat(slope.getGradient()) + " %<br>";
-            text += "Start elevetion m:" + GpsUtility.roundDoubleStat(slope.getStartElevation()) + " m<br>";
+            text += "Start elevation m:" + GpsUtility.roundDoubleStat(slope.getStartElevation()) + " m<br>";
             text += "End elevation km:" + GpsUtility.roundDoubleStat(slope.getEndElevation()) + " m<br>";
             text += "Avg speed:" + GpsUtility.roundDoubleStat(slope.getAvgSpeed()) + " km/h<br>";
             text += "Power:" + GpsUtility.roundDoubleStat(slope.getPower()) + " watt<br>";
@@ -173,13 +197,13 @@ public class DetailViewer extends JScrollPane {
             text += "Total distance:" + GpsUtility.roundDoubleStat(totalSlopeDistance) + "<br>";
             text += "Total elevation:" + GpsUtility.roundDoubleStat(totalSlopeElevation) + "<br>";
             text += "Total duration:" + TimeUtility.toStringFromTimeDiff(totalSlopeDuration) + "<br>";
-            text += "Avg distance:" + GpsUtility.roundDoubleStat(totalSlopeDistance) / track.getSlopes().size() + "<br>";
-            text += "Avg elevation:" + GpsUtility.roundDoubleStat(totalSlopeElevation) / track.getSlopes().size() + "<br>";
+            text += "Avg distance:" + GpsUtility.roundDoubleStat(totalSlopeDistance / track.getSlopes().size()) + "<br>";
+            text += "Avg elevation:" + GpsUtility.roundDoubleStat(totalSlopeElevation / track.getSlopes().size()) + "<br>";
             text += "Avg duration:" + TimeUtility.toStringFromTimeDiff(totalSlopeDuration / 2) + "<br>";
-            text += "Avg gradient:" + GpsUtility.roundDoubleStat(totalSlopeGradient) / track.getSlopes().size() + "<br>";
-            text += "Avg speed:" + GpsUtility.roundDoubleStat(totalAvgSpeed) / track.getSlopes().size() + "<br>";
-            text += "Avg power:" + GpsUtility.roundDoubleStat(totalPower) / track.getSlopes().size() + "<br>";
-            text += "Avg vam:" + GpsUtility.roundDoubleStat(totalVam) / track.getSlopes().size() + "<br>";
+            text += "Avg gradient:" + GpsUtility.roundDoubleStat(totalSlopeGradient / track.getSlopes().size()) + "<br>";
+            text += "Avg speed:" + GpsUtility.roundDoubleStat(totalAvgSpeed / track.getSlopes().size()) + "<br>";
+            text += "Avg power:" + GpsUtility.roundDoubleStat(totalPower / track.getSlopes().size()) + "<br>";
+            text += "Avg vam:" + GpsUtility.roundDoubleStat(totalVam / track.getSlopes().size()) + "<br>";
         }
         text += "</p></p><hr>";
         text += "<p><b>Details for lap</b><br><br>";

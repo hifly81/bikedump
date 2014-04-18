@@ -19,7 +19,6 @@ import java.util.Map;
  * @author
  * @date 26/01/14
  */
-//TODO define xmlbean for kml
 public abstract class GPSDocument {
 
     protected Logger log = LoggerFactory.getLogger(GPSDocument.class);

@@ -66,8 +66,40 @@ public class TrackTable extends JTable {
             }
         };
 
+        final Comparator<Object> ascendingColumn2 = new Comparator<Object>() {
+
+            @Override
+            public int compare(Object o1, Object o2) {
+
+                String s1 = (String) o1;
+                String s2 = (String) o2;
+
+
+                if (s1.equals("") && !s2.equals("")) {
+                    return 1;
+                } else if (!s1.equals("") && s2.equals("")) {
+                    return -1;
+                } else if (s1.equals("") && s2.equals("")) {
+                    return 0;
+                } else {
+                    if (s1 != null && s2 != null && !s1.equalsIgnoreCase("") && !s2.equalsIgnoreCase("")) {
+                            s1 = s1.replaceAll(",",".");
+                            s2 = s2.replaceAll(",",".");
+                            return
+
+                                    Double.valueOf(s1).compareTo(Double.valueOf(s2));
+                    }
+                }
+
+                return -1;
+            }
+        };
+
 
         sorter.setComparator(0, ascendingColumn0);
+        sorter.setComparator(2, ascendingColumn2);
+        sorter.setComparator(4, ascendingColumn2);
+        sorter.setComparator(5, ascendingColumn2);
         sorter.toggleSortOrder(0);
         setRowSelectionAllowed(true);
         setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

@@ -80,4 +80,9 @@ public class GPSController {
         }
         return new AbstractMap.SimpleImmutableEntry<Track, StringBuffer>(track, sb);
     }
+
+    public static Map.Entry<Track,StringBuffer> extractTrackFromKml(String filename, ProfileSetting profileSetting) {
+       //TODO implementation
+       return null;
+    }
 }
