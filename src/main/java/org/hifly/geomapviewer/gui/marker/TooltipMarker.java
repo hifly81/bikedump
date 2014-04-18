@@ -14,7 +14,7 @@ import java.awt.geom.Rectangle2D;
  * @date 03/02/14
  */
 public class TooltipMarker extends MapMarkerDot  {
-    protected String text=null;
+    protected String text,text2,text3,text4,text5=null;
     protected WaypointSegment waypoint;
     protected MapViewer mapViewer;
     private double x,y;
@@ -22,10 +22,11 @@ public class TooltipMarker extends MapMarkerDot  {
     public TooltipMarker(double lat, double lon, double x, double y,WaypointSegment waypoint, MapViewer viewer) {
         super(lat,lon);
 
-        text += "Time relevation:" + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", waypoint.getTimeSpent()) + "\n";
-        //text += "Time lap:" + TimeUtility.toStringFromTimeDiff(waypoint.getTimeIncrement()) + "\n";
-        //text += "Avg speed:" + GpsUtility.roundDoubleStat(waypoint.getAvgSpeed()) + " km/h\n";
-        //text += "Elevation gained:"+GpsUtility.roundDoubleStat(waypoint.getEleGained());
+        text =  "Lap: "+waypoint.getKm();
+        text2 = TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", waypoint.getTimeSpent());
+        text3 = TimeUtility.toStringFromTimeDiff(waypoint.getTimeIncrement());
+        text4 = GpsUtility.roundDoubleStat(waypoint.getAvgSpeed()) + " km/h";
+        text5 = GpsUtility.roundDoubleStat(waypoint.getEleGained())+ " m";
 
         this.waypoint = waypoint;
         this.mapViewer = viewer;
@@ -40,27 +41,18 @@ public class TooltipMarker extends MapMarkerDot  {
     @Override
     public void paint(Graphics g, Point position, int radio) {
         if (g instanceof Graphics2D) {
-            System.out.println("draw rectangle for marker:" + waypoint.getKm());
             Graphics2D g2 = (Graphics2D) g;
             Composite oldComposite = g2.getComposite();
-            g2.draw(new Rectangle2D.Double(x, y, 80, 80));
+            g2.draw(new Rectangle2D.Double(x, y, 105, 105));
 
-            String text = this.text;
+            g.setFont(new Font("Arial", Font.BOLD, 10));
+            g.setColor(Color.BLUE);
 
-            // Draw centered text
-            FontMetrics fm = g.getFontMetrics();
-            g.setFont(new Font("TimesRoman", Font.PLAIN, 8));
-            double textWidth = fm.getStringBounds(text, g).getWidth();
-            g.setColor(Color.BLACK);
-            int positionX =  (int) (position.x - textWidth/2);
-            int positionY =   (position.y + fm.getMaxAscent() / 2);
-
-            int startX = (int)(x + ( ( 80 - textWidth ) / 2 ));
-            int startY = (int)(y + ( ( 80 + fm.getHeight() ) / 2 ));
-
-
-            //g.drawString(text,positionX,positionY);
-            g.drawString(text,startX,startY);
+            g.drawString(text,(int)x+5,(int)y+15);
+            g.drawString(text2,(int)x+5,(int)y+30);
+            g.drawString(text3,(int)x+5,(int)y+45);
+            g.drawString(text4,(int)x+5,(int)y+60);
+            g.drawString(text5,(int)x+5,(int)y+75);
             g2.setComposite(oldComposite);
 
         }

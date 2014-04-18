@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.*;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import java.util.List;
  * @author
  * @date 03/02/14
  */
-public class MapViewer extends JMapViewer implements MouseListener {
+public class MapViewer extends JMapViewer implements MouseListener, MouseMotionListener {
     protected Logger log = LoggerFactory.getLogger(MapViewer.class);
 
     public Map<String,WaypointSegment>  mapCircleCoordinates = new Hashtable<>();
@@ -204,4 +205,17 @@ public class MapViewer extends JMapViewer implements MouseListener {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if(lastOpenedMarker!=null) {
+            removeMapMarker(lastOpenedMarker);
+        }
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        if(lastOpenedMarker!=null) {
+            removeMapMarker(lastOpenedMarker);
+        }
+    }
 }

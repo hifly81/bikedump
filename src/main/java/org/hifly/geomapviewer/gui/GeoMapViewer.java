@@ -564,6 +564,10 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                     mapViewer.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
                 if (showToolTip.isSelected()) mapViewer.setToolTipText(mapViewer.getPosition(p).toString());
+
+                if(mapViewer.lastOpenedMarker!=null) {
+                    mapViewer.removeMapMarker(mapViewer.lastOpenedMarker);
+                }
             }
         });
 
