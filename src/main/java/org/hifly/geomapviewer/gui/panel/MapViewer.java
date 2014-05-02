@@ -176,7 +176,7 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
             }
         }
 
-        System.out.println("found marker:" + waypoint.getKm());
+        log.debug("found marker:" + waypoint.getKm());
 
         if(lastOpenedMarker!=null) {
            removeMapMarker(lastOpenedMarker);

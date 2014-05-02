@@ -35,6 +35,7 @@ public class TrackTable extends JTable {
         setFillsViewportHeight(true);
         setRowSorter(sorter);
 
+        //FIXME don't order by month
         final Comparator<Object> ascendingColumn0 = new Comparator<Object>() {
 
             @Override
@@ -52,13 +53,39 @@ public class TrackTable extends JTable {
                     return 0;
                 } else {
                     if (s1 != null && s2 != null && !s1.equalsIgnoreCase("") && !s2.equalsIgnoreCase("")) {
+                        Integer day = Integer.parseInt(s1.substring(0,1));
+                        Integer month = Integer.parseInt(s1.substring(3,4));
+                        Integer year = Integer.parseInt(s1.substring(6));
 
-                        try {
-                            return
-                                    TimeUtility.convertToDate("dd-mm-yyyy", s1).compareTo(TimeUtility.convertToDate("dd-mm-yyyy", s2));
-                        } catch (Exception e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        Integer day2 = Integer.parseInt(s2.substring(0,1));
+                        Integer month2 = Integer.parseInt(s2.substring(3,4));
+                        Integer year2 = Integer.parseInt(s2.substring(6));
+
+                        if(year > year2)
+                            return 1;
+
+                        if(year < year2)
+                            return -1;
+
+                        if(year == year2) {
+                            if(month > month2)
+                                return 1;
+
+                            if(month < month2)
+                                return -1;
+
+                            if(month == month2) {
+                                if(day > day2)
+                                    return 1;
+
+                                if(day < day2)
+                                    return -1;
+
+                                return 0;
+
+                            }
                         }
+
                     }
                 }
 

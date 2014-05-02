@@ -55,10 +55,10 @@ public class GPX10Document extends GPSDocument {
                             last.getTime().getTime();
                         }
                         //add basic gps elements
-                        addGPSElement(currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, totalDistance);
+                        addGPSElement(gpsFile, currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, totalDistance);
                         //calculate speed between points
                         double timeDiffInHour = TimeUtility.getTimeDiffHour(last.getTime(), current.getTime());
-                        addSpeedElement(currentLat, currentLon, distance, timeDiffInHour);
+                        addSpeedElement(gpsFile, currentLat, currentLon, distance, timeDiffInHour);
                     }
                     last = current;
                 }

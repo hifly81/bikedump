@@ -145,6 +145,8 @@ public class GpsUtility {
 
     public static GpsUtility.GpsStats extractInfoFromWaypoints(List<Waypoint> waypoints, double totalDistance) {
         GpsUtility.GpsStats stats = new GpsStats();
+        if(waypoints == null || waypoints.isEmpty())
+            return stats;
 
         double limitHighestPoint = 0;
         double limitLowestPoint = 1000000;

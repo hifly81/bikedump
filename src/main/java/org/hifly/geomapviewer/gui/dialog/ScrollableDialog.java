@@ -32,8 +32,6 @@ public class ScrollableDialog {
         JButton btnOk = new JButton("Ok");
         btnOk.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // This will "close" the modal dialog and allow program
-                // execution to continue.
                 dialogResult = JOptionPane.OK_OPTION;
                 dialog.setVisible(false);
                 dialog.dispose();

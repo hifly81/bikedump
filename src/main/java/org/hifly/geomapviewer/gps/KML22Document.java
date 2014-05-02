@@ -1,7 +1,12 @@
 package org.hifly.geomapviewer.gps;
 
+import net.opengis.kml.x22.AbstractObjectType;
+import net.opengis.kml.x22.AbstractStyleSelectorType;
 import net.opengis.kml.x22.KmlDocument;
 import net.opengis.kml.x22.KmlType;
+import net.opengis.kml.x22.impl.DocumentTypeImpl;
+import net.opengis.kml.x22.impl.StyleTypeImpl;
+import org.apache.xmlbeans.XmlAnySimpleType;
 import org.hifly.geomapviewer.domain.Author;
 import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.Track;
@@ -31,8 +36,57 @@ public class KML22Document extends GPSDocument {
 
         KmlDocument doc = KmlDocument.Factory.parse(new File(gpsFile));
         KmlType kml = doc.getKml();
+        log.info(kml.getAbstractFeatureGroup().getName());
 
-        //TODO implementation
+
+        AbstractStyleSelectorType[] ass = kml.getAbstractFeatureGroup().getAbstractStyleSelectorGroupArray();
+        for(AbstractStyleSelectorType as:ass) {
+            log.info(as.getClass().getName());
+            if(as.getClass().getName().equals("net.opengis.kml.x22.impl.StyleTypeImpl")) {
+                StyleTypeImpl ss = (StyleTypeImpl)as;
+                log.info(ss.getId());
+            }
+        }
+
+
+
+
+
+
+
+      /*  for (TrkType track : kml.getKmlObjectExtensionGroupArray()[0].) {
+            WptType last = null;
+            for (TrksegType segment : track.getTrksegArray()) {
+                WptType[] trackPoints = segment.getTrkptArray();
+                for (int i = 0; i < trackPoints.length; i++) {
+                    WptType current = segment.getTrkptArray(i);
+                    double currentLat = current.getLat().doubleValue();
+                    double currentLon = current.getLon().doubleValue();
+                    //add coordinate element
+                    addCoordinateElement(currentLat, currentLon);
+                    Date currentTime = current.getTime().getTime();
+                    if (last != null) {
+                        double lastLat = last.getLat().doubleValue();
+                        double lastLon = last.getLon().doubleValue();
+                        double distance = GpsUtility.haversine(currentLat, currentLon,lastLat, lastLon);
+                        totalDistance += distance;
+                        //need to be objects since could be nullable
+                        BigDecimal currentCalcEle = current.getEle();
+                        BigDecimal lastCalcEle = last.getEle();
+                        Date lastTime = last.getTime().getTime();
+                        //add basic gps elements
+                        addGPSElement(gpsFile, currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, totalDistance);
+                        //calculate speed between points
+                        double timeDiffInHour = TimeUtility.getTimeDiffHour(last.getTime(), current.getTime());
+                        addSpeedElement(currentLat, currentLon, distance, timeDiffInHour);
+                    }
+                    last = current;
+                }
+
+            }
+            result.add(createTrack(track, gpx, gpsFile));
+        }  */
+
         return result;
     }
 
@@ -76,6 +130,16 @@ public class KML22Document extends GPSDocument {
         result.add(resultTrack);
 
         return resultTrack;
+    }
+
+    public static void main(String[] args)  {
+        KML22Document doc= new KML22Document(null);
+        List<Track> tracks = null;
+        try {
+            tracks = doc.extractTrack("/home/hifly/Scrivania/Collegamento a Scaricati/time-stamp-point.kml");
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
 

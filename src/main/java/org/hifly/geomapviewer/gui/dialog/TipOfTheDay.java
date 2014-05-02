@@ -2,6 +2,8 @@ package org.hifly.geomapviewer.gui.dialog;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 /**
@@ -28,6 +30,7 @@ public class TipOfTheDay extends JDialog {
         hint.setBorder(BorderFactory.createEmptyBorder(0, 25, 0, 0));
         topPanel.add(hint);
 
+        //FIXME define icon
         ImageIcon icon = new ImageIcon("jdev.png");
         JLabel label = new JLabel(icon);
         label.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -45,6 +48,7 @@ public class TipOfTheDay extends JDialog {
         JTextPane pane = new JTextPane();
 
         pane.setContentType("text/html");
+        //FIXME random text from a list
         String text = "<p><b>Closing windows using the mouse wheel</b></p>" +
                 "<p>Clicking with the mouse wheel on an editor tab closes the window. " +
                 "This method works also with dockable windows or Log window tabs.</p>";
@@ -55,7 +59,7 @@ public class TipOfTheDay extends JDialog {
         basic.add(textPanel);
 
         JPanel boxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
-
+        //FIXME disable tips at startup
         JCheckBox box = new JCheckBox("Show Tips at startup");
         box.setMnemonic(KeyEvent.VK_S);
 
@@ -64,10 +68,17 @@ public class TipOfTheDay extends JDialog {
 
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
+        //FIXME get next tip
         JButton ntip = new JButton("Next Tip");
         ntip.setMnemonic(KeyEvent.VK_N);
         JButton close = new JButton("Close");
         close.setMnemonic(KeyEvent.VK_C);
+        close.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {;
+                setVisible(false);
+                dispose();
+            }
+        });
 
         bottom.add(ntip);
         bottom.add(close);

@@ -102,10 +102,10 @@ public class TCX2Document extends GPSDocument {
                         lastTime = last.getTime().getTime();
                     }
                     //add basic gps elements
-                    addGPSElement(currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, totalDistanceCalculated);
+                    addGPSElement(gpsFile, currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, totalDistanceCalculated);
                     //calculate speed between points
                     double timeDiffInHour = TimeUtility.getTimeDiffHour(last.getTime(), current.getTime());
-                    addSpeedElement(currentLat, currentLon, distance, timeDiffInHour);
+                    addSpeedElement(gpsFile, currentLat, currentLon, distance, timeDiffInHour);
                 }
                 last = current;
             }

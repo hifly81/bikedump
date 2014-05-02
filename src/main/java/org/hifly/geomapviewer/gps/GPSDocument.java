@@ -51,7 +51,7 @@ public abstract class GPSDocument {
         this.profileSetting = profileSetting;
     }
 
-    protected void addSpeedElement(double currentLat, double currentLon, double distance, double timeDiffInHour) {
+    protected void addSpeedElement(String gpsFile, double currentLat, double currentLon, double distance, double timeDiffInHour) {
         if (timeDiffInHour != 0) {
             double speed = distance / timeDiffInHour;
             if (speed < 100) {
@@ -62,7 +62,7 @@ public abstract class GPSDocument {
                 totalEffectiveSpeed += speed;
                 totalEffectiveSpeedPoints++;
             } else {
-                log.warn("Found a spike in speed for coordinate ["+currentLat+","+currentLon+"]:"+speed);
+                log.warn(gpsFile+": found a spike in speed for coordinate ["+currentLat+","+currentLon+"]:"+speed);
 
             }
             totalSpeed += speed;
@@ -76,6 +76,7 @@ public abstract class GPSDocument {
     }
 
     protected void addGPSElement(
+            String gpsFile,
             double currentLat,
             double currentLon,
             double lastLat,
@@ -92,8 +93,7 @@ public abstract class GPSDocument {
         }
         Double eleCurrent = elevationMap.get(GpsUtility.getKeyForCoordinatesMap(currentLat + "-" + currentLon));
         if(eleCurrent==null) {
-            //TODO change to log4j
-            System.out.println("not found elevation for:"+currentLat + "-" + currentLon);
+            log.warn(gpsFile+": not found elevation for:"+currentLat + "-" + currentLon);
         }
         if (currentLat != lastLat && currentLon != lastLon) {
             totalTimeDiff += diffMillis;
@@ -115,7 +115,7 @@ public abstract class GPSDocument {
                 addWaypointElement(currentLat,currentLon,distance,eleCurrent,0.0,currentTime,totalDistanceFromStartingPoint);
             }
             else {
-                log.warn("Coordinate not found:"+currentLat + "-" + currentLon);
+                log.warn(gpsFile+": coordinate not found:"+currentLat + "-" + currentLon);
             }
         }
     }

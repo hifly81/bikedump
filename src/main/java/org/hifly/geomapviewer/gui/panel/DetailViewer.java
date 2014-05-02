@@ -25,6 +25,13 @@ public class DetailViewer extends JScrollPane {
 
     private Track track;
     private JFrame currentFrame;
+    private StringBuffer text4HTML = new StringBuffer();
+    private StringBuffer text4Report = new StringBuffer();
+    private HTMLEditorPanel textPane;
+
+    private final String ELEMENT_SEPARATOR_REPORT = "$$$";
+    private final String ELEMENT_SEPARATOR_SECTION_REPORT = "%%%";
+
 
     public DetailViewer(Track track, JFrame currentFrame) {
         super(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -36,7 +43,7 @@ public class DetailViewer extends JScrollPane {
     }
 
     private void createDetailViewer() {
-        HTMLEditorPanel textPane = new HTMLEditorPanel();
+        textPane = new HTMLEditorPanel();
         LinkAdapter handler = new LinkAdapter(currentFrame);
         textPane.addMouseListener(handler);
 
@@ -64,39 +71,78 @@ public class DetailViewer extends JScrollPane {
 
 
 
-        String text = "<p><b>" + track.getName() + "</b><br>";
-        text+= "Sport type:"+track.getSportType()+"<br>";
-        text += TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss",track.getStartDate()) + "&nbsp &nbsp;" + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getEndDate()) + "<br>";
+        appendTextToBuffer( "<p><b>" + track.getName() + "</b><br>");
+        appendTextToReportBuffer(track.getName());
+        String sportTypeSection = "Sport type:" + track.getSportType();
+        appendTextToBuffer(sportTypeSection + "<br>");
+        appendTextToReportBuffer(sportTypeSection);
+        String timeSection = TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getStartDate()) + "&nbsp; &nbsp;" + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getEndDate());
+        appendTextToBuffer(timeSection + "<br>");
+        appendTextToReportBuffer(timeSection);
         Map.Entry<String, String> sunTime = TimeUtility.getSunriseSunsetTime(
                 track.getCoordinates().get(0).getDecimalLatitude(),
                 track.getCoordinates().get(0).getDecimalLongitude(),
                 track.getStartDate());
         if(sunTime!=null) {
             //write
-            textPane.append(null, text);
-            text = "";
+            textPane.append(null, flushBuffer());
             textPane.addImg(imgSun,sunTime.getKey());
             textPane.addImg(imgSunset,sunTime.getValue());
         }
-        text += "Duration:" + TimeUtility.toStringFromTimeDiff(track.getRealTime()) + "<br>";
-        text += "Effective duration:" + TimeUtility.toStringFromTimeDiff(track.getEffectiveTime()) + "<br>";
-        text += "Distance:" + GpsUtility.roundDoubleStat(track.getTotalDistance()) + "<br>";
-        text += "Calories:" + track.getCalories() + "<br>";
-        text += "<br><br>";
-        text += "Calculated Speed:" + GpsUtility.roundDoubleStat(track.getCalculatedAvgSpeed()) + "<br>";
-        text += "Effective Speed:" + GpsUtility.roundDoubleStat(track.getEffectiveAvgSpeed()) + "<br>";
-        text += "Max Speed:" + GpsUtility.roundDoubleStat(track.getMaxSpeed()) + "<br>";
-        text += "<br><br>";
-        text += "Device elevation:" + GpsUtility.roundDoubleStat(track.getCalculatedElevation()) + "<br>";
-        text += "Real elevation:" + GpsUtility.roundDoubleStat(track.getRealElevation()) + "<br>";
-        text += "Device descent:" + GpsUtility.roundDoubleStat(track.getCalculatedDescent()) + "<br>";
-        text += "Real descent:" + GpsUtility.roundDoubleStat(track.getRealDescent()) + "<br>";
-        text += "Max altitude:" + GpsUtility.roundDoubleStat(track.getMaxAltitude()) + "<br>";
-        text += "Min altitude:" + GpsUtility.roundDoubleStat(track.getMinAltitude()) + "<br>";
-        text += "Climbing distance:" + GpsUtility.roundDoubleStat(track.getClimbingDistance()) + "<br>";
-        text += "Climbing time:" + TimeUtility.toStringFromTimeDiff(track.getClimbingTimeMillis()) + "<br>";
-        text += "Climbing speed:" + GpsUtility.roundDoubleStat(track.getClimbingSpeed()) + "<br>";
-        text += "<br><br>";
+        String durationSection = "Duration:" + TimeUtility.toStringFromTimeDiff(track.getRealTime());
+        appendTextToBuffer(durationSection + "<br>");
+        appendTextToReportBuffer(durationSection);
+        String effectiveDurationSection =  "Effective duration:" + TimeUtility.toStringFromTimeDiff(track.getEffectiveTime());
+        appendTextToBuffer(effectiveDurationSection + "<br>");
+        appendTextToReportBuffer(effectiveDurationSection);
+        String distanceSection = "Distance:" + GpsUtility.roundDoubleStat(track.getTotalDistance());
+        appendTextToBuffer(distanceSection + "<br>");
+        appendTextToReportBuffer(distanceSection);
+        String caloriesSection =  "Calories:" + track.getCalories();
+        appendTextToBuffer(caloriesSection + "<br>");
+        appendTextToReportBuffer(caloriesSection);
+        appendTextToBuffer("<br><br>");
+        appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
+        String calculatedSpeedSection = "Calculated Speed:" + GpsUtility.roundDoubleStat(track.getCalculatedAvgSpeed());
+        appendTextToBuffer(calculatedSpeedSection + "<br>");
+        appendTextToReportBuffer(calculatedSpeedSection);
+        String effectiveSpeedSection = "Effective Speed:" + GpsUtility.roundDoubleStat(track.getEffectiveAvgSpeed());
+        appendTextToBuffer(effectiveSpeedSection + "<br>");
+        appendTextToReportBuffer(effectiveSpeedSection);
+        String maxSpeedSection = "Max Speed:" + GpsUtility.roundDoubleStat(track.getMaxSpeed());
+        appendTextToBuffer("Max Speed:" + GpsUtility.roundDoubleStat(track.getMaxSpeed()) + "<br>");
+        appendTextToReportBuffer(maxSpeedSection);
+        appendTextToBuffer("<br><br>");
+        appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
+        String deviceElevationSection = "Device elevation:" + GpsUtility.roundDoubleStat(track.getCalculatedElevation());
+        appendTextToBuffer(deviceElevationSection + "<br>");
+        appendTextToReportBuffer(deviceElevationSection);
+        String realElevationSection =  "Real elevation:" + GpsUtility.roundDoubleStat(track.getRealElevation());
+        appendTextToBuffer(realElevationSection + "<br>");
+        appendTextToReportBuffer(realElevationSection);
+        String deviceDescentSection = "Device descent:" + GpsUtility.roundDoubleStat(track.getCalculatedDescent());
+        appendTextToBuffer(deviceDescentSection + "<br>");
+        appendTextToReportBuffer(deviceDescentSection);
+        String realDescentSection =  "Real descent:" + GpsUtility.roundDoubleStat(track.getRealDescent());
+        appendTextToBuffer(realDescentSection + "<br>");
+        appendTextToReportBuffer(realDescentSection);
+        String maxAltitudeSection = "Max altitude:" + GpsUtility.roundDoubleStat(track.getMaxAltitude());
+        appendTextToBuffer(maxAltitudeSection + "<br>");
+        appendTextToReportBuffer(maxAltitudeSection);
+        String minAltitudeSection = "Min altitude:" + GpsUtility.roundDoubleStat(track.getMinAltitude());
+        appendTextToBuffer(minAltitudeSection + "<br>");
+        appendTextToReportBuffer(minAltitudeSection);
+        String climbingDistanceSection = "Climbing distance:" + GpsUtility.roundDoubleStat(track.getClimbingDistance());
+        appendTextToBuffer(climbingDistanceSection + "<br>");
+        appendTextToReportBuffer(climbingDistanceSection);
+        String climbingTimeSection = "Climbing time:" + TimeUtility.toStringFromTimeDiff(track.getClimbingTimeMillis());
+        appendTextToBuffer(climbingTimeSection + "<br>");
+        appendTextToReportBuffer(climbingTimeSection);
+        String climbingSpeedSection = "Climbing speed:" + GpsUtility.roundDoubleStat(track.getClimbingSpeed());
+        appendTextToBuffer(climbingSpeedSection + "<br>");
+        appendTextToReportBuffer(climbingSpeedSection);
+        appendTextToBuffer("<br><br>");
+        appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
         WaypointSegment fastest = track.getStatsNewKm().get("Fastest");
         WaypointSegment slowest = track.getStatsNewKm().get("Slowest");
         WaypointSegment shortest = track.getStatsNewKm().get("Shortest");
@@ -104,39 +150,60 @@ public class DetailViewer extends JScrollPane {
         WaypointSegment lessElevated = track.getStatsNewKm().get("Less Elevated");
         WaypointSegment mostElevated = track.getStatsNewKm().get("Most Elevated");
         if(fastest!=null) {
-            text += "Fastest Lap:" + fastest.getKm() + " - " + GpsUtility.roundDoubleStat(fastest.getAvgSpeed()) + "<br>";
+            String fastestLapSection = "Fastest Lap:" + fastest.getKm() + " - " + GpsUtility.roundDoubleStat(fastest.getAvgSpeed());
+            appendTextToBuffer(fastestLapSection + "<br>");
+            appendTextToReportBuffer(fastestLapSection);
         }
         else {
-            text += "Fastest Lap:<br>";
+            String fastestLapSection = "Fastest Lap:";
+            appendTextToBuffer(fastestLapSection+"<br>");
+            appendTextToReportBuffer(fastestLapSection);
         }
         if(slowest!=null) {
-            text += "Slowest Lap:" + slowest.getKm() + " - " + GpsUtility.roundDoubleStat(slowest.getAvgSpeed()) + "<br>";
+            String slowestLapSection = "Slowest Lap:" + slowest.getKm() + " - " + GpsUtility.roundDoubleStat(slowest.getAvgSpeed());
+            appendTextToBuffer(slowestLapSection + "<br>");
+            appendTextToReportBuffer(slowestLapSection);
         }
         else {
-            text += "Slowest Lap:<br>";
+            String slowestLapSection = "Slowest Lap:";
+            appendTextToBuffer(slowestLapSection+"<br>");
+            appendTextToReportBuffer(slowestLapSection);
         }
         if(shortest!=null) {
-            text += "Shortest Lap:" + shortest.getKm() + " - " + TimeUtility.toStringFromTimeDiff(shortest.getTimeIncrement()) + "<br>";
+            String shortestLapSection = "Shortest Lap:" + shortest.getKm() + " - " + TimeUtility.toStringFromTimeDiff(shortest.getTimeIncrement());
+            appendTextToBuffer(shortestLapSection + "<br>");
+            appendTextToReportBuffer(shortestLapSection);
         }
         else {
-            text += "Shortest Lap:<br>";
+            String shortestLapSection = "Shortest Lap:";
+            appendTextToBuffer(shortestLapSection+"<br>");
+            appendTextToReportBuffer(shortestLapSection);
         }
         if(longest!=null) {
-            text += "Longest Lap:" + longest.getKm() + " - " + TimeUtility.toStringFromTimeDiff(longest.getTimeIncrement()) + "<br>";
+            String longestLapSection = "Longest Lap:" + longest.getKm() + " - " + TimeUtility.toStringFromTimeDiff(longest.getTimeIncrement());
+            appendTextToBuffer(longestLapSection + "<br>");
+            appendTextToReportBuffer(longestLapSection);
         }
         else {
-            text += "Longest Lap:<br>";
+            String longestLapSection = "Longest Lap:";
+            appendTextToBuffer(longestLapSection+"Longest Lap:<br>");
+            appendTextToReportBuffer(longestLapSection);
         }
 
+        String mostElevatedLapSection = "Most elevated Lap:" + mostElevated.getKm() + " - " + GpsUtility.roundDoubleStat(mostElevated.getEleGained());
+        appendTextToBuffer(mostElevatedLapSection + "<br>");
+        appendTextToReportBuffer(mostElevatedLapSection);
+        String lessElevatedLap = "Less elevated Lap:" + lessElevated.getKm() + " - " + GpsUtility.roundDoubleStat(lessElevated.getEleGained());
+        appendTextToBuffer(lessElevatedLap + "<br>");
+        appendTextToReportBuffer(lessElevatedLap);
+        appendTextToBuffer("<br><br></p><hr>");
+        appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
 
-        text += "Most elevated Lap:" + mostElevated.getKm() + " - " + GpsUtility.roundDoubleStat(mostElevated.getEleGained()) + "<br>";
-        text += "Less elevated Lap:" + lessElevated.getKm() + " - " + GpsUtility.roundDoubleStat(lessElevated.getEleGained()) + "<br>";
-        text += "<br><br></p><hr>";
-        text += "<p><b>Climbs" + "(" + track.getSlopes().size() + ")</b><br><br>";
-
+        String climbsSection = "Climbs" + "(" + track.getSlopes().size() + ")";
+        appendTextToBuffer("<p><b>Climbs" + climbsSection+"</b><br><br>");
+        appendTextToReportBuffer(climbsSection);
         //write
-        textPane.append(null, text);
-        text = "";
+        textPane.append(null, flushBuffer());
 
 
         long totalSlopeDuration = 0;
@@ -160,27 +227,53 @@ public class DetailViewer extends JScrollPane {
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
-            text += "Distance:" + GpsUtility.roundDoubleStat(slope.getDistance()) + " km<br>";
-            text += "Start km:" + GpsUtility.roundDoubleStat(slope.getStartDistance()) + " km<br>";
-            text += "End km:" + GpsUtility.roundDoubleStat(slope.getEndDistance()) + " km<br>";
+            String climbDistanceSection = "Distance:" + GpsUtility.roundDoubleStat(slope.getDistance());
+            appendTextToBuffer(climbDistanceSection+"<br>");
+            appendTextToReportBuffer(climbDistanceSection);
+            String climbStartDistanceSection = "Start km:" + GpsUtility.roundDoubleStat(slope.getStartDistance());
+            appendTextToBuffer(climbStartDistanceSection+"<br>");
+            appendTextToReportBuffer(climbStartDistanceSection);
+            String climbEndDistanceSection = "End km:" + GpsUtility.roundDoubleStat(slope.getEndDistance());
+            appendTextToBuffer(climbEndDistanceSection+"<br>");
+            appendTextToReportBuffer(climbEndDistanceSection);
             if(slope.getEndDate()!=null) {
-                text += "Duration:" + TimeUtility.toStringFromTimeDiff(slope.getEndDate().getTime() - slope.getStartDate().getTime()) + "<br>";
+                String climbDurationSection = "Duration:" + TimeUtility.toStringFromTimeDiff(slope.getEndDate().getTime() - slope.getStartDate().getTime());
+                appendTextToBuffer(climbDurationSection + "<br>");
+                appendTextToReportBuffer(climbDurationSection);
             }
             else {
-                text += "Duration:<br>";
+                String climbDurationSection = "Duration:";
+                appendTextToBuffer(climbDurationSection+"<br>");
+                appendTextToReportBuffer(climbDurationSection);
             }
 
-            text += "Elevation:" + GpsUtility.roundDoubleStat(slope.getElevation()) + " m<br>";
-            text += "Gradient:" + GpsUtility.roundDoubleStat(slope.getGradient()) + " %<br>";
-            text += "Start elevation m:" + GpsUtility.roundDoubleStat(slope.getStartElevation()) + " m<br>";
-            text += "End elevation km:" + GpsUtility.roundDoubleStat(slope.getEndElevation()) + " m<br>";
-            text += "Avg speed:" + GpsUtility.roundDoubleStat(slope.getAvgSpeed()) + " km/h<br>";
-            text += "Power:" + GpsUtility.roundDoubleStat(slope.getPower()) + " watt<br>";
-            text += "VAM:" + GpsUtility.roundDoubleStat(slope.getVam()) + " m/h<br>";
-            text += "<br><br>";
+            String climbElevationSection = "Elevation:" + GpsUtility.roundDoubleStat(slope.getElevation());
+            appendTextToBuffer(climbElevationSection+"<br>");
+            appendTextToReportBuffer(climbElevationSection);
+            String climbGradientSection = "Gradient:" + GpsUtility.roundDoubleStat(slope.getGradient()) + " %";
+            appendTextToBuffer(climbGradientSection+"<br>");
+            appendTextToReportBuffer(climbGradientSection);
+            String climbStartElevationSection = "Start elevation:" + GpsUtility.roundDoubleStat(slope.getStartElevation());
+            appendTextToBuffer(climbStartElevationSection+"<br>");
+            appendTextToReportBuffer(climbStartElevationSection);
+            String climbEndElevationSection = "End elevation:" + GpsUtility.roundDoubleStat(slope.getEndElevation());
+            appendTextToBuffer(climbEndElevationSection + "<br>");
+            appendTextToReportBuffer(climbEndElevationSection);
+            String climbAvgSpeedSection = "Avg speed:" + GpsUtility.roundDoubleStat(slope.getAvgSpeed());
+            appendTextToBuffer(climbAvgSpeedSection+"<br>");
+            appendTextToReportBuffer(climbAvgSpeedSection);
+            String climbPowerSection = "Power:" + GpsUtility.roundDoubleStat(slope.getPower());
+            appendTextToBuffer(climbPowerSection+"<br>");
+            appendTextToReportBuffer(climbPowerSection);
+            String climbVamSection =  "VAM:" + GpsUtility.roundDoubleStat(slope.getVam());
+            appendTextToBuffer(climbVamSection+"<br>");
+            appendTextToReportBuffer(climbVamSection);
+            appendTextToBuffer("<br><br>");
+            appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
+
             //write
-            textPane.append(null, text);
-            text = "";
+            textPane.append(null, flushBuffer());
+
             totalSlopeDistance += slope.getDistance();
             totalSlopeElevation += slope.getElevation();
             totalSlopeGradient += slope.getGradient();
@@ -194,41 +287,96 @@ public class DetailViewer extends JScrollPane {
         handler.setSlopes(listSlopes);
 
         if (track.getSlopes().size() > 0) {
-            text += "Total distance:" + GpsUtility.roundDoubleStat(totalSlopeDistance) + "<br>";
-            text += "Total elevation:" + GpsUtility.roundDoubleStat(totalSlopeElevation) + "<br>";
-            text += "Total duration:" + TimeUtility.toStringFromTimeDiff(totalSlopeDuration) + "<br>";
-            text += "Avg distance:" + GpsUtility.roundDoubleStat(totalSlopeDistance / track.getSlopes().size()) + "<br>";
-            text += "Avg elevation:" + GpsUtility.roundDoubleStat(totalSlopeElevation / track.getSlopes().size()) + "<br>";
-            text += "Avg duration:" + TimeUtility.toStringFromTimeDiff(totalSlopeDuration / 2) + "<br>";
-            text += "Avg gradient:" + GpsUtility.roundDoubleStat(totalSlopeGradient / track.getSlopes().size()) + "<br>";
-            text += "Avg speed:" + GpsUtility.roundDoubleStat(totalAvgSpeed / track.getSlopes().size()) + "<br>";
-            text += "Avg power:" + GpsUtility.roundDoubleStat(totalPower / track.getSlopes().size()) + "<br>";
-            text += "Avg vam:" + GpsUtility.roundDoubleStat(totalVam / track.getSlopes().size()) + "<br>";
+            String totalClimbDistanceSection = "Total distance:" + GpsUtility.roundDoubleStat(totalSlopeDistance);
+            appendTextToBuffer(totalClimbDistanceSection + "<br>");
+            appendTextToReportBuffer(totalClimbDistanceSection);
+            String totalClimbElevationSection = "Total elevation:" + GpsUtility.roundDoubleStat(totalSlopeElevation);
+            appendTextToBuffer(totalClimbElevationSection + "<br>");
+            appendTextToReportBuffer(totalClimbElevationSection);
+            String totalClimbDurationSection = "Total duration:" + TimeUtility.toStringFromTimeDiff(totalSlopeDuration);
+            appendTextToBuffer(totalClimbDurationSection + "<br>");
+            appendTextToReportBuffer(totalClimbDurationSection);
+            String totalClimbAvgSection = "Avg distance:" + GpsUtility.roundDoubleStat(totalSlopeDistance / track.getSlopes().size());
+            appendTextToBuffer(totalClimbAvgSection + "<br>");
+            appendTextToReportBuffer(totalClimbAvgSection);
+            String totalClimbAvgElevationSection = "Avg elevation:" + GpsUtility.roundDoubleStat(totalSlopeElevation / track.getSlopes().size());
+            appendTextToBuffer(totalClimbAvgElevationSection + "<br>");
+            appendTextToReportBuffer(totalClimbAvgElevationSection);
+            String totalClimbAvgDurationSection = "Avg duration:" + TimeUtility.toStringFromTimeDiff(totalSlopeDuration / 2);
+            appendTextToBuffer(totalClimbAvgDurationSection + "<br>");
+            appendTextToReportBuffer(totalClimbAvgDurationSection);
+            String totalClimbAvgGradient = "Avg gradient:" + GpsUtility.roundDoubleStat(totalSlopeGradient / track.getSlopes().size());
+            appendTextToBuffer(totalClimbAvgGradient + "<br>");
+            appendTextToReportBuffer(totalClimbAvgGradient);
+            String totalClimbAvgSpeedSection =  "Avg speed:" + GpsUtility.roundDoubleStat(totalAvgSpeed / track.getSlopes().size());
+            appendTextToBuffer(totalClimbAvgSpeedSection+ "<br>");
+            appendTextToReportBuffer(totalClimbAvgSpeedSection);
+            String totalClimbAvgPowerSection =  "Avg power:" + GpsUtility.roundDoubleStat(totalPower / track.getSlopes().size());
+            appendTextToBuffer(totalClimbAvgPowerSection + "<br>");
+            appendTextToReportBuffer(totalClimbAvgPowerSection);
+            String totalClimbAvgVamSection = "Avg vam:" + GpsUtility.roundDoubleStat(totalVam / track.getSlopes().size());
+            appendTextToBuffer(totalClimbAvgVamSection + "<br>");
+            appendTextToReportBuffer(totalClimbAvgVamSection);
         }
-        text += "</p></p><hr>";
-        text += "<p><b>Details for lap</b><br><br>";
+        appendTextToBuffer("</p></p><hr>");
+        appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
+
+        String lapsDetailSection = "Details for lap";
+        appendTextToBuffer("<p><b>"+lapsDetailSection+"</b><br><br>");
+        appendTextToReportBuffer(lapsDetailSection);
         int km = 1;
         for (Map.Entry<String, WaypointSegment> entry : track.getCoordinatesNewKm().entrySet()) {
-            text += km + ")<br>";
-            text += "Time relevation:" + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss",entry.getValue().getTimeSpent()) + "<br>";
-            text += "Time lap:" + TimeUtility.toStringFromTimeDiff(entry.getValue().getTimeIncrement()) + "<br>";
-            text += "Avg speed:" + GpsUtility.roundDoubleStat(entry.getValue().getAvgSpeed()) + " km/h<<br>";
+            appendTextToBuffer(km + ")<br>");
+            appendTextToReportBuffer(km + ")");
+            String lapTimeRelevationSection = "Time relevation:" + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss",entry.getValue().getTimeSpent());
+            appendTextToBuffer(lapTimeRelevationSection + "<br>");
+            appendTextToReportBuffer(lapTimeRelevationSection);
+            String lapTimeSection = "Time lap:" + TimeUtility.toStringFromTimeDiff(entry.getValue().getTimeIncrement());
+            appendTextToBuffer(lapTimeSection + "<br>");
+            appendTextToReportBuffer(lapTimeSection);
+            String lapAvgSpeedSection = "Avg speed:" + GpsUtility.roundDoubleStat(entry.getValue().getAvgSpeed());
+            appendTextToBuffer(lapAvgSpeedSection+"<br>");
+            appendTextToReportBuffer(lapAvgSpeedSection);
             String fontElevation = "<font color=\"red\">";
             String fontDescent = "<font color=\"green\">";
             if (entry.getValue().getEleGained() > 0) {
-                text += "Elevation gained:" + fontElevation + GpsUtility.roundDoubleStat(entry.getValue().getEleGained()) + " m</font><br>";
+                appendTextToBuffer("Elevation gained:" + fontElevation + GpsUtility.roundDoubleStat(entry.getValue().getEleGained()) + " m</font><br>");
             } else {
-                text += "Elevation gained:" + fontDescent + GpsUtility.roundDoubleStat(entry.getValue().getEleGained()) + " m</font><br>";
+                appendTextToBuffer("Elevation gained:" + fontDescent + GpsUtility.roundDoubleStat(entry.getValue().getEleGained()) + " m</font><br>");
             }
-            text += "<br><br>";
+            appendTextToReportBuffer("Elevation gained:" + GpsUtility.roundDoubleStat(entry.getValue().getEleGained()));
+            appendTextToBuffer("<br><br>");
+            appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
             km++;
         }
-        text += "</p></p><hr>";
+        appendTextToBuffer("</p></p><hr>");
 
         //write
-        textPane.append(null, text);
+        textPane.append(null, flushBuffer());
 
         this.getViewport().add(textPane);
 
     }
+
+    private void appendTextToBuffer(String text) {
+        text4HTML.append(text);
+    }
+
+    private void appendTextToReportBuffer(String text) {
+        text4Report.append(text);
+        //this is a separator for each line
+        text4Report.append(ELEMENT_SEPARATOR_REPORT);
+    }
+
+    private String flushBuffer() {
+        String text = text4HTML.toString();
+        text4HTML = new StringBuffer();
+        text4HTML.append("");
+        return text;
+    }
+
+    public String getText4Report() {
+        return text4Report.toString();
+    }
+
 }

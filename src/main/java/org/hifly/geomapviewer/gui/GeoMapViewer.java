@@ -23,6 +23,7 @@ import org.hifly.geomapviewer.gui.menu.GeoFileChooser;
 import org.hifly.geomapviewer.gui.menu.GeoFolderChooser;
 import org.hifly.geomapviewer.gui.menu.GeoMapMenu;
 import org.hifly.geomapviewer.gui.menu.GeoToolbar;
+import org.hifly.geomapviewer.report.PdfReport;
 import org.hifly.geomapviewer.storage.GeoMapStorage;
 import org.hifly.geomapviewer.utility.GUIUtility;
 import org.hifly.geomapviewer.utility.TimeUtility;
@@ -65,6 +66,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
     private List<List<WaypointSegment>> waypointsCalculated;
     private final Map<String, String> trackFileNames = new HashMap();
     private JScrollPane folderMapScrollViewer, folderDetailViewer, folderTableViewer;
+    private String textForReport;
 
 
     public GeoMapViewer() {
@@ -110,6 +112,27 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                 }
             }
         });
+        toolBar.getReportButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+               if(textForReport!=null && !textForReport.isEmpty()) {
+                   try {
+                       PdfReport report = new PdfReport(textForReport);
+                       String fileName = System.getProperty("user.home") + "/.geomapviewer/report" + new Date().getTime() + ".pdf";
+                       File tmpPdf = new File(fileName);
+                       report.saveReport(fileName);
+                       if (Desktop.isDesktopSupported()) {
+                           Desktop.getDesktop().open(tmpPdf);
+                       }
+                       //TODO define a delete method on exit
+
+                   } catch (Exception ex) {
+                       //TODO define exception
+                       ex.printStackTrace();
+                   }
+               }
+            }
+        });
         add(toolBar, BorderLayout.PAGE_START);
 
         //create menu and its events
@@ -151,19 +174,9 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                         addTrackToCache(coordinates, waypoint, tracks, file, sb);
                     }
                     if (sb.length() > 0) {
-                        ScrollableDialog dialog = new ScrollableDialog(null, sb.toString(),dimension.getKey()/2,dimension.getValue()/2);
+                        ScrollableDialog dialog = new ScrollableDialog(null, sb.toString(),dimension.getKey()/4,dimension.getValue()/4);
                         dialog.showMessage();
                     }
-
-                    //sort tracks by dates
-                    Collections.sort(tracks, new Comparator<Track>() {
-                        public int compare(Track o1, Track o2) {
-                            if (o1.getStartDate() != null && o2.getStartDate() != null) {
-                                return TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", o1.getStartDate()).compareTo(TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", o2.getStartDate()));
-                            }
-                            return -1;
-                        }
-                    });
 
                     //add dir to library
                     if (GeoMapStorage.librarySetting == null) {
@@ -328,7 +341,8 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                 waypointsCalculated.add(listWaypoints);
 
                 JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint, false);
-                JScrollPane detailViewer = new DetailViewer(track, currentFrame);
+                DetailViewer detailViewer = new DetailViewer(track, currentFrame);
+                textForReport = detailViewer.getText4Report();
                 JScrollPane treeViewer = createTableTracksViewer(tracks);
 
                 repaintPanels(treeViewer, mapScrollViewer, detailViewer);
