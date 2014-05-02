@@ -73,8 +73,4 @@ public class PdfReport {
         document.close();
     }
 
-    public static void main(String[]args) throws Exception {
-        PdfReport rep = new PdfReport("");
-        rep.saveReport("/home/hifly/.geomapviewer/"+new Date().getTime()+".pdf");
-    }
 }
