@@ -14,8 +14,9 @@ import java.util.List;
 public abstract class WaypointGraph {
 
     protected List<List<WaypointSegment>> waypoints;
-    protected boolean detailGraph;
     protected List<Waypoint> waypointDetails;
+    protected boolean detailGraph;
+    protected JFreeChart chart;
 
     public WaypointGraph(List<List<WaypointSegment>> waypoints) {
         this.waypoints = waypoints;
@@ -27,6 +28,7 @@ public abstract class WaypointGraph {
     }
 
     public abstract JFreeChart createGraph();
-
     public abstract XYDataset createDataset();
+
+
 }

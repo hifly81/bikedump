@@ -52,6 +52,7 @@ public class DetailViewer extends JScrollPane {
         String imgSave = null;
         String imgSun = null;
         String imgSunset = null;
+        String imgFw = null;
         try {
             URL imgMountainUrl = getClass().getResource("/img/mountain.png");
             imgMountain =  imgMountainUrl.toExternalForm();
@@ -65,8 +66,11 @@ public class DetailViewer extends JScrollPane {
             URL imgSunsetUrl = getClass().getResource("/img/sunset.png");
             imgSunset =  imgSunsetUrl.toExternalForm();
 
+            URL imgFwUrl = getClass().getResource("/img/fw.png");
+            imgFw =  imgFwUrl.toExternalForm();
+
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
 
@@ -76,6 +80,15 @@ public class DetailViewer extends JScrollPane {
         String sportTypeSection = "Sport type:" + track.getSportType();
         appendTextToBuffer(sportTypeSection + "<br>");
         appendTextToReportBuffer(sportTypeSection);
+        //write
+        textPane.append(null, flushBuffer());
+        try {
+            //TODO change URL format and include img;
+            textPane.addHyperlinkImg(
+                    new URL("http://geomapviewer.com?sportType=true"),imgFw, Color.BLUE);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
         String timeSection = TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getStartDate()) + "&nbsp; &nbsp;" + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getEndDate());
         appendTextToBuffer(timeSection + "<br>");
         appendTextToReportBuffer(timeSection);

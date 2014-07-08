@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 import java.io.IOException;
 import java.io.Reader;
@@ -25,7 +26,6 @@ public class HTMLEditorPanel extends JTextPane {
         String bodyRule = "body { font-family: " + font.getFamily() + "; " +
                 "font-size: " + font.getSize() + "pt; }";
         ((HTMLDocument)getDocument()).getStyleSheet().addRule(bodyRule);
-
     }
 
 
@@ -84,7 +84,5 @@ public class HTMLEditorPanel extends JTextPane {
             e.printStackTrace(System.err);
         }
     }
-
-
 
 }
