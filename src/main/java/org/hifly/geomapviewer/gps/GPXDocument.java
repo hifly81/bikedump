@@ -7,8 +7,14 @@ import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.utility.GpsUtility;
 import org.hifly.geomapviewer.utility.SlopeUtility;
 import org.hifly.geomapviewer.utility.TimeUtility;
+import org.xml.sax.InputSource;
 
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 import java.io.File;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -41,7 +47,7 @@ public class GPXDocument extends GPSDocument {
                     if (last != null) {
                         double lastLat = last.getLat().doubleValue();
                         double lastLon = last.getLon().doubleValue();
-                        double distance = GpsUtility.haversine(currentLat, currentLon,lastLat, lastLon);
+                        double distance = GpsUtility.haversine(currentLat, currentLon, lastLat, lastLon);
                         totalDistance += distance;
                         //need to be objects since could be nullable
                         BigDecimal currentCalcEle = current.getEle();
@@ -52,6 +58,21 @@ public class GPXDocument extends GPSDocument {
                         //calculate speed between points
                         double timeDiffInHour = TimeUtility.getTimeDiffHour(last.getTime(), current.getTime());
                         addSpeedElement(gpsFile, currentLat, currentLon, distance, timeDiffInHour);
+                        //TODO calculate heart
+                        ExtensionsType ext = current.getExtensions();
+                        if (ext != null) {
+                            int i1 = ext.toString().indexOf("<gpxtpx:hr>") + 11;
+                            int i2 = ext.toString().indexOf("</gpxtpx:hr>");
+                            try {
+                                double heart = Double.valueOf(ext.toString().substring(i1, i2));
+                                addHeart(heart);
+                                if(heart > maxHeart) {
+                                    maxHeart = heart;
+                                }
+                            }
+                            catch (Exception ex) {}
+
+                        }
                     }
                     last = current;
                 }
@@ -84,16 +105,19 @@ public class GPXDocument extends GPSDocument {
         resultTrack.setCalculatedElevation(totalCalculatedElevation);
         resultTrack.setCalculatedDescent(totalCalculatedDescent);
         resultTrack.setRealDescent(totalDescent);
+        resultTrack.setHeartFrequency(totalHeart / heart);
+        resultTrack.setHeartMax(maxHeart);
         Author author = new Author();
-        if(gpx.getMetadata()!=null) {
-            if(gpx.getMetadata().getAuthor()!=null) {
+        if (gpx.getMetadata() != null) {
+            if (gpx.getMetadata().getAuthor() != null) {
                 author.setName(gpx.getMetadata().getAuthor().getName());
             }
-            if(gpx.getMetadata().getAuthor()!=null && gpx.getMetadata().getAuthor().getEmail()!=null) {
+            if (gpx.getMetadata().getAuthor() != null && gpx.getMetadata().getAuthor().getEmail() != null) {
                 author.setEmail(
-                    gpx.getMetadata().getAuthor().getEmail().getId()
-                        + "@"
-                        + gpx.getMetadata().getAuthor().getEmail().getDomain());
+                        gpx.getMetadata().getAuthor().getEmail().getId()
+                                + "@"
+                                + gpx.getMetadata().getAuthor().getEmail().getDomain()
+                );
             }
         }
         resultTrack.setAuthor(author);
@@ -113,3 +137,6 @@ public class GPXDocument extends GPSDocument {
 
 
 }
+
+
+

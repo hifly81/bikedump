@@ -35,8 +35,10 @@ public abstract class GPSDocument {
            totalElevation, totalCalculatedElevation,
            totalDescent, totalCalculatedDescent,
            maxSpeed,
-           totalTime;
-    protected int totalEffectiveSpeedPoints, totalCalculatedSpeedPoints,calories;
+           maxHeart,
+           totalTime,
+           totalHeart;
+    protected int totalEffectiveSpeedPoints, totalCalculatedSpeedPoints, calories, heart;
     protected long totalTimeDiff = 0;
 
 
@@ -46,8 +48,10 @@ public abstract class GPSDocument {
         totalElevation = totalCalculatedElevation =
         totalDescent = totalCalculatedDescent =
         maxSpeed =
-        totalTime = 0;
-        totalEffectiveSpeedPoints = totalCalculatedSpeedPoints = calories = 0;
+        maxHeart =
+        totalTime =
+        totalHeart = 0;
+        totalEffectiveSpeedPoints = totalCalculatedSpeedPoints = calories = heart = 0;
         this.profileSetting = profileSetting;
     }
 
@@ -68,6 +72,11 @@ public abstract class GPSDocument {
             totalSpeed += speed;
             totalCalculatedSpeedPoints++;
         }
+    }
+
+    protected void addHeart(double heartValue) {
+        totalHeart+=heartValue;
+        heart+=1;
     }
 
     protected void addCoordinateElement(double currentLat, double currentLon) {

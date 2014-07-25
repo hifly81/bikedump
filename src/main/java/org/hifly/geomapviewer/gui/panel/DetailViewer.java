@@ -114,6 +114,12 @@ public class DetailViewer extends JScrollPane {
         String caloriesSection =  "Calories:" + track.getCalories();
         appendTextToBuffer(caloriesSection + "<br>");
         appendTextToReportBuffer(caloriesSection);
+        String avgHeartSection = "Avg Heart:" + GpsUtility.roundDoubleStat(track.getHeartFrequency());
+        appendTextToBuffer("Avg Heart:" + GpsUtility.roundDoubleStat(track.getHeartFrequency()) + "<br>");
+        appendTextToReportBuffer(avgHeartSection);
+        String maxHeartSection = "Max Heart:" + GpsUtility.roundDoubleStat(track.getHeartMax());
+        appendTextToBuffer("Max Heart:" + GpsUtility.roundDoubleStat(track.getHeartMax()) + "<br>");
+        appendTextToReportBuffer(maxHeartSection);
         appendTextToBuffer("<br><br>");
         appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
         String calculatedSpeedSection = "Calculated Speed:" + GpsUtility.roundDoubleStat(track.getCalculatedAvgSpeed());

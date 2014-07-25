@@ -498,7 +498,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
 
         JScrollPane pane = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         if (multiple) {
-            mapViewer = new MapViewer(null, null, 10);
+            mapViewer = new MapViewer(null, null, 10, resultList.get(0).get(0).getLat(), resultList.get(0).get(0).getLon());
         } else {
             mapViewer = new MapViewer(resultList, waypoints, 10);
         }

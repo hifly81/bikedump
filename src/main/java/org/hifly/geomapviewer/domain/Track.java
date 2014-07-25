@@ -47,6 +47,10 @@ public class Track {
     protected long effectiveTime;
     @DatabaseField(canBeNull = true)
     protected long calories;
+    @DatabaseField(canBeNull = true)
+    protected double heartFrequency;
+    @DatabaseField(canBeNull = true)
+    protected double heartMax;
     @DatabaseField(canBeNull = false, foreign = true)
     protected Author author;
     //TODO evaluate if this can be an object
@@ -244,6 +248,7 @@ public class Track {
                 "<br>Calculated Elevation:"+calculatedElevation+"<br>Real Elevation:"+realElevation+
                 "<br>Calculated Descent:"+calculatedDescent+"<br>Real Descent:"+realDescent
                 +"<br>Calories:"+calories+"<br>"+
+                "<br>Heart avg frequency:"+heartFrequency+"<br>Heart max frequency:"+heartMax +
                 "Slopes:"+slopes+"<br>"+
                 "Waypoint KM:"+coordinatesNewKm+"<br>"+
                 author;
@@ -295,5 +300,21 @@ public class Track {
 
     public void setSportType(String sportType) {
         this.sportType = sportType;
+    }
+
+    public double getHeartFrequency() {
+        return heartFrequency;
+    }
+
+    public void setHeartFrequency(double heartFrequency) {
+        this.heartFrequency = heartFrequency;
+    }
+
+    public double getHeartMax() {
+        return heartMax;
+    }
+
+    public void setHeartMax(double heartMax) {
+        this.heartMax = heartMax;
     }
 }

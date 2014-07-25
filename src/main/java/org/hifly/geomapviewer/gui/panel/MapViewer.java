@@ -30,6 +30,15 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
     public Map<String,WaypointSegment>  mapCircleCoordinates = new Hashtable<>();
     public TooltipMarker lastOpenedMarker = null;
 
+    public MapViewer(
+            List<List<ICoordinate>> coordinates,
+            List<Map<String, WaypointSegment>> coordinatesNewKm,
+            int zoomLevel,
+            double initialLat,
+            double initialLon) {
+        this(coordinates, coordinatesNewKm, zoomLevel);
+        setDisplayPositionByLatLon(initialLat, initialLon, zoomLevel);
+    }
 
     public MapViewer(
             List<List<ICoordinate>> coordinates,
