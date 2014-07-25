@@ -18,6 +18,7 @@ import org.hifly.geomapviewer.gui.dialog.ScrollableDialog;
 import org.hifly.geomapviewer.gui.dialog.Setting;
 import org.hifly.geomapviewer.gui.dialog.TipOfTheDay;
 import org.hifly.geomapviewer.gui.events.PanelWindowAdapter;
+import org.hifly.geomapviewer.gui.events.SharedListSelectionHandler;
 import org.hifly.geomapviewer.gui.panel.*;
 import org.hifly.geomapviewer.gui.menu.GeoFileChooser;
 import org.hifly.geomapviewer.gui.menu.GeoFolderChooser;
@@ -65,6 +66,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
     private Map.Entry<Integer, Integer> dimension;
     private List<List<WaypointSegment>> waypointsCalculated;
     private final Map<String, String> trackFileNames = new HashMap();
+    private List<Track> tracksInCache;
     private JScrollPane folderMapScrollViewer, folderDetailViewer, folderTableViewer;
     private String textForReport;
 
@@ -109,6 +111,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
             public void actionPerformed(ActionEvent event) {
                 if (folderDetailViewer != null && folderMapScrollViewer != null && folderTableViewer != null) {
                     repaintPanels(folderTableViewer, folderMapScrollViewer, folderDetailViewer);
+
                 }
             }
         });
@@ -205,6 +208,8 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                     folderMapScrollViewer = mapScrollViewer;
                     folderDetailViewer = detailViewer;
                     folderTableViewer = tableViewer;
+
+                    tracksInCache = tracks;
                 }
             }
         });
@@ -275,6 +280,8 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                     folderMapScrollViewer = mapScrollViewer;
                     folderDetailViewer = detailViewer;
                     folderTableViewer = tableViewer;
+
+                    tracksInCache = tracks;
 
                 }
                 return null;
@@ -397,35 +404,70 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                 sb.append(resultTrack.getValue().toString() + "\n");
             }
         }
+
     }
 
 
     private JScrollPane createTableTracksViewer(List<Track> tracks) {
         JScrollPane panel = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         final TrackTable table = new TrackTable(tracks);
+        final SharedListSelectionHandler listHandler;
         table.getSelectionModel().addListSelectionListener(
                 //TODO if track is already selected dont'load again
                 //TODO if a list of track is shown, when load the single track don't redraw the table list
-                new ListSelectionListener() {
-                    public void valueChanged(ListSelectionEvent event) {
-                        if (event.getValueIsAdjusting()) {
-                            return;
-                        }
-                        List<String> trackNamesTemp = new ArrayList(table.getSelectedRowCount());
-                        for (int c : table.getSelectedRows()) {
-                            Object fileKey = table.getValueAt(c, 1);
-                            if (fileKey != null) {
-                                trackNamesTemp.add(fileKey.toString());
+                listHandler = new SharedListSelectionHandler(table, new HashSet()));
+
+
+        table.addKeyListener(new KeyListener() {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+                    if (!listHandler.getSelectedTrackNames().isEmpty()) {
+                        if (!tracksInCache.isEmpty()) {
+                            List<Track> selectedTracks = new ArrayList();
+                            //TODO change algo
+                            for (Track track : tracksInCache) {
+                                if (listHandler.getSelectedTrackNames().contains(track.getName())) {
+                                    selectedTracks.add(track);
+                                }
+                            }
+
+                            if(!selectedTracks.isEmpty()) {
+                                if(selectedTracks.size() == 1) {
+                                    reloadTrackPanel(new File(selectedTracks.get(0).getFileName()));
+                                }
+                                else {
+                                    JScrollPane detailViewer = new AggregateDetailViewer(selectedTracks, currentFrame);
+                                    JScrollPane tableViewer = createTableTracksViewer(selectedTracks);
+
+                                    repaintPanels(tableViewer, folderMapScrollViewer, detailViewer);
+                                }
                             }
 
                         }
-                        //TODO reload more than one file
-                        if (trackNamesTemp.size() == 1) {
-                            reloadTrackPanel(new File(trackFileNames.get(trackNamesTemp.get(0))));
-                        }
-                    }
-                });
 
+                        //clear
+                        listHandler.getSelectedTrackNames().clear();
+                        table.clearSelection();
+
+
+                    }
+                }
+            }
+
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
 
         panel.getViewport().add(table);
         return panel;

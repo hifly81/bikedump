@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -18,6 +19,7 @@ import java.util.List;
 public class TrackTable extends JTable {
 
     private List<Track> tracks;
+
 
     protected String[] columnToolTips = {
             "Date of the track",
