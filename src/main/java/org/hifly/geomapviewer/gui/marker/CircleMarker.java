@@ -18,7 +18,7 @@ public class CircleMarker extends MapMarkerDot  {
 
     public CircleMarker(double lat, double lon, WaypointSegment waypoint,MapViewer viewer) {
         super(lat,lon);
-        this.text = String.valueOf(waypoint.getKm());
+        this.text = String.valueOf(waypoint.getUnit());
         this.waypoint = waypoint;
         this.mapViewer = viewer;
     }

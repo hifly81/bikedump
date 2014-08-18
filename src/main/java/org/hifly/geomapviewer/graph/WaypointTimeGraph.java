@@ -56,7 +56,7 @@ public class WaypointTimeGraph extends WaypointGraph {
         for(List<WaypointSegment> waypoint:waypoints) {
             XYSeries series1 = new XYSeries(index);
             for(WaypointSegment km:waypoint) {
-                series1.add(km.getKm(),((km.getTimeIncrement()/1000))/60);
+                series1.add(km.getUnit(),((km.getTimeIncrement()/1000))/60);
             }
             series.add(series1);
             index++;

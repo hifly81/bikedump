@@ -102,7 +102,7 @@ public class TCX2Document extends GPSDocument {
                         lastTime = last.getTime().getTime();
                     }
                     //add basic gps elements
-                    addGPSElement(gpsFile, currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, totalDistanceCalculated);
+                    createWaypointElement(gpsFile, currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, 0, totalDistanceCalculated);
                     //calculate speed between points
                     double timeDiffInHour = TimeUtility.getTimeDiffHour(last.getTime(), current.getTime());
                     addSpeedElement(gpsFile, currentLat, currentLon, distance, timeDiffInHour);
@@ -150,7 +150,7 @@ public class TCX2Document extends GPSDocument {
         resultTrack.setClimbingSpeed(stats.getClimbingSpeed());
         resultTrack.setClimbingTimeMillis(stats.getClimbingTime());
         resultTrack.setClimbingDistance(stats.getClimbingDistance());
-        resultTrack.setStatsNewKm(GpsUtility.calculateStatsFromKm(resultTrack.getCoordinatesNewKm()));
+        resultTrack.setStatsNewKm(GpsUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
 
         result.add(resultTrack);
 

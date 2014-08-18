@@ -1,12 +1,9 @@
 package org.hifly.geomapviewer.gps;
 
-import net.opengis.kml.x22.AbstractObjectType;
 import net.opengis.kml.x22.AbstractStyleSelectorType;
 import net.opengis.kml.x22.KmlDocument;
 import net.opengis.kml.x22.KmlType;
-import net.opengis.kml.x22.impl.DocumentTypeImpl;
 import net.opengis.kml.x22.impl.StyleTypeImpl;
-import org.apache.xmlbeans.XmlAnySimpleType;
 import org.hifly.geomapviewer.domain.Author;
 import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.Track;
@@ -75,7 +72,7 @@ public class KML22Document extends GPSDocument {
                         BigDecimal lastCalcEle = last.getEle();
                         Date lastTime = last.getTime().getTime();
                         //add basic gps elements
-                        addGPSElement(gpsFile, currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, totalDistance);
+                        createWaypointElement(gpsFile, currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, totalDistance);
                         //calculate speed between points
                         double timeDiffInHour = TimeUtility.getTimeDiffHour(last.getTime(), current.getTime());
                         addSpeedElement(currentLat, currentLon, distance, timeDiffInHour);
@@ -125,7 +122,7 @@ public class KML22Document extends GPSDocument {
         resultTrack.setClimbingSpeed(stats.getClimbingSpeed());
         resultTrack.setClimbingTimeMillis(stats.getClimbingTime());
         resultTrack.setClimbingDistance(stats.getClimbingDistance());
-        resultTrack.setStatsNewKm(GpsUtility.calculateStatsFromKm(resultTrack.getCoordinatesNewKm()));
+        resultTrack.setStatsNewKm(GpsUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
 
         result.add(resultTrack);
 

@@ -1,30 +1,26 @@
 package org.hifly.geomapviewer.controller;
 
-import org.apache.xmlbeans.XmlException;
 import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.gps.GPSDocument;
 import org.hifly.geomapviewer.gps.GPX10Document;
 import org.hifly.geomapviewer.gps.GPXDocument;
 import org.hifly.geomapviewer.gps.TCX2Document;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.AbstractMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXParseException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+import java.util.AbstractMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author
@@ -35,9 +31,6 @@ public class GPSController {
     protected static Logger log = LoggerFactory.getLogger(GPSController.class);
 
     public static Map.Entry<Track,StringBuffer> extractTrackFromGpx(String filename, ProfileSetting profileSetting) {
-
-
-
         Track track = null;
         StringBuffer sb = new StringBuffer();
         List<Track> tracks = null;
@@ -47,10 +40,12 @@ public class GPSController {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder builder;
-            Document docForXpath = null;
+            //FIXME the evalutaion via XPATH is really slow
+            Document docForXpath;
             String gpxVersion = null;
             builder = factory.newDocumentBuilder();
-            docForXpath = builder.parse(filename);
+            //TODO consider URI from external sources
+            docForXpath = builder.parse("file://"+filename);
             XPathFactory xpathFactory = XPathFactory.newInstance();
             XPath xpath = xpathFactory.newXPath();
             XPathExpression expr =
@@ -76,7 +71,10 @@ public class GPSController {
                 sb.append(error);
             }
 
+            long time1 = System.currentTimeMillis();
             tracks = doc.extractTrack(filename);
+            long time2 = System.currentTimeMillis();
+            System.out.println("Extract info from Track Duration ["+filename+"]:" + (time2 - time1));
 
 
             //TODO manage a list of tracks: a single file can contain multiple tracks
@@ -88,7 +86,8 @@ public class GPSController {
             log.error("file is not GPX ["+sax.getMessage()+"]:"+filename);
         }
         catch (Exception ex) {
-            ex.printStackTrace();
+            //TODO some tracks are not loaded, explore exception cause
+            log.error("can't load [" + ex.getMessage() + "]:" + filename);
             sb.append("can't load:"+filename);
         }
 
@@ -104,6 +103,7 @@ public class GPSController {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder builder;
+            //FIXME xpath evalutaion is really slow: optimize
             Document docForXpath = null;
             builder = factory.newDocumentBuilder();
             docForXpath = builder.parse(filename);
@@ -116,13 +116,17 @@ public class GPSController {
                 log.error("file is not TCX:"+filename);
             }
 
+            long time1 = System.currentTimeMillis();
             tracks = doc.extractTrack(filename);
+            long time2 = System.currentTimeMillis();
+            System.out.println("Extract info from Track Duration ["+filename+"]:" + (time2 - time1));
         }
         catch (SAXParseException sax) {
             log.error("file is not TCX ["+sax.getMessage()+"]:"+filename);
         }
         catch (Exception ex) {
-            ex.printStackTrace();
+            //TODO some tracks are not loaded, explore exception cause
+            log.error("can't load [" + ex.getMessage() + "]:" + filename);
             sb.append("can't load:"+filename);
         }
 
@@ -136,7 +140,7 @@ public class GPSController {
     }
 
     public static Map.Entry<Track,StringBuffer> extractTrackFromKml(String filename, ProfileSetting profileSetting) {
-        //TODO implementation
+        //TODO KML implementation
         return null;
     }
 }

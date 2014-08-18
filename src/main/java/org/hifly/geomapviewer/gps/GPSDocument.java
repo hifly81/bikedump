@@ -66,7 +66,7 @@ public abstract class GPSDocument {
                 totalEffectiveSpeed += speed;
                 totalEffectiveSpeedPoints++;
             } else {
-                log.warn(gpsFile+": found a spike in speed for coordinate ["+currentLat+","+currentLon+"]:"+speed);
+                //log.warn(gpsFile+": found a spike in speed for coordinate ["+currentLat+","+currentLon+"]:"+speed);
 
             }
             totalSpeed += speed;
@@ -84,7 +84,7 @@ public abstract class GPSDocument {
         coordinates.add(coordinate);
     }
 
-    protected void addGPSElement(
+    protected void createWaypointElement(
             String gpsFile,
             double currentLat,
             double currentLon,
@@ -95,6 +95,7 @@ public abstract class GPSDocument {
             BigDecimal lastCalcEle,
             Date currentTime,
             Date lastTime,
+            double heart,
             double totalDistanceFromStartingPoint) {
         long diffMillis = 0;
         if(currentTime!=null && lastTime!=null) {
@@ -102,7 +103,7 @@ public abstract class GPSDocument {
         }
         Double eleCurrent = elevationMap.get(GpsUtility.getKeyForCoordinatesMap(currentLat + "-" + currentLon));
         if(eleCurrent==null) {
-            log.warn(gpsFile+": not found elevation for:"+currentLat + "-" + currentLon);
+            //log.warn(gpsFile+": not found elevation for:"+currentLat + "-" + currentLon);
         }
         if (currentLat != lastLat && currentLon != lastLon) {
             totalTimeDiff += diffMillis;
@@ -115,16 +116,16 @@ public abstract class GPSDocument {
                 if (eleGained < 0) {
                     totalDescent += Math.abs(eleGained);
                 }
-                addWaypointElement(currentLat, currentLon, distance, eleCurrent, eleGained, currentTime,totalDistanceFromStartingPoint);
+                addWaypointElement(currentLat, currentLon, distance, eleCurrent, eleGained, currentTime, heart, totalDistanceFromStartingPoint);
             }
             addCalculatedElevationElement(currentCalcEle, lastCalcEle);
         }
         else {
             if (eleCurrent != null) {
-                addWaypointElement(currentLat,currentLon,distance,eleCurrent,0.0,currentTime,totalDistanceFromStartingPoint);
+                addWaypointElement(currentLat,currentLon,distance,eleCurrent,0.0,currentTime, heart, totalDistanceFromStartingPoint);
             }
             else {
-                log.warn(gpsFile+": coordinate not found:"+currentLat + "-" + currentLon);
+                //log.warn(gpsFile+": coordinate not found:"+currentLat + "-" + currentLon);
             }
         }
     }
@@ -136,6 +137,7 @@ public abstract class GPSDocument {
             Double eleCurrent,
             Double eleGained,
             Date currentTime,
+            double heart,
             double totalDistanceFromStartingPoint) {
         //TODO totalDistance or totalCalculatedDistance?
         Waypoint waypoint =
@@ -146,13 +148,13 @@ public abstract class GPSDocument {
                         eleCurrent,
                         eleGained,
                         totalDistanceFromStartingPoint,
+                        heart,
                         currentTime);
         waypoints.add(waypoint);
     }
 
     protected void addCalculatedElevationElement(BigDecimal eleCalcCurrent, BigDecimal eleCalcLast) {
         if (eleCalcCurrent != null && eleCalcLast != null) {
-            //TODO if
             Double eleGained = eleCalcCurrent.doubleValue() - eleCalcLast.doubleValue();
             if (eleGained > 0) {
                 totalCalculatedElevation += eleGained;

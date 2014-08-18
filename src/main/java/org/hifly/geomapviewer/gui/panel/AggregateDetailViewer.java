@@ -226,34 +226,39 @@ public class AggregateDetailViewer extends JScrollPane {
         }
 
         if (fastest != null) {
-            text += "Fastest Lap:" + fastest.getKm() + " - " + GpsUtility.roundDoubleStat(fastest.getAvgSpeed()) + "in track:" + fastestString + "<br>";
+            text += "Fastest Lap:" + fastest.getUnit() + " - " + GpsUtility.roundDoubleStat(fastest.getAvgSpeed()) + "in track:" + fastestString + "<br>";
         } else {
             text += "Fastest Lap:<br>";
         }
         if (slowest != null) {
-            text += "Slowest Lap:" + slowest.getKm() + " - " + GpsUtility.roundDoubleStat(slowest.getAvgSpeed()) + "in track:" + slowestString + "<br>";
+            text += "Slowest Lap:" + slowest.getUnit() + " - " + GpsUtility.roundDoubleStat(slowest.getAvgSpeed()) + "in track:" + slowestString + "<br>";
         } else {
             text += "Slowest Lap:<br>";
         }
         if (shortest != null) {
-            text += "Shortest Lap:" + shortest.getKm() + " - " + TimeUtility.toStringFromTimeDiff(shortest.getTimeIncrement()) + "in track:" + shortestString + "<br>";
+            text += "Shortest Lap:" + shortest.getUnit() + " - " + TimeUtility.toStringFromTimeDiff(shortest.getTimeIncrement()) + "in track:" + shortestString + "<br>";
         } else {
             text += "Shortest Lap:<br>";
         }
         if (longest != null) {
-            text += "Longest Lap:" + longest.getKm() + " - " + TimeUtility.toStringFromTimeDiff(longest.getTimeIncrement()) + "in track:" + longestString + "<br>";
+            text += "Longest Lap:" + longest.getUnit() + " - " + TimeUtility.toStringFromTimeDiff(longest.getTimeIncrement()) + "in track:" + longestString + "<br>";
         } else {
             text += "Longest Lap:<br>";
         }
 
 
-        text += "Most elevated Lap:" + mostElevated.getKm() + " - " + GpsUtility.roundDoubleStat(mostElevated.getEleGained()) + "in track:" + mostElevatedString + "<br>";
-        text += "Less elevated Lap:" + lessElevated.getKm() + " - " + GpsUtility.roundDoubleStat(lessElevated.getEleGained()) + "in track:" + lessElevatedString + "<br>";
+        text += "Most elevated Lap:" + mostElevated.getUnit() + " - " + GpsUtility.roundDoubleStat(mostElevated.getEleGained()) + "in track:" + mostElevatedString + "<br>";
+        text += "Less elevated Lap:" + lessElevated.getUnit() + " - " + GpsUtility.roundDoubleStat(lessElevated.getEleGained()) + "in track:" + lessElevatedString + "<br>";
+
+
+        //TODO these details not shown for aggregate detail
+        /*
         text += "</p></p><hr>";
 
         //write
         textPane.append(null, text);
         text = "";
+
 
         Map<Integer, List<SlopeSegment>> mapSlopes = new HashMap(tracks.size());
         for (int k = 0; k < tracks.size(); k++) {
@@ -336,7 +341,7 @@ public class AggregateDetailViewer extends JScrollPane {
 
         handler.setMapSlopes(mapSlopes);
 
-        text += "</p></p><hr>";
+        text += "</p></p><hr>"; */
 
         //write
         textPane.append(null, text);

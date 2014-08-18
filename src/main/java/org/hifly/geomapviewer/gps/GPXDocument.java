@@ -7,14 +7,8 @@ import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.utility.GpsUtility;
 import org.hifly.geomapviewer.utility.SlopeUtility;
 import org.hifly.geomapviewer.utility.TimeUtility;
-import org.xml.sax.InputSource;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -43,7 +37,7 @@ public class GPXDocument extends GPSDocument {
                     double currentLon = current.getLon().doubleValue();
                     //add coordinate element
                     addCoordinateElement(currentLat, currentLon);
-                    Date currentTime = current.getTime().getTime();
+                    Date currentTime = current.getTime()!=null?current.getTime().getTime():null;
                     if (last != null) {
                         double lastLat = last.getLat().doubleValue();
                         double lastLon = last.getLon().doubleValue();
@@ -53,18 +47,15 @@ public class GPXDocument extends GPSDocument {
                         BigDecimal currentCalcEle = current.getEle();
                         BigDecimal lastCalcEle = last.getEle();
                         Date lastTime = last.getTime().getTime();
-                        //add basic gps elements
-                        addGPSElement(gpsFile, currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, totalDistance);
-                        //calculate speed between points
-                        double timeDiffInHour = TimeUtility.getTimeDiffHour(last.getTime(), current.getTime());
-                        addSpeedElement(gpsFile, currentLat, currentLon, distance, timeDiffInHour);
-                        //TODO calculate heart
+                        double heart = 0;
+                        //calculate heart element
+                        //FIXME indexOf evalution is really slow: optimize
                         ExtensionsType ext = current.getExtensions();
                         if (ext != null) {
                             int i1 = ext.toString().indexOf("<gpxtpx:hr>") + 11;
                             int i2 = ext.toString().indexOf("</gpxtpx:hr>");
                             try {
-                                double heart = Double.valueOf(ext.toString().substring(i1, i2));
+                                heart = Double.valueOf(ext.toString().substring(i1, i2));
                                 addHeart(heart);
                                 if(heart > maxHeart) {
                                     maxHeart = heart;
@@ -73,6 +64,13 @@ public class GPXDocument extends GPSDocument {
                             catch (Exception ex) {}
 
                         }
+                        //add basic gps elements
+                        createWaypointElement(
+                                gpsFile, currentLat, currentLon, lastLat, lastLon, distance,
+                                currentCalcEle, lastCalcEle, currentTime, lastTime, heart, totalDistance);
+                        //calculate speed between points
+                        double timeDiffInHour = TimeUtility.getTimeDiffHour(last.getTime(), current.getTime());
+                        addSpeedElement(gpsFile, currentLat, currentLon, distance, timeDiffInHour);
                     }
                     last = current;
                 }
@@ -130,7 +128,7 @@ public class GPXDocument extends GPSDocument {
         resultTrack.setClimbingSpeed(stats.getClimbingSpeed());
         resultTrack.setClimbingTimeMillis(stats.getClimbingTime());
         resultTrack.setClimbingDistance(stats.getClimbingDistance());
-        resultTrack.setStatsNewKm(GpsUtility.calculateStatsFromKm(resultTrack.getCoordinatesNewKm()));
+        resultTrack.setStatsNewKm(GpsUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
 
         return resultTrack;
     }

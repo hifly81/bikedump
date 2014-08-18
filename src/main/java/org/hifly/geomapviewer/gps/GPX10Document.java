@@ -55,7 +55,7 @@ public class GPX10Document extends GPSDocument {
                             last.getTime().getTime();
                         }
                         //add basic gps elements
-                        addGPSElement(gpsFile, currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, totalDistance);
+                        createWaypointElement(gpsFile, currentLat, currentLon, lastLat, lastLon, distance, currentCalcEle, lastCalcEle, currentTime, lastTime, 0, totalDistance);
                         //calculate speed between points
                         double timeDiffInHour = TimeUtility.getTimeDiffHour(last.getTime(), current.getTime());
                         addSpeedElement(gpsFile, currentLat, currentLon, distance, timeDiffInHour);
@@ -114,7 +114,7 @@ public class GPX10Document extends GPSDocument {
         resultTrack.setClimbingSpeed(stats.getClimbingSpeed());
         resultTrack.setClimbingTimeMillis(stats.getClimbingTime());
         resultTrack.setClimbingDistance(stats.getClimbingDistance());
-        resultTrack.setStatsNewKm(GpsUtility.calculateStatsFromKm(resultTrack.getCoordinatesNewKm()));
+        resultTrack.setStatsNewKm(GpsUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
 
         return resultTrack;
     }

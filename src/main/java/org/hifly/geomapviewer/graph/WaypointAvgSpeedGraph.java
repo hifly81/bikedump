@@ -64,7 +64,7 @@ public class WaypointAvgSpeedGraph extends WaypointGraph {
         for(List<WaypointSegment> waypoint:waypoints) {
             XYSeries series1 = new XYSeries(index);
             for(WaypointSegment km:waypoint) {
-                series1.add(km.getKm(), GpsUtility.roundDoubleStat(km.getAvgSpeed()));
+                series1.add(km.getUnit(), GpsUtility.roundDoubleStat(km.getAvgSpeed()));
             }
             series.add(series1);
             index++;

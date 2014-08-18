@@ -1,20 +1,20 @@
 package org.hifly.geomapviewer.gui.events;
 
 import org.hifly.geomapviewer.gui.panel.TrackTable;
+import org.hifly.geomapviewer.storage.DataHolder;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.util.HashSet;
 
-public class SharedListSelectionHandler implements ListSelectionListener {
+public class TableSelectionHandler implements ListSelectionListener {
 
     private TrackTable table;
-    private HashSet<String> selectedTrackNames;
 
-    public SharedListSelectionHandler(TrackTable table, HashSet<String> selectedTrackNames) {
+    public TableSelectionHandler(TrackTable table, HashSet<String> selectedTrackNames) {
           this.table = table;
-          this.selectedTrackNames = selectedTrackNames;
+          DataHolder.tracksSelected = selectedTrackNames;
     }
 
     public void valueChanged(ListSelectionEvent e) {
@@ -25,10 +25,13 @@ public class SharedListSelectionHandler implements ListSelectionListener {
             int minIndex = lsm.getMinSelectionIndex();
             int maxIndex = lsm.getMaxSelectionIndex();
             for (int i = minIndex; i <= maxIndex; i++) {
+                if(minIndex == maxIndex && !DataHolder.tracksSelected.isEmpty()) {
+                    DataHolder.tracksSelected.clear();
+                }
                 if (lsm.isSelectedIndex(i)) {
                     Object fileKey = table.getValueAt(i, 1);
                     if (fileKey != null) {
-                        selectedTrackNames.add(fileKey.toString());
+                        DataHolder.tracksSelected.add(fileKey.toString());
                     }
                 }
             }
@@ -36,11 +39,4 @@ public class SharedListSelectionHandler implements ListSelectionListener {
 
     }
 
-    public HashSet<String> getSelectedTrackNames() {
-        return selectedTrackNames;
-    }
-
-    public void setSelectedTrackNames(HashSet<String> selectedTrackNames) {
-        this.selectedTrackNames = selectedTrackNames;
-    }
 }

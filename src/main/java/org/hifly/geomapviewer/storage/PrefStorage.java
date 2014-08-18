@@ -80,6 +80,7 @@ public class PrefStorage {
         return bikes;
     }
 
+
     public static LibrarySetting readLibrarySetting() {
         File file = new File(System.getProperty("user.home") + "/.geomapviewer/preferences/library.pref");
         FileInputStream streamIn = null;

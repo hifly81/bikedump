@@ -1,6 +1,5 @@
 package org.hifly.geomapviewer.gps;
 
-import com.garmin.xmlschemas.trainingCenterDatabase.v2.*;
 import com.google.earth.kml.x21.KmlDocument;
 import com.google.earth.kml.x21.KmlType;
 import org.hifly.geomapviewer.domain.Author;
@@ -8,13 +7,10 @@ import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.utility.GpsUtility;
 import org.hifly.geomapviewer.utility.SlopeUtility;
-import org.hifly.geomapviewer.utility.TimeUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -75,7 +71,7 @@ public class KML21Document extends GPSDocument {
         resultTrack.setClimbingSpeed(stats.getClimbingSpeed());
         resultTrack.setClimbingTimeMillis(stats.getClimbingTime());
         resultTrack.setClimbingDistance(stats.getClimbingDistance());
-        resultTrack.setStatsNewKm(GpsUtility.calculateStatsFromKm(resultTrack.getCoordinatesNewKm()));
+        resultTrack.setStatsNewKm(GpsUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
 
         result.add(resultTrack);
 

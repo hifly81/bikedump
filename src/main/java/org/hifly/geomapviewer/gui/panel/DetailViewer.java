@@ -9,7 +9,6 @@ import org.hifly.geomapviewer.utility.TimeUtility;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ public class DetailViewer extends JScrollPane {
         String imgSave = null;
         String imgSun = null;
         String imgSunset = null;
-        String imgFw = null;
+        String imgEdit = null;
         try {
             URL imgMountainUrl = getClass().getResource("/img/mountain.png");
             imgMountain =  imgMountainUrl.toExternalForm();
@@ -66,29 +65,26 @@ public class DetailViewer extends JScrollPane {
             URL imgSunsetUrl = getClass().getResource("/img/sunset.png");
             imgSunset =  imgSunsetUrl.toExternalForm();
 
-            URL imgFwUrl = getClass().getResource("/img/fw.png");
-            imgFw =  imgFwUrl.toExternalForm();
+            URL imgEditUrl = getClass().getResource("/img/edit.png");
+            imgEdit =  imgEditUrl.toExternalForm();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-
+        try {
+            //TODO change URL format and include img;
+            textPane.addHyperlinkImg(
+                    new URL("http://geomapviewer.com?edit=" + track.getFileName()),imgEdit, "Edit", Color.BLUE);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
 
         appendTextToBuffer( "<p><b>" + track.getName() + "</b><br>");
         appendTextToReportBuffer(track.getName());
         String sportTypeSection = "Sport type:" + track.getSportType();
         appendTextToBuffer(sportTypeSection + "<br>");
         appendTextToReportBuffer(sportTypeSection);
-        //write
-        textPane.append(null, flushBuffer());
-        try {
-            //TODO change URL format and include img;
-            textPane.addHyperlinkImg(
-                    new URL("http://geomapviewer.com?sportType=true"),imgFw, Color.BLUE);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
         String timeSection = TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getStartDate()) + "&nbsp; &nbsp;" + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getEndDate());
         appendTextToBuffer(timeSection + "<br>");
         appendTextToReportBuffer(timeSection);
@@ -169,7 +165,7 @@ public class DetailViewer extends JScrollPane {
         WaypointSegment lessElevated = track.getStatsNewKm().get("Less Elevated");
         WaypointSegment mostElevated = track.getStatsNewKm().get("Most Elevated");
         if(fastest!=null) {
-            String fastestLapSection = "Fastest Lap:" + fastest.getKm() + " - " + GpsUtility.roundDoubleStat(fastest.getAvgSpeed());
+            String fastestLapSection = "Fastest Lap:" + fastest.getUnit() + " - " + GpsUtility.roundDoubleStat(fastest.getAvgSpeed());
             appendTextToBuffer(fastestLapSection + "<br>");
             appendTextToReportBuffer(fastestLapSection);
         }
@@ -179,7 +175,7 @@ public class DetailViewer extends JScrollPane {
             appendTextToReportBuffer(fastestLapSection);
         }
         if(slowest!=null) {
-            String slowestLapSection = "Slowest Lap:" + slowest.getKm() + " - " + GpsUtility.roundDoubleStat(slowest.getAvgSpeed());
+            String slowestLapSection = "Slowest Lap:" + slowest.getUnit() + " - " + GpsUtility.roundDoubleStat(slowest.getAvgSpeed());
             appendTextToBuffer(slowestLapSection + "<br>");
             appendTextToReportBuffer(slowestLapSection);
         }
@@ -189,7 +185,7 @@ public class DetailViewer extends JScrollPane {
             appendTextToReportBuffer(slowestLapSection);
         }
         if(shortest!=null) {
-            String shortestLapSection = "Shortest Lap:" + shortest.getKm() + " - " + TimeUtility.toStringFromTimeDiff(shortest.getTimeIncrement());
+            String shortestLapSection = "Shortest Lap:" + shortest.getUnit() + " - " + TimeUtility.toStringFromTimeDiff(shortest.getTimeIncrement());
             appendTextToBuffer(shortestLapSection + "<br>");
             appendTextToReportBuffer(shortestLapSection);
         }
@@ -199,7 +195,7 @@ public class DetailViewer extends JScrollPane {
             appendTextToReportBuffer(shortestLapSection);
         }
         if(longest!=null) {
-            String longestLapSection = "Longest Lap:" + longest.getKm() + " - " + TimeUtility.toStringFromTimeDiff(longest.getTimeIncrement());
+            String longestLapSection = "Longest Lap:" + longest.getUnit() + " - " + TimeUtility.toStringFromTimeDiff(longest.getTimeIncrement());
             appendTextToBuffer(longestLapSection + "<br>");
             appendTextToReportBuffer(longestLapSection);
         }
@@ -209,10 +205,10 @@ public class DetailViewer extends JScrollPane {
             appendTextToReportBuffer(longestLapSection);
         }
 
-        String mostElevatedLapSection = "Most elevated Lap:" + mostElevated.getKm() + " - " + GpsUtility.roundDoubleStat(mostElevated.getEleGained());
+        String mostElevatedLapSection = "Most elevated Lap:" + mostElevated.getUnit() + " - " + GpsUtility.roundDoubleStat(mostElevated.getEleGained());
         appendTextToBuffer(mostElevatedLapSection + "<br>");
         appendTextToReportBuffer(mostElevatedLapSection);
-        String lessElevatedLap = "Less elevated Lap:" + lessElevated.getKm() + " - " + GpsUtility.roundDoubleStat(lessElevated.getEleGained());
+        String lessElevatedLap = "Less elevated Lap:" + lessElevated.getUnit() + " - " + GpsUtility.roundDoubleStat(lessElevated.getEleGained());
         appendTextToBuffer(lessElevatedLap + "<br>");
         appendTextToReportBuffer(lessElevatedLap);
         appendTextToBuffer("<br><br></p><hr>");
@@ -240,9 +236,9 @@ public class DetailViewer extends JScrollPane {
             try {
                 //TODO change URL format and include img;
                 textPane.addHyperlinkImg(
-                        new URL("http://geomapviewer.com?slopeIndex=" + z),imgMountain, Color.BLUE);
+                        new URL("http://geomapviewer.com?slopeIndex=" + z),imgMountain, "View climb detail" ,Color.BLUE);
                 textPane.addHyperlinkImg(
-                        new URL("http://geomapviewer.com/save/?slopeIndex=" + z), imgSave, Color.BLUE);
+                        new URL("http://geomapviewer.com/save/?slopeIndex=" + z), imgSave, "Save climb", Color.BLUE);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
@@ -364,7 +360,9 @@ public class DetailViewer extends JScrollPane {
                 appendTextToBuffer("Elevation gained:" + fontDescent + GpsUtility.roundDoubleStat(entry.getValue().getEleGained()) + " m</font><br>");
             }
             appendTextToReportBuffer("Elevation gained:" + GpsUtility.roundDoubleStat(entry.getValue().getEleGained()));
-            appendTextToBuffer("<br><br>");
+            String heartSection = "Min heart:" + GpsUtility.roundDoubleStat(entry.getValue().getMinHeart()) + "-" + "Max heart:" + GpsUtility.roundDoubleStat(entry.getValue().getMaxHeart());
+            appendTextToBuffer(heartSection+"<br><br>");
+            appendTextToReportBuffer(heartSection);
             appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
             km++;
         }

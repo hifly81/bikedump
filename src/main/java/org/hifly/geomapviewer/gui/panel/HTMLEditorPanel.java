@@ -57,7 +57,7 @@ public class HTMLEditorPanel extends JTextPane {
         }
     }
 
-    public void addHyperlinkImg(URL url, String text, Color color) {
+    public void addHyperlinkImg(URL url, String text, String alt, Color color) {
         try {
             Document doc = this.getDocument();
             SimpleAttributeSet attrs = new SimpleAttributeSet();
@@ -66,6 +66,7 @@ public class HTMLEditorPanel extends JTextPane {
             attrs.addAttribute(HTML.Attribute.HREF, url.toString());
             attrs.addAttribute(StyleConstants.NameAttribute, HTML.Tag.IMG);
             attrs.addAttribute(HTML.Attribute.SRC, text);
+            attrs.addAttribute(HTML.Attribute.ALT, alt);
             doc.insertString(doc.getLength(), " ", attrs);
         } catch (BadLocationException e) {
             e.printStackTrace(System.err);

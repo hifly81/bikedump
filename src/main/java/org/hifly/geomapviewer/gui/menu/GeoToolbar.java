@@ -1,8 +1,23 @@
 package org.hifly.geomapviewer.gui.menu;
 
+import org.hifly.geomapviewer.graph.WaypointAvgSpeedGraph;
+import org.hifly.geomapviewer.graph.WaypointElevationGainedGraph;
+import org.hifly.geomapviewer.graph.WaypointElevationGraph;
+import org.hifly.geomapviewer.graph.WaypointTimeGraph;
+import org.hifly.geomapviewer.gui.GeoMapViewer;
+import org.hifly.geomapviewer.gui.dialog.GraphViewer;
+import org.hifly.geomapviewer.gui.panel.WorkoutCalendar;
+import org.hifly.geomapviewer.report.PdfReport;
+import org.hifly.geomapviewer.storage.DataHolder;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Date;
 
 /**
  * @author
@@ -10,18 +25,19 @@ import java.net.URL;
  */
 public class GeoToolbar extends JToolBar {
 
-    protected JButton backButton;
-    protected JButton graphButton;
-    protected JButton reportButton;
+    private GeoMapViewer currentFrame;
+    private JButton backButton;
+    private JButton graphButton;
+    private JButton reportButton;
+    private JButton calendarButton;
 
-
-    public GeoToolbar() {
+    public GeoToolbar(GeoMapViewer currentFrame) {
         super();
-
+        this.currentFrame = currentFrame;
         addButtons();
     }
 
-    protected void addButtons() {
+    private void addButtons() {
         URL backImageUrl = getClass().getResource("/img/back.png");
         ImageIcon backImageIcon = new ImageIcon(backImageUrl);
         Image img = backImageIcon.getImage();
@@ -40,18 +56,67 @@ public class GeoToolbar extends JToolBar {
         img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
         reportImageIcon = new ImageIcon(img);
         reportButton = makeNavigationButton("Report","Report","Report",reportImageIcon);
+        URL calendarImageUrl = getClass().getResource("/img/calendar.png");
+        ImageIcon calendarImageIcon = new ImageIcon(calendarImageUrl);
+        img = calendarImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        calendarImageIcon = new ImageIcon(img);
+        calendarButton = makeNavigationButton("Calendar","Calendar","Calendar",calendarImageIcon);
+
         add(backButton);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (currentFrame.getFolderDetailViewer() != null && currentFrame.getFolderMapScrollViewer() != null && currentFrame.getFolderTableViewer() != null) {
+                    currentFrame.repaintPanels(currentFrame.getFolderTableViewer(), currentFrame.getFolderMapScrollViewer(), currentFrame.getFolderDetailViewer());
+                }
+            }
+        });
         add(graphButton);
+        graphButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                WaypointElevationGraph waypointElevationGraph = new WaypointElevationGraph(DataHolder.listsWaypointSegment);
+                WaypointAvgSpeedGraph waypointAvgSpeedGraph = new WaypointAvgSpeedGraph(DataHolder.listsWaypointSegment);
+                WaypointTimeGraph waypointTimeGraph = new WaypointTimeGraph(DataHolder.listsWaypointSegment);
+                WaypointElevationGainedGraph waypointElevationGainedGraph = new WaypointElevationGainedGraph(DataHolder.listsWaypointSegment);
+                new GraphViewer(currentFrame,
+                                Arrays.asList(waypointElevationGraph, waypointAvgSpeedGraph, waypointTimeGraph, waypointElevationGainedGraph));
+            }
+        });
         add(reportButton);
+        reportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (currentFrame.getTextForReport() != null && !currentFrame.getTextForReport().isEmpty()) {
+                    try {
+                        PdfReport report = new PdfReport(currentFrame.getTextForReport());
+                        String fileName = System.getProperty("user.home") + "/.geomapviewer/report" + new Date().getTime() + ".pdf";
+                        File tmpPdf = new File(fileName);
+                        report.saveReport(fileName);
+                        if (Desktop.isDesktopSupported()) {
+                            Desktop.getDesktop().open(tmpPdf);
+                        }
+                        //TODO define a delete method on exit
+
+                    } catch (Exception ex) {
+                        //TODO define exception
+                    }
+                }
+            }
+        });
+        add(calendarButton);
+        calendarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                new WorkoutCalendar(currentFrame);
+            }
+        });
 
     }
 
-    protected JButton makeNavigationButton(
-                                           String actionCommand,
-                                           String toolTipText,
-                                           String altText,
-                                           ImageIcon icon) {
-        JButton button = null;
+    private JButton makeNavigationButton(String actionCommand, String toolTipText, String altText, ImageIcon icon) {
+        JButton button;
         if(icon!=null) {
             button = new JButton(icon);
         }
@@ -62,32 +127,8 @@ public class GeoToolbar extends JToolBar {
         button.setActionCommand(actionCommand);
         button.setToolTipText(toolTipText);
 
-
         return button;
 
     }
 
-    public JButton getGraphButton() {
-        return graphButton;
-    }
-
-    public void setGraphButton(JButton graphButton) {
-        this.graphButton = graphButton;
-    }
-
-    public JButton getReportButton() {
-        return reportButton;
-    }
-
-    public void setReportButton(JButton reportButton) {
-        this.reportButton = reportButton;
-    }
-
-    public JButton getBackButton() {
-        return backButton;
-    }
-
-    public void setBackButton(JButton backButton) {
-        this.backButton = backButton;
-    }
 }

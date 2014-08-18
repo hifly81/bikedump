@@ -22,7 +22,7 @@ public class TooltipMarker extends MapMarkerDot  {
     public TooltipMarker(double lat, double lon, double x, double y,WaypointSegment waypoint, MapViewer viewer) {
         super(lat,lon);
 
-        text =  "Lap: "+waypoint.getKm();
+        text =  "Lap: "+waypoint.getUnit();
         text2 = TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", waypoint.getTimeSpent());
         text3 = TimeUtility.toStringFromTimeDiff(waypoint.getTimeIncrement());
         text4 = GpsUtility.roundDoubleStat(waypoint.getAvgSpeed()) + " km/h";

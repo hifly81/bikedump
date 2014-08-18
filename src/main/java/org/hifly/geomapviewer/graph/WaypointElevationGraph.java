@@ -132,7 +132,7 @@ public class WaypointElevationGraph extends WaypointGraph {
         for(List<WaypointSegment> waypoint:waypoints) {
             XYSeries series1 = new XYSeries(index);
             for(WaypointSegment km:waypoint) {
-                series1.add(km.getKm(), GpsUtility.roundDoubleStat(km.getEle()));
+                series1.add(km.getUnit(), GpsUtility.roundDoubleStat(km.getEle()));
             }
             series.add(series1);
             index++;

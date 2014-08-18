@@ -37,7 +37,6 @@ public class TrackTable extends JTable {
         setFillsViewportHeight(true);
         setRowSorter(sorter);
 
-        //FIXME don't order by month
         final Comparator<Object> ascendingColumn0 = new Comparator<Object>() {
 
             @Override
@@ -57,9 +56,9 @@ public class TrackTable extends JTable {
                     if (s1 != null && s2 != null && !s1.equalsIgnoreCase("") && !s2.equalsIgnoreCase("")) {
                         try {
                             return
-                                    TimeUtility.convertToDate("dd-mm-yyyy", s1).compareTo(TimeUtility.convertToDate("dd-mm-yyyy", s2));
+                                    TimeUtility.convertToDate(TimeUtility.ITA_DATE_FORMAT, s1).compareTo(TimeUtility.convertToDate(TimeUtility.ITA_DATE_FORMAT, s2));
                         } catch (Exception e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -137,7 +136,7 @@ public class TrackTable extends JTable {
         }
 
         public Object getValueAt(int row, int col) {
-            SimpleDateFormat dt1 = new SimpleDateFormat("dd-MM-yyyy");
+            SimpleDateFormat dt1 = new SimpleDateFormat(TimeUtility.ITA_DATE_FORMAT);
             Track track = tracks.get(row);
             if (col == 0) {
                 if (track.getStartDate() == null) {

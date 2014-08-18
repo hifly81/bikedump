@@ -30,6 +30,7 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
     public Map<String,WaypointSegment>  mapCircleCoordinates = new Hashtable<>();
     public TooltipMarker lastOpenedMarker = null;
 
+    //TODO extremely slow even with 4 routes
     public MapViewer(
             List<List<ICoordinate>> coordinates,
             List<Map<String, WaypointSegment>> coordinatesNewKm,
@@ -185,7 +186,7 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
             }
         }
 
-        log.debug("found marker:" + waypoint.getKm());
+        log.debug("found marker:" + waypoint.getUnit());
 
         if(lastOpenedMarker!=null) {
            removeMapMarker(lastOpenedMarker);

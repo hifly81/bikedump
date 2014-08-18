@@ -8,19 +8,21 @@ import java.util.Date;
  */
 public class WaypointSegment {
     //TODO consider even miles
-    private int km;
+    private int unit;
     private Date timeSpent;
     private long timeIncrement;
     private double avgSpeed;
     private double eleGained;
     private double ele;
+    private double minHeart;
+    private double maxHeart;
 
-    public int getKm() {
-        return km;
+    public int getUnit() {
+        return unit;
     }
 
-    public void setKm(int km) {
-        this.km = km;
+    public void setUnit(int unit) {
+        this.unit = unit;
     }
 
     public Date getTimeSpent() {
@@ -63,7 +65,23 @@ public class WaypointSegment {
         this.timeIncrement = timeIncrement;
     }
 
+    public double getMinHeart() {
+        return minHeart;
+    }
+
+    public void setMinHeart(double minHeart) {
+        this.minHeart = minHeart;
+    }
+
+    public double getMaxHeart() {
+        return maxHeart;
+    }
+
+    public void setMaxHeart(double maxHeart) {
+        this.maxHeart = maxHeart;
+    }
+
     public String toString() {
-        return "[WaypointSegment]<br>"+km+" km.))) Time Spent:"+timeSpent+" - Time increment:"+timeIncrement+"<br> Avg speed:"+avgSpeed+" km/h -<br> Ele gained:"+eleGained+" m.";
+        return "[WaypointSegment]<br>"+ unit +" unit.))) Time Spent:"+timeSpent+" - Time increment:"+timeIncrement+"<br> Avg speed:"+avgSpeed+" unit/h -<br> Ele gained:"+eleGained+" m.";
     }
 }

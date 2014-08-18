@@ -14,6 +14,7 @@ public class Waypoint implements Serializable {
     private double lat;
     private double lon;
     private double ele;
+    private double heart;
     private double distanceFromStartingPoint;
     private Date dateRelevation;
 
@@ -71,5 +72,13 @@ public class Waypoint implements Serializable {
 
     public void setDistanceFromStartingPoint(double distanceFromStartingPoint) {
         this.distanceFromStartingPoint = distanceFromStartingPoint;
+    }
+
+    public double getHeart() {
+        return heart;
+    }
+
+    public void setHeart(double heart) {
+        this.heart = heart;
     }
 }

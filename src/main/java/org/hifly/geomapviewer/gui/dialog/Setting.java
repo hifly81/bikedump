@@ -27,7 +27,7 @@ public class Setting extends JDialog {
     private JSpinner spinnerWeight, spinnerHeight, spinnerBikeWeight = null;
     private JComboBox bikeBrandsCombo, bikeTypesCombo = null;
     private JTextField bikeNameField, bikeModelField = null;
-    private JCheckBox scanFoldersCheck = null;
+    private JCheckBox scanFoldersCheck, elevationCorrection = null;
     private ProfileSetting profileSetting;
 
 
@@ -41,6 +41,7 @@ public class Setting extends JDialog {
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("General", null, createGeneralSettingPanel(), "General settings");
+        tabbedPane.addTab("Physical", null, createPhysicalSettingPanel(), "Physical settings");
         tabbedPane.addTab("Conversion", null, createConversionSettingPanel(), "Conversion settings");
         tabbedPane.addTab("Library", null, createLibrarySettingPanel(), "Library settings");
         tabbedPane.addTab("Bike", null, createBikeSettingPanel(), "Bike settings");
@@ -58,6 +59,25 @@ public class Setting extends JDialog {
     }
 
     public JPanel createGeneralSettingPanel() {
+        JPanel panel = new JPanel();
+
+        JPanel panel1 = new JPanel();
+        Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "General");
+        panel1.setBorder(titleBorder);
+
+        elevationCorrection = new JCheckBox("Elevation Correction");
+        elevationCorrection.addItemListener(new CheckListener());
+        //TODO implement save/restore from pref
+        elevationCorrection.setSelected(true);
+
+        panel1.add(elevationCorrection);
+
+        panel.add(panel1);
+
+        return panel;
+    }
+
+    public JPanel createPhysicalSettingPanel() {
         JPanel panel = new JPanel();
 
         JPanel panel1 = new JPanel();

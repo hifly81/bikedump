@@ -16,6 +16,8 @@ import java.util.Map;
  */
 public class TimeUtility {
 
+    public static final String ITA_DATE_FORMAT = "dd-MM-yyyy";
+
     public static double getTimeDiffHour(Calendar first, Calendar second) {
         if(first==null || second==null) {
             return 0;
