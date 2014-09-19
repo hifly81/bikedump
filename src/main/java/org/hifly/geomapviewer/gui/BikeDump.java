@@ -3,17 +3,9 @@ package org.hifly.geomapviewer.gui;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.hifly.geomapviewer.controller.GPSController;
-import org.hifly.geomapviewer.domain.Bike;
-import org.hifly.geomapviewer.domain.LibrarySetting;
-import org.hifly.geomapviewer.domain.ProfileSetting;
-import org.hifly.geomapviewer.domain.Track;
+import org.hifly.geomapviewer.domain.*;
 import org.hifly.geomapviewer.domain.gps.Coordinate;
 import org.hifly.geomapviewer.domain.gps.WaypointSegment;
-import org.hifly.geomapviewer.graph.WaypointAvgSpeedGraph;
-import org.hifly.geomapviewer.graph.WaypointElevationGainedGraph;
-import org.hifly.geomapviewer.graph.WaypointElevationGraph;
-import org.hifly.geomapviewer.graph.WaypointTimeGraph;
-import org.hifly.geomapviewer.gui.dialog.GraphViewer;
 import org.hifly.geomapviewer.gui.dialog.ScrollableDialog;
 import org.hifly.geomapviewer.gui.dialog.Setting;
 import org.hifly.geomapviewer.gui.dialog.TipOfTheDay;
@@ -24,7 +16,6 @@ import org.hifly.geomapviewer.gui.menu.GeoFileChooser;
 import org.hifly.geomapviewer.gui.menu.GeoFolderChooser;
 import org.hifly.geomapviewer.gui.menu.GeoMapMenu;
 import org.hifly.geomapviewer.gui.menu.GeoToolbar;
-import org.hifly.geomapviewer.report.PdfReport;
 import org.hifly.geomapviewer.storage.DataHolder;
 import org.hifly.geomapviewer.storage.GeoMapStorage;
 import org.hifly.geomapviewer.utility.GUIUtility;
@@ -53,11 +44,11 @@ import java.util.List;
  * @date 07/02/14
  */
 //TODO use resource bundles i18n
-public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
+public class BikeDump extends JFrame implements JMapViewerEventListener {
 
-    private ProfileSetting profileSetting = new ProfileSetting();
+    private ProfileSetting profileSetting;
     private Setting settingDialog = null;
-    private GeoMapViewer currentFrame = this;
+    private BikeDump currentFrame = this;
     protected MapViewer mapViewer;
     private JSplitPane mainPanel = new JSplitPane();
     private JLabel zoomLabel, zoomValue, measureLabel, measureValue;
@@ -66,7 +57,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
     public TrackTable trackTable = null;
     private String textForReport;
 
-    public GeoMapViewer() {
+    public BikeDump() {
         super();
         //panel dimension
         dimension = GUIUtility.getScreenDimension();
@@ -77,11 +68,10 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
         addWindowListener(new PanelWindowAdapter());
 
         //saved pref
-        List<Bike> bikes = GeoMapStorage.savedBikesList;
-        if (bikes != null && !bikes.isEmpty()) {
-            profileSetting.setBikes(bikes);
+        profileSetting = GeoMapStorage.profileSetting;
+        if (profileSetting == null) {
+            profileSetting = new ProfileSetting();
         }
-
 
         //define dialogs
         settingDialog = new Setting(currentFrame, profileSetting);
@@ -101,7 +91,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
         itemImportFile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                int returnVal = fileChooser.showOpenDialog(GeoMapViewer.this);
+                int returnVal = fileChooser.showOpenDialog(BikeDump.this);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fileChooser.getSelectedFile();
                     reloadTrackPanel(file);
@@ -114,7 +104,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
         itemImportFolder.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                int returnVal = folderChooser.showOpenDialog(GeoMapViewer.this);
+                int returnVal = folderChooser.showOpenDialog(BikeDump.this);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File directory = folderChooser.getSelectedFile();
                     Collection files = FileUtils.listFiles(directory, null, true);
@@ -184,10 +174,8 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
 
         new SwingWorker<Void, String>() {
             final JLabel label = new JLabel("Loading... ", JLabel.CENTER);
-
             @Override
             protected Void doInBackground() throws Exception {
-                long time1 = System.currentTimeMillis();
                 add(label, BorderLayout.CENTER);
                 label.setVisible(true);
                 //load saved elements
@@ -199,14 +187,10 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                     }
                     List<Track> tracks = new ArrayList();
                     StringBuffer sb = new StringBuffer();
-                    for (Map.Entry<String, String> entry : GeoMapStorage.tracksLibrary.entrySet()) {
+                    for (Map.Entry<String, TrackPref> entry : GeoMapStorage.tracksLibrary.entrySet()) {
                         File file = new File(entry.getKey());
                         addTrackToCache(coordinates, waypoint, tracks, file, sb);
                     }
-
-                    long time2 = System.currentTimeMillis();
-                    System.out.println("Loader tracks Duration:" + (time2 - time1));
-
                     //check new file
                     if (GeoMapStorage.librarySetting != null && GeoMapStorage.librarySetting.isScanFolder()) {
                         if (GeoMapStorage.librarySetting.getScannedDirs() != null && !GeoMapStorage.librarySetting.getScannedDirs().isEmpty()) {
@@ -261,7 +245,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
             JScrollPane detailViewer) {
 
         JSplitPane split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeViewer, mapScrollViewer);
-        split1.setDividerLocation(dimension.getKey() / 6);
+        split1.setDividerLocation(dimension.getKey() / 3);
         JSplitPane split2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, detailViewer, null);
         JSplitPane split3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, split1, split2);
         split3.setDividerLocation(dimension.getKey() - 350);
@@ -334,7 +318,7 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
     }
 
     public static void main(String[] args) throws Exception {
-        GeoMapViewer viewer = new GeoMapViewer();
+        BikeDump viewer = new BikeDump();
         viewer.setVisible(true);
     }
 
@@ -549,7 +533,6 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
 
     }
 
-
     private void addTrackToCache(
             List<List<Coordinate>> coordinates,
             List<Map<String, WaypointSegment>> waypoint,
@@ -577,7 +560,11 @@ public class GeoMapViewer extends JFrame implements JMapViewerEventListener {
                     if (GeoMapStorage.tracksLibrary == null) {
                         GeoMapStorage.tracksLibrary = new HashMap();
                     }
-                    GeoMapStorage.tracksLibrary.put(track.getFileName(), track.getFileName());
+                    TrackPref trackPref = new TrackPref();
+                    trackPref.setHeight(profileSetting.getHeight());
+                    trackPref.setWeight(profileSetting.getWeight());
+                    trackPref.setLhtr(profileSetting.getLhtr());
+                    GeoMapStorage.tracksLibrary.put(track.getFileName(), trackPref);
                     coordinates.add(track.getCoordinates());
                     waypoint.add(track.getCoordinatesNewKm());
                     tracks.add(track);

@@ -105,6 +105,15 @@ public class TrackTable extends JTable {
         setRowSelectionAllowed(true);
         setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         setFont(new Font("Arial", Font.PLAIN, 10));
+        setIntercellSpacing(new Dimension(10,0));
+        getColumnModel().setColumnMargin(10);
+
+        Dimension tableSize =  this.getPreferredSize();
+        this.getColumnModel().getColumn(0).setPreferredWidth(Math.round(tableSize.width*0.20f));
+        this.getColumnModel().getColumn(1).setPreferredWidth(Math.round(tableSize.width*0.35f));
+        this.getColumnModel().getColumn(2).setPreferredWidth(Math.round(tableSize.width*0.15f));
+        this.getColumnModel().getColumn(3).setPreferredWidth(Math.round(tableSize.width*0.15f));
+        this.getColumnModel().getColumn(4).setPreferredWidth(Math.round(tableSize.width*0.15f));
     }
 
     protected JTableHeader createDefaultTableHeader() {

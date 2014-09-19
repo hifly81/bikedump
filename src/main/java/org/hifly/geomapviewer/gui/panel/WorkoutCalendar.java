@@ -2,7 +2,7 @@ package org.hifly.geomapviewer.gui.panel;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.hifly.geomapviewer.domain.Track;
-import org.hifly.geomapviewer.gui.GeoMapViewer;
+import org.hifly.geomapviewer.gui.BikeDump;
 import org.hifly.geomapviewer.storage.DataHolder;
 
 import javax.swing.*;
@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.List;
 
 public class WorkoutCalendar extends JFrame {
-    private GeoMapViewer mapViewer;
+    private BikeDump mapViewer;
     private WorkoutCalendar currentFrame;
 
     static JLabel lblMonth;
@@ -27,7 +27,7 @@ public class WorkoutCalendar extends JFrame {
     static HashMap<String, List<Track>> tracksByMonth = DataHolder.getTracksByMonth();
 
     //TODO derive dimension from parent
-    public WorkoutCalendar(GeoMapViewer mapViewer) {
+    public WorkoutCalendar(BikeDump mapViewer) {
         this.mapViewer = mapViewer;
         this.currentFrame = this;
 

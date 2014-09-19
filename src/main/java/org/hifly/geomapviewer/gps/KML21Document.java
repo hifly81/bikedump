@@ -5,7 +5,7 @@ import com.google.earth.kml.x21.KmlType;
 import org.hifly.geomapviewer.domain.Author;
 import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.Track;
-import org.hifly.geomapviewer.utility.GpsUtility;
+import org.hifly.geomapviewer.utility.GPSUtility;
 import org.hifly.geomapviewer.utility.SlopeUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,14 +64,14 @@ public class KML21Document extends GPSDocument {
         resultTrack.setAuthor(author);
         resultTrack.setSlopes(SlopeUtility.extractSlope(waypoints, profileSetting));
         resultTrack.setCoordinates(coordinates);
-        GpsUtility.GpsStats stats = GpsUtility.extractInfoFromWaypoints(waypoints, totalDistance);
+        GPSUtility.GpsStats stats = GPSUtility.extractInfoFromWaypoints(waypoints, totalDistance);
         resultTrack.setCoordinatesNewKm(stats.getWaypointsKm());
         resultTrack.setMaxAltitude(stats.getMaxAltitude());
         resultTrack.setMinAltitude(stats.getMinAltitude());
         resultTrack.setClimbingSpeed(stats.getClimbingSpeed());
         resultTrack.setClimbingTimeMillis(stats.getClimbingTime());
         resultTrack.setClimbingDistance(stats.getClimbingDistance());
-        resultTrack.setStatsNewKm(GpsUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
+        resultTrack.setStatsNewKm(GPSUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
 
         result.add(resultTrack);
 

@@ -11,7 +11,7 @@ import java.util.*;
  * @author
  * @date 02/02/14
  */
-public class GpsUtility {
+public class GPSUtility {
 
     public static class GpsStats {
         private Map<String, WaypointSegment> waypointsKm;
@@ -133,7 +133,7 @@ public class GpsUtility {
         //create a gradient wrapper
         Waypoint wrapper = new Waypoint();
         wrapper.setDistance(distance);
-        wrapper.setGradient(GpsUtility.gradientPercentage(gainInElevation, distance));
+        wrapper.setGradient(GPSUtility.gradientPercentage(gainInElevation, distance));
         wrapper.setDateRelevation(time);
         wrapper.setEle(elevation);
         wrapper.setLat(latitude);
@@ -143,8 +143,8 @@ public class GpsUtility {
         return wrapper;
     }
 
-    public static GpsUtility.GpsStats extractInfoFromWaypoints(List<Waypoint> waypoints, double totalDistance) {
-        GpsUtility.GpsStats stats = new GpsStats();
+    public static GPSUtility.GpsStats extractInfoFromWaypoints(List<Waypoint> waypoints, double totalDistance) {
+        GPSUtility.GpsStats stats = new GpsStats();
         if(waypoints == null || waypoints.isEmpty())
             return stats;
 

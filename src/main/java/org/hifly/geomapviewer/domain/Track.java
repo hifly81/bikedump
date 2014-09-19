@@ -27,35 +27,24 @@ public class Track {
     protected Date endDate;
     @DatabaseField(canBeNull = false)
     protected double totalDistance;
-    @DatabaseField(canBeNull = false)
-    protected double calculatedAvgSpeed;
-    @DatabaseField(canBeNull = false)
-    protected double effectiveAvgSpeed;
-    @DatabaseField(canBeNull = false)
-    protected double maxSpeed;
-    @DatabaseField(canBeNull = false)
-    protected double calculatedElevation;
-    @DatabaseField(canBeNull = false)
-    protected double realElevation;
-    @DatabaseField(canBeNull = false)
-    protected double calculatedDescent;
-    @DatabaseField(canBeNull = false)
-    protected double realDescent;
-    @DatabaseField(canBeNull = false)
-    protected long realTime;
-    @DatabaseField(canBeNull = false)
-    protected long effectiveTime;
     @DatabaseField(canBeNull = true)
     protected long calories;
-    @DatabaseField(canBeNull = true)
-    protected double heartFrequency;
-    @DatabaseField(canBeNull = true)
-    protected double heartMax;
     @DatabaseField(canBeNull = false, foreign = true)
     protected Author author;
+
+    protected double calculatedAvgSpeed;
+    protected double effectiveAvgSpeed;
+    protected double maxSpeed;
+    protected double calculatedElevation;
+    protected double realElevation;
+    protected double calculatedDescent;
+    protected double realDescent;
+    protected long realTime;
+    protected long effectiveTime;
+    protected double heartFrequency;
+    protected double heartMax;
     //TODO evaluate if this can be an object
     protected String sportType;
-
     //calculated elements from a gps document
     protected List<SlopeSegment> slopes;
     protected List<Coordinate> coordinates;
@@ -237,23 +226,6 @@ public class Track {
         this.statsNewKm = statsNewKm;
     }
 
-
-    public String toString() {
-        return "[Track]<br>"+id+","+name+","+fileName+
-                "<br>Date:"+startDate+"<br>"+endDate+"<br>"+ TimeUtility.toStringFromTimeDiff(realTime)+
-                "<br>"+TimeUtility.toStringFromTimeDiff(effectiveTime)+"<br>"+
-                "Distance:"+totalDistance+
-                "<br>Calculated Speed:"+calculatedAvgSpeed+"<br>Effective Speed:"+effectiveAvgSpeed+
-                "<br>Max Speed:"+maxSpeed+
-                "<br>Calculated Elevation:"+calculatedElevation+"<br>Real Elevation:"+realElevation+
-                "<br>Calculated Descent:"+calculatedDescent+"<br>Real Descent:"+realDescent
-                +"<br>Calories:"+calories+"<br>"+
-                "<br>Heart avg frequency:"+heartFrequency+"<br>Heart max frequency:"+heartMax +
-                "Slopes:"+slopes+"<br>"+
-                "Waypoint KM:"+coordinatesNewKm+"<br>"+
-                author;
-    }
-
     public double getMaxAltitude() {
         return maxAltitude;
     }
@@ -316,5 +288,21 @@ public class Track {
 
     public void setHeartMax(double heartMax) {
         this.heartMax = heartMax;
+    }
+
+    public String toString() {
+        return "[Track]<br>"+id+","+name+","+fileName+
+                "<br>Date:"+startDate+"<br>"+endDate+"<br>"+ TimeUtility.toStringFromTimeDiff(realTime)+
+                "<br>"+TimeUtility.toStringFromTimeDiff(effectiveTime)+"<br>"+
+                "Distance:"+totalDistance+
+                "<br>Calculated Speed:"+calculatedAvgSpeed+"<br>Effective Speed:"+effectiveAvgSpeed+
+                "<br>Max Speed:"+maxSpeed+
+                "<br>Calculated Elevation:"+calculatedElevation+"<br>Real Elevation:"+realElevation+
+                "<br>Calculated Descent:"+calculatedDescent+"<br>Real Descent:"+realDescent
+                +"<br>Calories:"+calories+"<br>"+
+                "<br>Heart avg frequency:"+heartFrequency+"<br>Heart max frequency:"+heartMax +
+                "Slopes:"+slopes+"<br>"+
+                "Waypoint KM:"+coordinatesNewKm+"<br>"+
+                author;
     }
 }

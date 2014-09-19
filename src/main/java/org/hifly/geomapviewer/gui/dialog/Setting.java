@@ -24,7 +24,7 @@ public class Setting extends JDialog {
     private Setting currentFrame = this;
     private Frame externalFrame = null;
     private BikeSelection bikeSelectionDialog;
-    private JSpinner spinnerWeight, spinnerHeight, spinnerBikeWeight = null;
+    private JSpinner spinnerWeight, spinnerHeight, spinnerBikeWeight, spinnerHr = null;
     private JComboBox bikeBrandsCombo, bikeTypesCombo = null;
     private JTextField bikeNameField, bikeModelField = null;
     private JCheckBox scanFoldersCheck, elevationCorrection = null;
@@ -52,7 +52,10 @@ public class Setting extends JDialog {
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent we) {
                 //store bikes list in storage
-                GeoMapStorage.savedBikesList = getProfileSetting().getBikes();
+                profileSetting.setWeight((Double) spinnerWeight.getValue());
+                profileSetting.setHeight((Double) spinnerHeight.getValue());
+                profileSetting.setLhtr((Double) spinnerHr.getValue());
+                GeoMapStorage.profileSetting = profileSetting;
             }
         });
 
@@ -92,19 +95,38 @@ public class Setting extends JDialog {
                 60.0,
                 250.0,
                 0.1);
+        SpinnerModel hrSpinnerModel = new SpinnerNumberModel(100.0,
+                50.0,
+                220.0,
+                0.1);
 
         JLabel weightLabel = new JLabel("Weight");
         spinnerWeight = new JSpinner(weightSpinnerModel);
         weightLabel.setLabelFor(spinnerWeight);
+        if(profileSetting.getWeight() != null) {
+           spinnerWeight.setValue(profileSetting.getWeight());
+        }
 
         JLabel heightLabel = new JLabel("Height");
         spinnerHeight = new JSpinner(heightSpinnerModel);
         heightLabel.setLabelFor(spinnerHeight);
+        if(profileSetting.getHeight() != null) {
+            spinnerHeight.setValue(profileSetting.getHeight());
+        }
+
+        JLabel hrLabel = new JLabel("Avg. Heart Rate");
+        spinnerHr = new JSpinner(hrSpinnerModel);
+        hrLabel.setLabelFor(spinnerHr);
+        if(profileSetting.getLhtr() != null) {
+            spinnerHr.setValue(profileSetting.getLhtr());
+        }
 
         panel1.add(weightLabel);
         panel1.add(spinnerWeight);
         panel1.add(heightLabel);
         panel1.add(spinnerHeight);
+        panel1.add(hrLabel);
+        panel1.add(spinnerHr);
 
         panel.add(panel1);
 
@@ -120,7 +142,7 @@ public class Setting extends JDialog {
 
         scanFoldersCheck = new JCheckBox("Scan imported folders");
         scanFoldersCheck.addItemListener(new CheckListener());
-        scanFoldersCheck.setSelected(GeoMapStorage.librarySetting==null?false:GeoMapStorage.librarySetting.isScanFolder());
+        scanFoldersCheck.setSelected(GeoMapStorage.librarySetting == null ? false:GeoMapStorage.librarySetting.isScanFolder());
 
         panel1.add(scanFoldersCheck);
 
@@ -195,8 +217,6 @@ public class Setting extends JDialog {
         buttonSave.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                profileSetting.setWeight((Double) spinnerWeight.getValue());
-                profileSetting.setHeight((Double) spinnerHeight.getValue());
                 //TODO check if bike already exist
                 List<Bike> bikes = profileSetting.getBikes();
                 if (bikes == null) {
@@ -261,12 +281,6 @@ public class Setting extends JDialog {
     public ProfileSetting getProfileSetting() {
         return profileSetting;
     }
-
-    public void setProfileSetting(ProfileSetting profileSetting) {
-        this.profileSetting = profileSetting;
-    }
-
-
 
     class RadioListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {

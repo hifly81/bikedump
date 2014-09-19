@@ -2,6 +2,8 @@ package org.hifly.geomapviewer.storage;
 
 import org.hifly.geomapviewer.domain.Bike;
 import org.hifly.geomapviewer.domain.LibrarySetting;
+import org.hifly.geomapviewer.domain.ProfileSetting;
+import org.hifly.geomapviewer.domain.TrackPref;
 
 import java.io.*;
 import java.util.List;
@@ -32,15 +34,15 @@ public class PrefStorage {
         }
     }
 
-    public static Map<String, String> readOpenedTracks() {
+    public static Map<String, TrackPref> readOpenedTracks() {
         File file = new File(System.getProperty("user.home") + "/.geomapviewer/preferences/tracks.pref");
         FileInputStream streamIn = null;
-        Map<String, String> map = null;
+        Map<String, TrackPref> map = null;
         if (file != null && file.exists()) {
             try {
                 streamIn = new FileInputStream(file);
                 ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
-                map = (Map<String, String>) objectinputstream.readObject();
+                map = (Map<String, TrackPref>) objectinputstream.readObject();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -56,15 +58,15 @@ public class PrefStorage {
         return map;
     }
 
-    public static List<Bike> readSavedBikes() {
-        File file = new File(System.getProperty("user.home") + "/.geomapviewer/preferences/bikes.pref");
+    public static ProfileSetting readSavedProfileSetting() {
+        File file = new File(System.getProperty("user.home") + "/.geomapviewer/preferences/profile.pref");
         FileInputStream streamIn = null;
-        List<Bike> bikes = null;
+        ProfileSetting profile = null;
         if (file != null && file.exists()) {
             try {
                 streamIn = new FileInputStream(file);
                 ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
-                bikes = (List<Bike>) objectinputstream.readObject();
+                profile = (ProfileSetting) objectinputstream.readObject();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -77,7 +79,7 @@ public class PrefStorage {
                 }
             }
         }
-        return bikes;
+        return profile;
     }
 
 

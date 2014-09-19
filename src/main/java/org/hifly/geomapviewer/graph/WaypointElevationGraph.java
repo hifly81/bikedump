@@ -2,7 +2,7 @@ package org.hifly.geomapviewer.graph;
 
 import org.hifly.geomapviewer.domain.gps.Waypoint;
 import org.hifly.geomapviewer.domain.gps.WaypointSegment;
-import org.hifly.geomapviewer.utility.GpsUtility;
+import org.hifly.geomapviewer.utility.GPSUtility;
 import org.jfree.chart.*;
 import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.plot.PlotOrientation;
@@ -132,7 +132,7 @@ public class WaypointElevationGraph extends WaypointGraph {
         for(List<WaypointSegment> waypoint:waypoints) {
             XYSeries series1 = new XYSeries(index);
             for(WaypointSegment km:waypoint) {
-                series1.add(km.getUnit(), GpsUtility.roundDoubleStat(km.getEle()));
+                series1.add(km.getUnit(), GPSUtility.roundDoubleStat(km.getEle()));
             }
             series.add(series1);
             index++;
@@ -151,7 +151,7 @@ public class WaypointElevationGraph extends WaypointGraph {
         int index = 0;
         XYSeries series1 = new XYSeries(index);
         for(Waypoint waypoint:waypointDetails) {
-            series1.add(waypoint.getDistanceFromStartingPoint(),GpsUtility.roundDoubleStat(waypoint.getEle()));
+            series1.add(waypoint.getDistanceFromStartingPoint(), GPSUtility.roundDoubleStat(waypoint.getEle()));
         }
 
         XYSeriesCollection dataset = new XYSeriesCollection();

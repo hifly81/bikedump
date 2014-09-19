@@ -129,7 +129,7 @@ public class SlopeUtility {
                             combined = true;
                             lastSlope.setElevation(lastSlope.getElevation()+(gradientLast.getEle() - gradientFirst.getEle()));
                             lastSlope.setDistance(lastSlope.getDistance()+(gradientLast.getDistanceFromStartingPoint()-gradientFirst.getDistanceFromStartingPoint()));
-                            lastSlope.setGradient(GpsUtility.gradientPercentage(lastSlope.getElevation(), lastSlope.getDistance()));
+                            lastSlope.setGradient(GPSUtility.gradientPercentage(lastSlope.getElevation(), lastSlope.getDistance()));
                             lastSlope.setEndLatitude(gradientLast.getLat());
                             lastSlope.setEndLongitude(gradientLast.getLon());
                             lastSlope.setEndDate(gradientLast.getDateRelevation());
@@ -195,7 +195,7 @@ public class SlopeUtility {
                     combined = true;
                     lastSlope.setElevation(lastSlope.getElevation()+(gradientLast.getEle() - gradientFirst.getEle()));
                     lastSlope.setDistance(lastSlope.getDistance()+(gradientLast.getDistanceFromStartingPoint()-gradientFirst.getDistanceFromStartingPoint()));
-                    lastSlope.setGradient(GpsUtility.gradientPercentage(lastSlope.getElevation(), lastSlope.getDistance()));
+                    lastSlope.setGradient(GPSUtility.gradientPercentage(lastSlope.getElevation(), lastSlope.getDistance()));
                     lastSlope.setEndLatitude(gradientLast.getLat());
                     lastSlope.setEndLongitude(gradientLast.getLon());
                     lastSlope.setEndDate(gradientLast.getDateRelevation());
@@ -281,7 +281,7 @@ public class SlopeUtility {
             double speed = Math.abs(accDistance / timeDiffInHour);
             slope.setElevation(elevation);
             slope.setDistance(gradientLast.getDistanceFromStartingPoint() - gradientFirst.getDistanceFromStartingPoint());
-            slope.setGradient(GpsUtility.gradientPercentage(elevation, accDistance));
+            slope.setGradient(GPSUtility.gradientPercentage(elevation, accDistance));
             slope.setEndLatitude(gradientLast.getLat());
             slope.setEndLongitude(gradientLast.getLon());
             slope.setStartLatitude(gradientFirst.getLat());

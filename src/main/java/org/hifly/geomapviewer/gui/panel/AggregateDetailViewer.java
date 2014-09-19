@@ -1,17 +1,12 @@
 package org.hifly.geomapviewer.gui.panel;
 
 import org.hifly.geomapviewer.domain.Track;
-import org.hifly.geomapviewer.domain.gps.SlopeSegment;
 import org.hifly.geomapviewer.domain.gps.WaypointSegment;
 import org.hifly.geomapviewer.gui.events.LinkAdapter;
-import org.hifly.geomapviewer.utility.GpsUtility;
+import org.hifly.geomapviewer.utility.GPSUtility;
 import org.hifly.geomapviewer.utility.TimeUtility;
 
 import javax.swing.*;
-import java.awt.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,14 +74,14 @@ public class AggregateDetailViewer extends JScrollPane {
 
         String text = "<p>Number of tracks:" + tracks.size() + "<br>";
         for (Track track : tracks) {
-            totalDistance += GpsUtility.roundDoubleStat(track.getTotalDistance());
+            totalDistance += GPSUtility.roundDoubleStat(track.getTotalDistance());
             totalCalories += track.getCalories();
-            totalDeviceElevation += GpsUtility.roundDoubleStat(track.getCalculatedElevation());
-            totalRealElevation += GpsUtility.roundDoubleStat(track.getRealElevation());
-            totalDeviceDescent += GpsUtility.roundDoubleStat(track.getCalculatedDescent());
-            totalRealDescent += GpsUtility.roundDoubleStat(track.getRealDescent());
-            totalCalculatedSpeed += GpsUtility.roundDoubleStat(track.getCalculatedAvgSpeed());
-            totalEffectiveSpeed += GpsUtility.roundDoubleStat(track.getEffectiveAvgSpeed());
+            totalDeviceElevation += GPSUtility.roundDoubleStat(track.getCalculatedElevation());
+            totalRealElevation += GPSUtility.roundDoubleStat(track.getRealElevation());
+            totalDeviceDescent += GPSUtility.roundDoubleStat(track.getCalculatedDescent());
+            totalRealDescent += GPSUtility.roundDoubleStat(track.getRealDescent());
+            totalCalculatedSpeed += GPSUtility.roundDoubleStat(track.getCalculatedAvgSpeed());
+            totalEffectiveSpeed += GPSUtility.roundDoubleStat(track.getEffectiveAvgSpeed());
             totalRealTime += track.getRealTime();
             totalEffectiveTime += track.getEffectiveTime();
             double maxAltitudeTemp = track.getMaxAltitude();
@@ -111,34 +106,34 @@ public class AggregateDetailViewer extends JScrollPane {
             mostElevateds.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Most Elevated"));
 
         }
-        text += "Total distance:" + GpsUtility.roundDoubleStat(totalDistance) + "<br>";
-        text += "Avg distance:" + GpsUtility.roundDoubleStat(totalDistance / tracks.size()) + "<br>";
+        text += "Total distance:" + GPSUtility.roundDoubleStat(totalDistance) + "<br>";
+        text += "Avg distance:" + GPSUtility.roundDoubleStat(totalDistance / tracks.size()) + "<br>";
         text += "Total calories:" + totalCalories + "<br>";
-        text += "Avg calories:" + GpsUtility.roundDoubleStat(totalCalories / tracks.size()) + "<br>";
+        text += "Avg calories:" + GPSUtility.roundDoubleStat(totalCalories / tracks.size()) + "<br>";
         text += "<br><br>";
         text += "Total duration:" + TimeUtility.toStringFromTimeDiff(totalRealTime) + "<br>";
         text += "Total effective duration:" + TimeUtility.toStringFromTimeDiff(totalEffectiveTime) + "<br>";
         text += "Avg duration:" + TimeUtility.toStringFromTimeDiff(totalRealTime / tracks.size()) + "<br>";
         text += "Avg effective duration:" + TimeUtility.toStringFromTimeDiff(totalEffectiveTime / tracks.size()) + "<br>";
         text += "<br><br>";
-        text += "Avg calculated speed:" + GpsUtility.roundDoubleStat(totalCalculatedSpeed / tracks.size()) + "<br>";
-        text += "Avg effective speed:" + GpsUtility.roundDoubleStat(totalEffectiveSpeed / tracks.size()) + "<br>";
+        text += "Avg calculated speed:" + GPSUtility.roundDoubleStat(totalCalculatedSpeed / tracks.size()) + "<br>";
+        text += "Avg effective speed:" + GPSUtility.roundDoubleStat(totalEffectiveSpeed / tracks.size()) + "<br>";
         text += "<br><br>";
-        text += "Total device elevation:" + GpsUtility.roundDoubleStat(totalDeviceElevation) + "<br>";
-        text += "Total real elevation:" + GpsUtility.roundDoubleStat(totalRealElevation) + "<br>";
-        text += "Total device descent:" + GpsUtility.roundDoubleStat(totalDeviceDescent) + "<br>";
-        text += "Total real descent:" + GpsUtility.roundDoubleStat(totalRealDescent) + "<br>";
+        text += "Total device elevation:" + GPSUtility.roundDoubleStat(totalDeviceElevation) + "<br>";
+        text += "Total real elevation:" + GPSUtility.roundDoubleStat(totalRealElevation) + "<br>";
+        text += "Total device descent:" + GPSUtility.roundDoubleStat(totalDeviceDescent) + "<br>";
+        text += "Total real descent:" + GPSUtility.roundDoubleStat(totalRealDescent) + "<br>";
         text += "<br><br>";
-        text += "Avg device elevation:" + GpsUtility.roundDoubleStat(totalDeviceElevation / tracks.size()) + "<br>";
-        text += "Avg real elevation:" + GpsUtility.roundDoubleStat(totalRealElevation / tracks.size()) + "<br>";
-        text += "Avg device descent:" + GpsUtility.roundDoubleStat(totalDeviceDescent / tracks.size()) + "<br>";
-        text += "Avg real descent:" + GpsUtility.roundDoubleStat(totalRealDescent / tracks.size()) + "<br>";
-        text += "Max altitude:" + GpsUtility.roundDoubleStat(maxAltitude) + " in track:" + trackNameMaxAltitude + "<br>";
-        text += "Min altitude:" + GpsUtility.roundDoubleStat(minAltitude) + " in track:" + trackNameMinAltitude + "<br>";
-        text += "Total climbing distance:" + GpsUtility.roundDoubleStat(totalClimbingDistance) + "<br>";
+        text += "Avg device elevation:" + GPSUtility.roundDoubleStat(totalDeviceElevation / tracks.size()) + "<br>";
+        text += "Avg real elevation:" + GPSUtility.roundDoubleStat(totalRealElevation / tracks.size()) + "<br>";
+        text += "Avg device descent:" + GPSUtility.roundDoubleStat(totalDeviceDescent / tracks.size()) + "<br>";
+        text += "Avg real descent:" + GPSUtility.roundDoubleStat(totalRealDescent / tracks.size()) + "<br>";
+        text += "Max altitude:" + GPSUtility.roundDoubleStat(maxAltitude) + " in track:" + trackNameMaxAltitude + "<br>";
+        text += "Min altitude:" + GPSUtility.roundDoubleStat(minAltitude) + " in track:" + trackNameMinAltitude + "<br>";
+        text += "Total climbing distance:" + GPSUtility.roundDoubleStat(totalClimbingDistance) + "<br>";
         text += "Total climbing time:" + TimeUtility.toStringFromTimeDiff(totalClimbingTime) + "<br>";
         text += "Avg climbing time:" + TimeUtility.toStringFromTimeDiff(totalClimbingTime / tracks.size()) + "<br>";
-        text += "Avg climbing speed:" + GpsUtility.roundDoubleStat(totalClimbingSpeed / tracks.size()) + "<br>";
+        text += "Avg climbing speed:" + GPSUtility.roundDoubleStat(totalClimbingSpeed / tracks.size()) + "<br>";
         text += "<br><br>";
 
         for (Map.Entry<String, WaypointSegment> entry : fastests.entrySet()) {
@@ -226,12 +221,12 @@ public class AggregateDetailViewer extends JScrollPane {
         }
 
         if (fastest != null) {
-            text += "Fastest Lap:" + fastest.getUnit() + " - " + GpsUtility.roundDoubleStat(fastest.getAvgSpeed()) + "in track:" + fastestString + "<br>";
+            text += "Fastest Lap:" + fastest.getUnit() + " - " + GPSUtility.roundDoubleStat(fastest.getAvgSpeed()) + "in track:" + fastestString + "<br>";
         } else {
             text += "Fastest Lap:<br>";
         }
         if (slowest != null) {
-            text += "Slowest Lap:" + slowest.getUnit() + " - " + GpsUtility.roundDoubleStat(slowest.getAvgSpeed()) + "in track:" + slowestString + "<br>";
+            text += "Slowest Lap:" + slowest.getUnit() + " - " + GPSUtility.roundDoubleStat(slowest.getAvgSpeed()) + "in track:" + slowestString + "<br>";
         } else {
             text += "Slowest Lap:<br>";
         }
@@ -247,8 +242,8 @@ public class AggregateDetailViewer extends JScrollPane {
         }
 
 
-        text += "Most elevated Lap:" + mostElevated.getUnit() + " - " + GpsUtility.roundDoubleStat(mostElevated.getEleGained()) + "in track:" + mostElevatedString + "<br>";
-        text += "Less elevated Lap:" + lessElevated.getUnit() + " - " + GpsUtility.roundDoubleStat(lessElevated.getEleGained()) + "in track:" + lessElevatedString + "<br>";
+        text += "Most elevated Lap:" + mostElevated.getUnit() + " - " + GPSUtility.roundDoubleStat(mostElevated.getEleGained()) + "in track:" + mostElevatedString + "<br>";
+        text += "Less elevated Lap:" + lessElevated.getUnit() + " - " + GPSUtility.roundDoubleStat(lessElevated.getEleGained()) + "in track:" + lessElevatedString + "<br>";
 
 
         //TODO these details not shown for aggregate detail

@@ -1,7 +1,7 @@
 package org.hifly.geomapviewer.graph;
 
 import org.hifly.geomapviewer.domain.gps.WaypointSegment;
-import org.hifly.geomapviewer.utility.GpsUtility;
+import org.hifly.geomapviewer.utility.GPSUtility;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
@@ -58,7 +58,7 @@ public class WaypointElevationGainedGraph extends WaypointGraph {
         for(List<WaypointSegment> waypoint:waypoints) {
             XYSeries series1 = new XYSeries(index);
             for(WaypointSegment km:waypoint) {
-                series1.add(km.getUnit(), GpsUtility.roundDoubleStat(km.getEleGained()));
+                series1.add(km.getUnit(), GPSUtility.roundDoubleStat(km.getEleGained()));
             }
             series.add(series1);
             index++;

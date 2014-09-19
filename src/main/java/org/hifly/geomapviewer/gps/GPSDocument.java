@@ -5,7 +5,7 @@ import org.hifly.geomapviewer.domain.gps.Waypoint;
 import org.hifly.geomapviewer.domain.Track;
 import org.hifly.geomapviewer.domain.gps.Coordinate;
 import org.hifly.geomapviewer.storage.GeoMapStorage;
-import org.hifly.geomapviewer.utility.GpsUtility;
+import org.hifly.geomapviewer.utility.GPSUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,13 +101,13 @@ public abstract class GPSDocument {
         if(currentTime!=null && lastTime!=null) {
             diffMillis = currentTime.getTime() - lastTime.getTime();
         }
-        Double eleCurrent = elevationMap.get(GpsUtility.getKeyForCoordinatesMap(currentLat + "-" + currentLon));
+        Double eleCurrent = elevationMap.get(GPSUtility.getKeyForCoordinatesMap(currentLat + "-" + currentLon));
         if(eleCurrent==null) {
             //log.warn(gpsFile+": not found elevation for:"+currentLat + "-" + currentLon);
         }
         if (currentLat != lastLat && currentLon != lastLon) {
             totalTimeDiff += diffMillis;
-            Double eleLast = elevationMap.get(GpsUtility.getKeyForCoordinatesMap(lastLat + "-" + lastLon));
+            Double eleLast = elevationMap.get(GPSUtility.getKeyForCoordinatesMap(lastLat + "-" + lastLon));
             if (eleCurrent != null && eleLast != null) {
                 Double eleGained = eleCurrent - eleLast;
                 if (eleGained > 0) {
@@ -139,9 +139,8 @@ public abstract class GPSDocument {
             Date currentTime,
             double heart,
             double totalDistanceFromStartingPoint) {
-        //TODO totalDistance or totalCalculatedDistance?
         Waypoint waypoint =
-                GpsUtility.createWaypointWrapper(
+                GPSUtility.createWaypointWrapper(
                         currentLat,
                         currentLon,
                         distance,

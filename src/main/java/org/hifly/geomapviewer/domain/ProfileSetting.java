@@ -1,31 +1,34 @@
 package org.hifly.geomapviewer.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author
  * @date 27/02/14
  */
-public class ProfileSetting {
+//TODO multiple profile settings --> similar
+public class ProfileSetting implements Serializable {
     private String profileName;
-    private double weight = 72;
-    private double height = 180;
+    private Double weight = 72.0;
+    private Double height = 180.0;
+    private Double lhtr = 100.0;
     private String unitSystem;
     private List<Bike> bikes;
 
-    public double getWeight() {
+    public Double getWeight() {
         return weight;
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(Double weight) {
         this.weight = weight;
     }
 
-    public double getHeight() {
+    public Double getHeight() {
         return height;
     }
 
-    public void setHeight(double height) {
+    public void setHeight(Double height) {
         this.height = height;
     }
 
@@ -45,11 +48,11 @@ public class ProfileSetting {
         this.bikes = bikes;
     }
 
-    public String getProfileName() {
-        return profileName;
+    public Double getLhtr() {
+        return lhtr;
     }
 
-    public void setProfileName(String profileName) {
-        this.profileName = profileName;
+    public void setLhtr(Double lhtr) {
+        this.lhtr = lhtr;
     }
 }

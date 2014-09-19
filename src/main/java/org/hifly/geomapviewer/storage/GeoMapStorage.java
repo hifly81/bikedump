@@ -4,6 +4,8 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import org.hifly.geomapviewer.domain.Bike;
 import org.hifly.geomapviewer.domain.LibrarySetting;
+import org.hifly.geomapviewer.domain.ProfileSetting;
+import org.hifly.geomapviewer.domain.TrackPref;
 import org.hifly.geomapviewer.domain.gps.SlopeSegment;
 
 import java.io.BufferedInputStream;
@@ -22,8 +24,8 @@ public class GeoMapStorage {
 
     public static Map<String, Double> gpsElevationMap;
     public static List<SlopeSegment> savedClimbsList;
-    public static Map<String,String> tracksLibrary;
-    public static List<Bike> savedBikesList;
+    public static Map<String,TrackPref> tracksLibrary;
+    public static ProfileSetting profileSetting;
     public static LibrarySetting librarySetting;
 
     static {
@@ -33,17 +35,14 @@ public class GeoMapStorage {
             streamIn = new FileInputStream(System.getProperty("user.home")+"/.geomapviewer/storage_coordinates_kyro.db");
             input = new Input(streamIn);
             Kryo kryo = new Kryo();
-            long time1 = System.currentTimeMillis();
             gpsElevationMap = (Map<String, Double>)kryo.readObject(input, HashMap.class);
-            long time2 = System.currentTimeMillis();
-            System.out.println("Deserialization Duration:"+ (time2-time1));
 
             //load saved climbs
             savedClimbsList = ClimbStorage.readSavedClimbs();
             //load opened tracks
             tracksLibrary = PrefStorage.readOpenedTracks();
-            //load saved bikes
-            savedBikesList = PrefStorage.readSavedBikes();
+            //load saved profile
+            profileSetting = PrefStorage.readSavedProfileSetting();
             //load saved library
             librarySetting = PrefStorage.readLibrarySetting();
         }

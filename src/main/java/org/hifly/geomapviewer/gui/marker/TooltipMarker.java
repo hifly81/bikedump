@@ -2,7 +2,7 @@ package org.hifly.geomapviewer.gui.marker;
 
 import org.hifly.geomapviewer.domain.gps.WaypointSegment;
 import org.hifly.geomapviewer.gui.panel.MapViewer;
-import org.hifly.geomapviewer.utility.GpsUtility;
+import org.hifly.geomapviewer.utility.GPSUtility;
 import org.hifly.geomapviewer.utility.TimeUtility;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
 
@@ -25,8 +25,8 @@ public class TooltipMarker extends MapMarkerDot  {
         text =  "Lap: "+waypoint.getUnit();
         text2 = TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", waypoint.getTimeSpent());
         text3 = TimeUtility.toStringFromTimeDiff(waypoint.getTimeIncrement());
-        text4 = GpsUtility.roundDoubleStat(waypoint.getAvgSpeed()) + " km/h";
-        text5 = GpsUtility.roundDoubleStat(waypoint.getEleGained())+ " m";
+        text4 = GPSUtility.roundDoubleStat(waypoint.getAvgSpeed()) + " km/h";
+        text5 = GPSUtility.roundDoubleStat(waypoint.getEleGained())+ " m";
 
         this.waypoint = waypoint;
         this.mapViewer = viewer;

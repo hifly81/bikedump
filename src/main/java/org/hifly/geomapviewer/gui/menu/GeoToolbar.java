@@ -4,7 +4,7 @@ import org.hifly.geomapviewer.graph.WaypointAvgSpeedGraph;
 import org.hifly.geomapviewer.graph.WaypointElevationGainedGraph;
 import org.hifly.geomapviewer.graph.WaypointElevationGraph;
 import org.hifly.geomapviewer.graph.WaypointTimeGraph;
-import org.hifly.geomapviewer.gui.GeoMapViewer;
+import org.hifly.geomapviewer.gui.BikeDump;
 import org.hifly.geomapviewer.gui.dialog.GraphViewer;
 import org.hifly.geomapviewer.gui.panel.WorkoutCalendar;
 import org.hifly.geomapviewer.report.PdfReport;
@@ -25,13 +25,16 @@ import java.util.Date;
  */
 public class GeoToolbar extends JToolBar {
 
-    private GeoMapViewer currentFrame;
+    private BikeDump currentFrame;
     private JButton backButton;
     private JButton graphButton;
     private JButton reportButton;
     private JButton calendarButton;
+    private JButton webButton;
+    private JButton trophyButton;
+    private JButton targetButton;
 
-    public GeoToolbar(GeoMapViewer currentFrame) {
+    public GeoToolbar(BikeDump currentFrame) {
         super();
         this.currentFrame = currentFrame;
         addButtons();
@@ -62,6 +65,24 @@ public class GeoToolbar extends JToolBar {
         img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
         calendarImageIcon = new ImageIcon(img);
         calendarButton = makeNavigationButton("Calendar","Calendar","Calendar",calendarImageIcon);
+        URL webImageUrl = getClass().getResource("/img/web.png");
+        ImageIcon webImageIcon = new ImageIcon(webImageUrl);
+        img = webImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        webImageIcon = new ImageIcon(img);
+        webButton = makeNavigationButton("Internet","Internet","Internet",webImageIcon);
+        URL recordImageUrl = getClass().getResource("/img/trophy.png");
+        ImageIcon recordImageIcon = new ImageIcon(recordImageUrl);
+        img = recordImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        recordImageIcon = new ImageIcon(img);
+        trophyButton = makeNavigationButton("Record","Record","Record",recordImageIcon);
+        URL targetImageUrl = getClass().getResource("/img/target.png");
+        ImageIcon targetImageIcon = new ImageIcon(targetImageUrl);
+        img = targetImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        targetImageIcon = new ImageIcon(img);
+        targetButton = makeNavigationButton("Target","Target","Target",targetImageIcon);
 
         add(backButton);
         backButton.addActionListener(new ActionListener() {
@@ -112,6 +133,12 @@ public class GeoToolbar extends JToolBar {
                 new WorkoutCalendar(currentFrame);
             }
         });
+        //TODO internet connection
+        add(webButton);
+        //TODO record section
+        add(trophyButton);
+        //TODO target section
+        add(targetButton);
 
     }
 

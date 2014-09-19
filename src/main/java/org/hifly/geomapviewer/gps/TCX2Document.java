@@ -4,7 +4,7 @@ import com.garmin.xmlschemas.trainingCenterDatabase.v2.*;
 import org.hifly.geomapviewer.domain.Author;
 import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.Track;
-import org.hifly.geomapviewer.utility.GpsUtility;
+import org.hifly.geomapviewer.utility.GPSUtility;
 import org.hifly.geomapviewer.utility.SlopeUtility;
 import org.hifly.geomapviewer.utility.TimeUtility;
 import org.slf4j.Logger;
@@ -74,7 +74,7 @@ public class TCX2Document extends GPSDocument {
                     double lastLat = last.getPosition().getLatitudeDegrees();
                     double lastLon = last.getPosition().getLongitudeDegrees();
                     //calculate harvesine  in km
-                    double distance = GpsUtility.haversine(currentLat, currentLon,lastLat, lastLon);
+                    double distance = GPSUtility.haversine(currentLat, currentLon, lastLat, lastLon);
                     totalDistanceCalculated += distance;
                     //need to be objects since could be nullable
                     //TODO
@@ -143,14 +143,14 @@ public class TCX2Document extends GPSDocument {
         resultTrack.setAuthor(author);
         resultTrack.setSlopes(SlopeUtility.extractSlope(waypoints, profileSetting));
         resultTrack.setCoordinates(coordinates);
-        GpsUtility.GpsStats stats = GpsUtility.extractInfoFromWaypoints(waypoints, totalDistance);
+        GPSUtility.GpsStats stats = GPSUtility.extractInfoFromWaypoints(waypoints, totalDistance);
         resultTrack.setCoordinatesNewKm(stats.getWaypointsKm());
         resultTrack.setMaxAltitude(stats.getMaxAltitude());
         resultTrack.setMinAltitude(stats.getMinAltitude());
         resultTrack.setClimbingSpeed(stats.getClimbingSpeed());
         resultTrack.setClimbingTimeMillis(stats.getClimbingTime());
         resultTrack.setClimbingDistance(stats.getClimbingDistance());
-        resultTrack.setStatsNewKm(GpsUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
+        resultTrack.setStatsNewKm(GPSUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
 
         result.add(resultTrack);
 

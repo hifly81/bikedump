@@ -15,13 +15,13 @@ public class PanelWindowAdapter extends WindowAdapter {
     public PanelWindowAdapter() {}
 
     public void windowClosing(WindowEvent e) {
-        if(GeoMapStorage.tracksLibrary!=null) {
+        if(GeoMapStorage.tracksLibrary != null) {
             PrefStorage.savePref(GeoMapStorage.tracksLibrary, "tracks");
         }
-        if(GeoMapStorage.savedBikesList!=null) {
-            PrefStorage.savePref(GeoMapStorage.savedBikesList, "bikes");
+        if(GeoMapStorage.profileSetting != null) {
+            PrefStorage.savePref(GeoMapStorage.profileSetting, "profile");
         }
-        if(GeoMapStorage.librarySetting!=null) {
+        if(GeoMapStorage.librarySetting != null) {
             PrefStorage.savePref(GeoMapStorage.librarySetting, "library");
         }
         System.exit(0);

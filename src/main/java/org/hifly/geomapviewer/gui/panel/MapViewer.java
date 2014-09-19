@@ -5,7 +5,7 @@ import org.hifly.geomapviewer.gui.marker.CircleMarker;
 import org.hifly.geomapviewer.gui.marker.LineMarker;
 import org.hifly.geomapviewer.gui.marker.TooltipMarker;
 import org.hifly.geomapviewer.storage.GeoMapStorage;
-import org.hifly.geomapviewer.utility.GpsUtility;
+import org.hifly.geomapviewer.utility.GPSUtility;
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
@@ -60,7 +60,7 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
                 List<ICoordinate> listTemp = new ArrayList<>();
                 Map<String, WaypointSegment> tempMap = coordinatesNewKm.get(indexMap);
                 for (int i = 0; i < listCoordinates.size(); i++) {
-                    String key = GpsUtility.getKeyForCoordinatesMap(
+                    String key = GPSUtility.getKeyForCoordinatesMap(
                             String.valueOf(listCoordinates.get(i).getLat()) + "-" + String.valueOf(listCoordinates.get(i).getLon()));
                     Double obj = GeoMapStorage.gpsElevationMap.get(key);
                     double ele = 0;

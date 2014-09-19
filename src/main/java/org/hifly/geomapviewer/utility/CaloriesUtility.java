@@ -18,8 +18,8 @@ public class CaloriesUtility {
     //TODO consider even avgSpeed
     public static double calculateMETCalories(double weight, double durationMinutes, String sportType) {
         double met = mapSportMET.get(sportType);
-        if(met!=0.0) {
-            return GpsUtility.roundDoubleStat(durationMinutes * ((met*3.5*weight)/200));
+        if(met != 0.0) {
+            return GPSUtility.roundDoubleStat(durationMinutes * ((met * 3.5 * weight) / 200));
         }
         //Total Calories Burned = Duration in Minutes
         // x (((MET – a number representing the type and intensity of your workout)
