@@ -114,8 +114,9 @@ public class GPX10Document extends GPSDocument {
         resultTrack.setClimbingSpeed(stats.getClimbingSpeed());
         resultTrack.setClimbingTimeMillis(stats.getClimbingTime());
         resultTrack.setClimbingDistance(stats.getClimbingDistance());
-        resultTrack.setStatsNewKm(GPSUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
-
+        if(resultTrack.getCoordinatesNewKm() != null) {
+            resultTrack.setStatsNewKm(GPSUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
+        }
         return resultTrack;
     }
 

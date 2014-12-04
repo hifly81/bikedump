@@ -130,15 +130,17 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
                             + "-"
                             +
                             String.valueOf(listCoordinates.get(i).getLon());
-                    WaypointSegment waypoint = tempMap.get(key);
-                    if (waypoint != null) {
-                        CircleMarker c = new CircleMarker(
-                                listCoordinates.get(i).getLat(),
-                                listCoordinates.get(i).getLon(),
-                                waypoint,
-                                this);
-                        addMapMarker(c);
-                        mapCircleCoordinates.put(listCoordinates.get(i).getLat()+"-"+listCoordinates.get(i).getLon(),waypoint);
+                    if(tempMap !=null) {
+                        WaypointSegment waypoint = tempMap.get(key);
+                        if (waypoint != null) {
+                            CircleMarker c = new CircleMarker(
+                                    listCoordinates.get(i).getLat(),
+                                    listCoordinates.get(i).getLon(),
+                                    waypoint,
+                                    this);
+                            addMapMarker(c);
+                            mapCircleCoordinates.put(listCoordinates.get(i).getLat() + "-" + listCoordinates.get(i).getLon(), waypoint);
+                        }
                     }
                 }
                 indexMap++;

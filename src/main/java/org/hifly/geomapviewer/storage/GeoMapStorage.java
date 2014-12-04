@@ -2,16 +2,16 @@ package org.hifly.geomapviewer.storage;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
-import org.hifly.geomapviewer.domain.Bike;
-import org.hifly.geomapviewer.domain.LibrarySetting;
-import org.hifly.geomapviewer.domain.ProfileSetting;
-import org.hifly.geomapviewer.domain.TrackPref;
+import org.hifly.geomapviewer.domain.*;
+import org.hifly.geomapviewer.domain.gps.Coordinate;
 import org.hifly.geomapviewer.domain.gps.SlopeSegment;
+import org.hifly.geomapviewer.domain.gps.WaypointSegment;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

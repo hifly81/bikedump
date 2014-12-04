@@ -62,6 +62,9 @@ public class TCX2Document extends GPSDocument {
             TrackpointT last = null;
             for (TrackpointT segment : segments) {
                 TrackpointT current = segment;
+                if(current == null || current.getPosition() == null) {
+                    continue;
+                }
                 double currentLat = current.getPosition().getLatitudeDegrees();
                 double currentLon = current.getPosition().getLongitudeDegrees();
                 //add coordinate element
@@ -150,7 +153,9 @@ public class TCX2Document extends GPSDocument {
         resultTrack.setClimbingSpeed(stats.getClimbingSpeed());
         resultTrack.setClimbingTimeMillis(stats.getClimbingTime());
         resultTrack.setClimbingDistance(stats.getClimbingDistance());
-        resultTrack.setStatsNewKm(GPSUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
+        if(resultTrack.getCoordinatesNewKm() != null) {
+            resultTrack.setStatsNewKm(GPSUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
+        }
 
         result.add(resultTrack);
 

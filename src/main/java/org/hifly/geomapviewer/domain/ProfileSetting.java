@@ -7,29 +7,17 @@ import java.util.List;
  * @author
  * @date 27/02/14
  */
-//TODO multiple profile settings --> similar
 public class ProfileSetting implements Serializable {
-    private String profileName;
-    private Double weight = 72.0;
-    private Double height = 180.0;
-    private Double lhtr = 100.0;
     private String unitSystem;
+    private List<Profile> profiles;
     private List<Bike> bikes;
 
-    public Double getWeight() {
-        return weight;
+    public List<Profile> getProfiles() {
+        return profiles;
     }
 
-    public void setWeight(Double weight) {
-        this.weight = weight;
-    }
-
-    public Double getHeight() {
-        return height;
-    }
-
-    public void setHeight(Double height) {
-        this.height = height;
+    public void setProfiles(List<Profile> profiles) {
+        this.profiles = profiles;
     }
 
     public String getUnitSystem() {
@@ -48,11 +36,18 @@ public class ProfileSetting implements Serializable {
         this.bikes = bikes;
     }
 
-    public Double getLhtr() {
-        return lhtr;
+    public Profile getSelectedProfile() {
+        Profile profile = null;
+        if(profiles !=null && !profiles.isEmpty()) {
+            for(Profile temp:profiles) {
+                if(temp.isSelected()) {
+                    profile = temp;
+                    break;
+                }
+            }
+        }
+        return profile;
     }
 
-    public void setLhtr(Double lhtr) {
-        this.lhtr = lhtr;
-    }
+
 }

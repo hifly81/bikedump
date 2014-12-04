@@ -86,6 +86,7 @@ public class GPSController {
             log.error("file is not GPX ["+sax.getMessage()+"]:"+filename);
         }
         catch (Exception ex) {
+            ex.printStackTrace();
             //TODO some tracks are not loaded, explore exception cause
             log.error("can't load [" + ex.getMessage() + "]:" + filename);
             sb.append("can't load:"+filename);
@@ -120,11 +121,17 @@ public class GPSController {
             tracks = doc.extractTrack(filename);
             long time2 = System.currentTimeMillis();
             System.out.println("Extract info from Track Duration ["+filename+"]:" + (time2 - time1));
+
+            //TODO manage a list of tracks: a single file can contain multiple tracks
+            if (tracks != null && !tracks.isEmpty()) {
+                track = tracks.get(0);
+            }
         }
         catch (SAXParseException sax) {
             log.error("file is not TCX ["+sax.getMessage()+"]:"+filename);
         }
         catch (Exception ex) {
+            ex.printStackTrace();
             //TODO some tracks are not loaded, explore exception cause
             log.error("can't load [" + ex.getMessage() + "]:" + filename);
             sb.append("can't load:"+filename);

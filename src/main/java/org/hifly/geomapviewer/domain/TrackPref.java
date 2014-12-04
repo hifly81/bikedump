@@ -5,34 +5,8 @@ import java.io.Serializable;
 
 public class TrackPref implements Serializable {
 
-    private double weight = 72;
-    private double height = 180;
-    private double lhtr = 100;
+    private Profile profile;
     private Bike bike;
-
-    public double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(double weight) {
-        this.weight = weight;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
-    }
-
-    public double getLhtr() {
-        return lhtr;
-    }
-
-    public void setLhtr(double lhtr) {
-        this.lhtr = lhtr;
-    }
 
     public Bike getBike() {
         return bike;
@@ -40,5 +14,13 @@ public class TrackPref implements Serializable {
 
     public void setBike(Bike bike) {
         this.bike = bike;
+    }
+
+    public Profile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(Profile profile) {
+        this.profile = profile;
     }
 }

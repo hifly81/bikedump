@@ -1,7 +1,7 @@
 bikedump
 ============
 
-LOREM IPSUM
+Manage and extract stats from fyour bike gps gpx tcx workouts
 
 ============
 External libraries and licensing

@@ -122,7 +122,9 @@ public class KML22Document extends GPSDocument {
         resultTrack.setClimbingSpeed(stats.getClimbingSpeed());
         resultTrack.setClimbingTimeMillis(stats.getClimbingTime());
         resultTrack.setClimbingDistance(stats.getClimbingDistance());
-        resultTrack.setStatsNewKm(GPSUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
+        if(resultTrack.getCoordinatesNewKm() != null) {
+            resultTrack.setStatsNewKm(GPSUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
+        }
 
         result.add(resultTrack);
 

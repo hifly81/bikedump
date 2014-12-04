@@ -98,12 +98,14 @@ public class AggregateDetailViewer extends JScrollPane {
             totalClimbingSpeed += track.getClimbingSpeed();
             totalClimbingTime += track.getClimbingTimeMillis();
 
-            fastests.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Fastest"));
-            slowests.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Slowest"));
-            shortests.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Shortest"));
-            longests.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Longest"));
-            lessElevateds.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Less Elevated"));
-            mostElevateds.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Most Elevated"));
+            if(track.getStatsNewKm() !=null) {
+                fastests.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Fastest"));
+                slowests.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Slowest"));
+                shortests.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Shortest"));
+                longests.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Longest"));
+                lessElevateds.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Less Elevated"));
+                mostElevateds.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Most Elevated"));
+            }
 
         }
         text += "Total distance:" + GPSUtility.roundDoubleStat(totalDistance) + "<br>";
@@ -241,10 +243,19 @@ public class AggregateDetailViewer extends JScrollPane {
             text += "Longest Lap:<br>";
         }
 
+        if (mostElevated != null) {
+            text += "Most elevated Lap:" + mostElevated.getUnit() + " - " + GPSUtility.roundDoubleStat(mostElevated.getEleGained()) + "in track:" + mostElevatedString + "<br>";
+        }
+        else {
+            text += "Most elevated Lap:<br>";
+        }
 
-        text += "Most elevated Lap:" + mostElevated.getUnit() + " - " + GPSUtility.roundDoubleStat(mostElevated.getEleGained()) + "in track:" + mostElevatedString + "<br>";
-        text += "Less elevated Lap:" + lessElevated.getUnit() + " - " + GPSUtility.roundDoubleStat(lessElevated.getEleGained()) + "in track:" + lessElevatedString + "<br>";
-
+        if (lessElevated !=null) {
+            text += "Less elevated Lap:" + lessElevated.getUnit() + " - " + GPSUtility.roundDoubleStat(lessElevated.getEleGained()) + "in track:" + lessElevatedString + "<br>";
+        }
+        else {
+            text += "Less elevated Lap:<br>";
+        }
 
         //TODO these details not shown for aggregate detail
         /*

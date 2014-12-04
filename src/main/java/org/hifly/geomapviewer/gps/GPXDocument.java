@@ -46,7 +46,10 @@ public class GPXDocument extends GPSDocument {
                         //need to be objects since could be nullable
                         BigDecimal currentCalcEle = current.getEle();
                         BigDecimal lastCalcEle = last.getEle();
-                        Date lastTime = last.getTime().getTime();
+                        Date lastTime = null;
+                        if(last.getTime()!=null) {
+                            lastTime = last.getTime().getTime();
+                        }
                         double heart = 0;
                         //calculate heart element
                         //FIXME indexOf evalution is really slow: optimize
@@ -84,10 +87,16 @@ public class GPXDocument extends GPSDocument {
     private Track createTrack(TrkType track, GpxType gpx, String fileName) {
         Track resultTrack = new Track();
         resultTrack.setFileName(fileName);
-        startTime = track.getTrksegArray(0).getTrkptArray(0).getTime().getTime();
-        TrksegType lastSegment = track.getTrksegArray(track.getTrksegArray().length - 1);
-        endTime = lastSegment.getTrkptArray(lastSegment.getTrkptArray().length - 1).getTime().getTime();
-        long diffStartEndTime = endTime.getTime() - startTime.getTime();
+        long diffStartEndTime = 0;
+        try {
+            startTime = track.getTrksegArray(0).getTrkptArray(0).getTime().getTime();
+            TrksegType lastSegment = track.getTrksegArray(track.getTrksegArray().length - 1);
+            endTime = lastSegment.getTrkptArray(lastSegment.getTrkptArray().length - 1).getTime().getTime();
+            diffStartEndTime = endTime.getTime() - startTime.getTime();
+        }
+        catch(Exception ex) {
+           //TODO define exception
+        }
 
         resultTrack.setSportType(track.getType());
         resultTrack.setStartDate(startTime);
@@ -128,7 +137,9 @@ public class GPXDocument extends GPSDocument {
         resultTrack.setClimbingSpeed(stats.getClimbingSpeed());
         resultTrack.setClimbingTimeMillis(stats.getClimbingTime());
         resultTrack.setClimbingDistance(stats.getClimbingDistance());
-        resultTrack.setStatsNewKm(GPSUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
+        if(resultTrack.getCoordinatesNewKm() != null) {
+            resultTrack.setStatsNewKm(GPSUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
+        }
 
         return resultTrack;
     }

@@ -2,6 +2,7 @@ package org.hifly.geomapviewer.gui.dialog;
 
 import org.hifly.geomapviewer.domain.Bike;
 import org.hifly.geomapviewer.domain.LibrarySetting;
+import org.hifly.geomapviewer.domain.Profile;
 import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.storage.GeoMapStorage;
 
@@ -19,11 +20,11 @@ import java.util.List;
  * @author
  * @date 27/02/14
  */
-//TODO should allow to define a list of profiles
-public class Setting extends JDialog {
-    private Setting currentFrame = this;
+public class SettingDialog extends JDialog {
+    private SettingDialog currentFrame = this;
     private Frame externalFrame = null;
     private BikeSelection bikeSelectionDialog;
+    private ProfileSelection profileSelectionDialog;
     private JSpinner spinnerWeight, spinnerHeight, spinnerBikeWeight, spinnerHr = null;
     private JComboBox bikeBrandsCombo, bikeTypesCombo = null;
     private JTextField bikeNameField, bikeModelField = null;
@@ -31,7 +32,7 @@ public class Setting extends JDialog {
     private ProfileSetting profileSetting;
 
 
-    public Setting(Frame frame, final ProfileSetting profileSetting) {
+    public SettingDialog(Frame frame, final ProfileSetting profileSetting) {
         super(frame, true);
 
         this.externalFrame = frame;
@@ -51,10 +52,6 @@ public class Setting extends JDialog {
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent we) {
-                //store bikes list in storage
-                profileSetting.setWeight((Double) spinnerWeight.getValue());
-                profileSetting.setHeight((Double) spinnerHeight.getValue());
-                profileSetting.setLhtr((Double) spinnerHr.getValue());
                 GeoMapStorage.profileSetting = profileSetting;
             }
         });
@@ -83,9 +80,37 @@ public class Setting extends JDialog {
     public JPanel createPhysicalSettingPanel() {
         JPanel panel = new JPanel();
 
+        JPanel panel0 = new JPanel();
+        JLabel profileList = new JLabel();
+        profileList.setText("<html><a href=\"\">profile list</a></html>");
+        profileList.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        profileList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (profileSetting.getProfiles() == null || profileSetting.getProfiles().isEmpty()) {
+                    JOptionPane.showMessageDialog(currentFrame,
+                            "No profiles",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                } else {
+                    //define dialogs
+                    profileSelectionDialog = new ProfileSelection(externalFrame, getProfileSetting());
+                    profileSelectionDialog.pack();
+                    profileSelectionDialog.setLocationRelativeTo(currentFrame);
+                    profileSelectionDialog.setVisible(true);
+                }
+            }
+        });
+        panel0.add(profileList);
+
         JPanel panel1 = new JPanel();
-        Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "Physical attributes");
+        Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "New Profile definition");
         panel1.setBorder(titleBorder);
+
+        final JTextField profileNameField = new JTextField();
+        profileNameField.setPreferredSize(new Dimension(100, 24));
+        JLabel profileNameLabel = new JLabel("Profile name");
+        profileNameLabel.setLabelFor(profileNameField);
 
         SpinnerModel weightSpinnerModel = new SpinnerNumberModel(60.0,
                 40.0,
@@ -103,32 +128,46 @@ public class Setting extends JDialog {
         JLabel weightLabel = new JLabel("Weight");
         spinnerWeight = new JSpinner(weightSpinnerModel);
         weightLabel.setLabelFor(spinnerWeight);
-        if(profileSetting.getWeight() != null) {
-           spinnerWeight.setValue(profileSetting.getWeight());
-        }
 
         JLabel heightLabel = new JLabel("Height");
         spinnerHeight = new JSpinner(heightSpinnerModel);
         heightLabel.setLabelFor(spinnerHeight);
-        if(profileSetting.getHeight() != null) {
-            spinnerHeight.setValue(profileSetting.getHeight());
-        }
 
         JLabel hrLabel = new JLabel("Avg. Heart Rate");
         spinnerHr = new JSpinner(hrSpinnerModel);
         hrLabel.setLabelFor(spinnerHr);
-        if(profileSetting.getLhtr() != null) {
-            spinnerHr.setValue(profileSetting.getLhtr());
-        }
 
+        JButton buttonSave = new JButton("Add");
+        buttonSave.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                //TODO check if profiles already exist
+                List<Profile> profiles = profileSetting.getProfiles();
+                if (profiles == null) {
+                    profiles = new ArrayList();
+                }
+                Profile profile = new Profile();
+                profile.setName(profileNameField.getText());
+                profile.setWeight((Double) spinnerWeight.getValue());
+                profile.setHeight((Double) spinnerHeight.getValue());
+                profile.setLhtr((Double) spinnerHr.getValue());
+                profiles.add(profile);
+                profileSetting.setProfiles(profiles);
+            }
+        });
+
+        panel1.add(profileNameLabel);
+        panel1.add(profileNameField);
         panel1.add(weightLabel);
         panel1.add(spinnerWeight);
         panel1.add(heightLabel);
         panel1.add(spinnerHeight);
         panel1.add(hrLabel);
         panel1.add(spinnerHr);
+        panel1.add(buttonSave);
 
         panel.add(panel1);
+        panel.add(panel0);
 
         return panel;
     }

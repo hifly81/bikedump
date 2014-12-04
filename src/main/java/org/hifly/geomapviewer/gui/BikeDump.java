@@ -7,7 +7,7 @@ import org.hifly.geomapviewer.domain.*;
 import org.hifly.geomapviewer.domain.gps.Coordinate;
 import org.hifly.geomapviewer.domain.gps.WaypointSegment;
 import org.hifly.geomapviewer.gui.dialog.ScrollableDialog;
-import org.hifly.geomapviewer.gui.dialog.Setting;
+import org.hifly.geomapviewer.gui.dialog.SettingDialog;
 import org.hifly.geomapviewer.gui.dialog.TipOfTheDay;
 import org.hifly.geomapviewer.gui.events.PanelWindowAdapter;
 import org.hifly.geomapviewer.gui.events.TableSelectionHandler;
@@ -18,6 +18,7 @@ import org.hifly.geomapviewer.gui.menu.GeoMapMenu;
 import org.hifly.geomapviewer.gui.menu.GeoToolbar;
 import org.hifly.geomapviewer.storage.DataHolder;
 import org.hifly.geomapviewer.storage.GeoMapStorage;
+import org.hifly.geomapviewer.timer.NewTrackTimer;
 import org.hifly.geomapviewer.utility.GUIUtility;
 import org.openstreetmap.gui.jmapviewer.OsmFileCacheTileLoader;
 import org.openstreetmap.gui.jmapviewer.OsmTileLoader;
@@ -47,7 +48,7 @@ import java.util.List;
 public class BikeDump extends JFrame implements JMapViewerEventListener {
 
     private ProfileSetting profileSetting;
-    private Setting settingDialog = null;
+    private SettingDialog settingDialog = null;
     private BikeDump currentFrame = this;
     protected MapViewer mapViewer;
     private JSplitPane mainPanel = new JSplitPane();
@@ -67,15 +68,8 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         //exit behaviour
         addWindowListener(new PanelWindowAdapter());
 
-        //saved pref
-        profileSetting = GeoMapStorage.profileSetting;
-        if (profileSetting == null) {
-            profileSetting = new ProfileSetting();
-        }
-
-        //define dialogs
-        settingDialog = new Setting(currentFrame, profileSetting);
-        settingDialog.pack();
+        //settings
+        initSettings();
 
         //create toolbar
         GeoToolbar toolBar = new GeoToolbar(currentFrame);
@@ -191,26 +185,9 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                         File file = new File(entry.getKey());
                         addTrackToCache(coordinates, waypoint, tracks, file, sb);
                     }
+                    //TODO check for new files at regular tinterval --> TimerTask
                     //check new file
-                    if (GeoMapStorage.librarySetting != null && GeoMapStorage.librarySetting.isScanFolder()) {
-                        if (GeoMapStorage.librarySetting.getScannedDirs() != null && !GeoMapStorage.librarySetting.getScannedDirs().isEmpty()) {
-                            for (String directory : GeoMapStorage.librarySetting.getScannedDirs()) {
-                                Collection files = FileUtils.listFiles(new File(directory), null, true);
-                                for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {
-                                    File file = (File) iterator.next();
-                                    if (GeoMapStorage.tracksLibrary.get(file.getAbsolutePath()) == null) {
-                                        addTrackToCache(coordinates, waypoint, tracks, file, sb);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (sb.length() > 0) {
-                        ScrollableDialog dialog = new ScrollableDialog(null, sb.toString(), dimension.getKey() / 2, dimension.getValue() / 2);
-                        dialog.showMessage();
-                    }
-
+                    checkNewTrack(coordinates, waypoint, tracks, sb);
 
                     JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint, true);
                     JScrollPane detailViewer = new AggregateDetailViewer(tracks, currentFrame);
@@ -233,9 +210,12 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 label.setVisible(false);
                 TipOfTheDay tip = new TipOfTheDay();
                 tip.setVisible(true);
+
+                new NewTrackTimer(currentFrame);
+
+
             }
         }.execute();
-
 
     }
 
@@ -249,7 +229,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         JSplitPane split2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, detailViewer, null);
         JSplitPane split3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, split1, split2);
         split3.setDividerLocation(dimension.getKey() - 350);
-
 
         split1.setOneTouchExpandable(true);
         split2.setOneTouchExpandable(true);
@@ -293,40 +272,49 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         }
     }
 
+    public void checkNewTrack(List<List<Coordinate>> coordinates, List<Map<String, WaypointSegment>> waypoint, List<Track> tracks, StringBuffer sb) {
+        if (GeoMapStorage.librarySetting != null && GeoMapStorage.librarySetting.isScanFolder()) {
+            if (GeoMapStorage.librarySetting.getScannedDirs() != null && !GeoMapStorage.librarySetting.getScannedDirs().isEmpty()) {
+                for (String directory : GeoMapStorage.librarySetting.getScannedDirs()) {
+                    Collection files = FileUtils.listFiles(new File(directory), null, true);
+                    for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {
+                        File file = (File) iterator.next();
+                        if (GeoMapStorage.tracksLibrary.get(file.getAbsolutePath()) == null) {
+                            addTrackToCache(coordinates, waypoint, tracks, file, sb);
+                        }
+                    }
+                }
+            }
+        }
+
+        //List of loader results
+        if (sb.length() > 0) {
+            ScrollableDialog dialog = new ScrollableDialog(null, sb.toString(), dimension.getKey() / 2, dimension.getValue() / 2);
+            dialog.showMessage();
+        }
+    }
+
     @Override
     public void processCommand(JMVCommandEvent command) {
         if (command.getCommand().equals(JMVCommandEvent.COMMAND.ZOOM) ||
                 command.getCommand().equals(JMVCommandEvent.COMMAND.MOVE)) {
-            updateZoomParameters();
+            if (measureValue != null)
+                measureValue.setText(String.format("%s", mapViewer.getMeterPerPixel()));
+            if (zoomValue != null)
+                zoomValue.setText(String.format("%s", mapViewer.getZoom()));
         }
     }
 
-    public JScrollPane getFolderMapScrollViewer() {
-        return folderMapScrollViewer;
-    }
+    private void initSettings() {
+        //saved pref
+        profileSetting = GeoMapStorage.profileSetting;
+        if (profileSetting == null) {
+            profileSetting = new ProfileSetting();
+        }
 
-    public JScrollPane getFolderDetailViewer() {
-        return folderDetailViewer;
-    }
-
-    public JScrollPane getFolderTableViewer() {
-        return folderTableViewer;
-    }
-
-    public String getTextForReport() {
-        return textForReport;
-    }
-
-    public static void main(String[] args) throws Exception {
-        BikeDump viewer = new BikeDump();
-        viewer.setVisible(true);
-    }
-
-    private void updateZoomParameters() {
-        if (measureValue != null)
-            measureValue.setText(String.format("%s", mapViewer.getMeterPerPixel()));
-        if (zoomValue != null)
-            zoomValue.setText(String.format("%s", mapViewer.getZoom()));
+        //define dialogs
+        settingDialog = new SettingDialog(currentFrame, profileSetting);
+        settingDialog.pack();
     }
 
     private JScrollPane createMapViewer(
@@ -487,14 +475,13 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
             }
         });
 
-
         scrollPanel.getViewport().add(panel);
         return scrollPanel;
     }
 
     private void reloadTrackPanel(File file) {
         String ext = FilenameUtils.getExtension(file.getAbsolutePath());
-        Track track = null;
+        Track track;
         Map.Entry<Track, StringBuffer> resultTrack = null;
         if (ext.equalsIgnoreCase("gpx")) {
             resultTrack = GPSController.extractTrackFromGpx(file.getAbsolutePath(), profileSetting);
@@ -561,16 +548,18 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                         GeoMapStorage.tracksLibrary = new HashMap();
                     }
                     TrackPref trackPref = new TrackPref();
-                    trackPref.setHeight(profileSetting.getHeight());
-                    trackPref.setWeight(profileSetting.getWeight());
-                    trackPref.setLhtr(profileSetting.getLhtr());
+                    Profile profile = profileSetting.getSelectedProfile();
+                    trackPref.setProfile(profile);
+
                     GeoMapStorage.tracksLibrary.put(track.getFileName(), trackPref);
                     coordinates.add(track.getCoordinates());
                     waypoint.add(track.getCoordinatesNewKm());
                     tracks.add(track);
-                    List<WaypointSegment> listWaypoints =
-                            new ArrayList(track.getCoordinatesNewKm().values());
-                    DataHolder.listsWaypointSegment.add(listWaypoints);
+                    if(track.getCoordinatesNewKm() !=null && !track.getCoordinatesNewKm().isEmpty()) {
+                        List<WaypointSegment> listWaypoints =
+                                new ArrayList(track.getCoordinatesNewKm().values());
+                        DataHolder.listsWaypointSegment.add(listWaypoints);
+                    }
                 }
             } else {
                 sb.append(resultTrack.getValue().toString() + "\n");
@@ -579,15 +568,13 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
     }
 
-
     private JScrollPane createTableTracksViewer(List<Track> tracks) {
         JScrollPane panel = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         final TrackTable table = new TrackTable(tracks);
-        final TableSelectionHandler listHandler;
         table.getSelectionModel().addListSelectionListener(
                 //TODO if track is already selected dont'load again
                 //TODO if a list of track is shown, when load the single track don't redraw the table list
-                listHandler = new TableSelectionHandler(table, new HashSet()));
+                new TableSelectionHandler(table, new HashSet()));
 
 
         table.addKeyListener(new KeyListener() {
@@ -610,6 +597,27 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         trackTable = table;
         panel.getViewport().add(table);
         return panel;
+    }
+
+    public JScrollPane getFolderMapScrollViewer() {
+        return folderMapScrollViewer;
+    }
+
+    public JScrollPane getFolderDetailViewer() {
+        return folderDetailViewer;
+    }
+
+    public JScrollPane getFolderTableViewer() {
+        return folderTableViewer;
+    }
+
+    public String getTextForReport() {
+        return textForReport;
+    }
+
+    public static void main(String[] args) throws Exception {
+        BikeDump viewer = new BikeDump();
+        viewer.setVisible(true);
     }
 
 }
