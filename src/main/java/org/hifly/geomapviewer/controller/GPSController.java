@@ -18,6 +18,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
+import java.net.URLDecoder;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class GPSController {
             String gpxVersion = null;
             builder = factory.newDocumentBuilder();
             //TODO consider URI from external sources
-            docForXpath = builder.parse("file://"+filename);
+            docForXpath = builder.parse("file://"+ filename);
             XPathFactory xpathFactory = XPathFactory.newInstance();
             XPath xpath = xpathFactory.newXPath();
             XPathExpression expr =
