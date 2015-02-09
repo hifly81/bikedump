@@ -5,3 +5,4 @@ mvn install:install-file -Dfile=tcx.jar -DgroupId=com.garmin.xmlschemas.training
 mvn install:install-file -Dfile=SunriseSunsetCalculator-1.0-SNAPSHOT.jar -DgroupId=com.luckycatlabs.sunrisesunset -DartifactId=sunrisesunset -Dversion=1.0-SNAPSHOT -Dpackaging=jar
 mvn install:install-file -Dfile=kml21.jar -DgroupId=com.google.earth.kml -DartifactId=x21 -Dversion=1.0 -Dpackaging=jar
 mvn install:install-file -Dfile=kml22.jar -DgroupId=net.opengis.kml -DartifactId=x22 -Dversion=1.0 -Dpackaging=jar
+mvn install:install-file -Dfile=jstrava-0.1.0.jar -DgroupId=org.jstrava -DartifactId=jstrava -Dversion=0.1.0 -Dpackaging=jar

@@ -24,6 +24,9 @@ public class PanelWindowAdapter extends WindowAdapter {
         if(GeoMapStorage.librarySetting != null) {
             PrefStorage.savePref(GeoMapStorage.librarySetting, "library");
         }
+        if(GeoMapStorage.stravaSetting != null) {
+            PrefStorage.savePref(GeoMapStorage.stravaSetting, "strava");
+        }
         System.exit(0);
     }
 

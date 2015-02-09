@@ -1,4 +1,5 @@
-geomapviewer use these external libraries:
+bikedump use these external libraries:
+
  - apache xml beans
    http://xmlbeans.apache.org
 
@@ -11,3 +12,6 @@ geomapviewer use these external libraries:
  - jmapviewer
    http://wiki.openstreetmap.org/wiki/JMapViewer
    license: GPL
+
+ - JStrava
+   https://github.com/dustedrob/JStrava

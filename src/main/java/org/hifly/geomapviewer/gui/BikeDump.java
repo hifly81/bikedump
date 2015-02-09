@@ -6,9 +6,12 @@ import org.hifly.geomapviewer.controller.GPSController;
 import org.hifly.geomapviewer.domain.*;
 import org.hifly.geomapviewer.domain.gps.Coordinate;
 import org.hifly.geomapviewer.domain.gps.WaypointSegment;
+import org.hifly.geomapviewer.domain.strava.StravaAthlete;
+import org.hifly.geomapviewer.domain.strava.StravaSetting;
 import org.hifly.geomapviewer.gui.dialog.ScrollableDialog;
 import org.hifly.geomapviewer.gui.dialog.SettingDialog;
 import org.hifly.geomapviewer.gui.dialog.TipOfTheDay;
+import org.hifly.geomapviewer.gui.dialog.strava.StravaDialog;
 import org.hifly.geomapviewer.gui.events.PanelWindowAdapter;
 import org.hifly.geomapviewer.gui.events.TableSelectionHandler;
 import org.hifly.geomapviewer.gui.panel.*;
@@ -49,6 +52,8 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
     private ProfileSetting profileSetting;
     private SettingDialog settingDialog = null;
+    private StravaSetting stravaSetting = null;
+    private StravaDialog stravaDialog = null;
     private BikeDump currentFrame = this;
     protected MapViewer mapViewer;
     private JSplitPane mainPanel = new JSplitPane();
@@ -70,6 +75,9 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
         //settings
         initSettings();
+
+        //dialogs
+        initDialogs();
 
         //create toolbar
         GeoToolbar toolBar = new GeoToolbar(currentFrame);
@@ -148,6 +156,17 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
                     DataHolder.tracksLoaded = tracks;
                 }
+            }
+        });
+
+        //strava sync menu item
+        JMenuItem itemStravaSync = mainMenu.getIteamStravaSync();
+        itemStravaSync.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                stravaDialog.setLocationRelativeTo(currentFrame);
+                stravaDialog.setVisible(true);
+
             }
         });
 
@@ -312,9 +331,21 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
             profileSetting = new ProfileSetting();
         }
 
+        stravaSetting = GeoMapStorage.stravaSetting;
+        if (stravaSetting == null) {
+            stravaSetting = new StravaSetting();
+            stravaSetting.setStravaAthletes(new ArrayList<StravaAthlete>());
+        }
+
+    }
+
+    private void initDialogs() {
         //define dialogs
         settingDialog = new SettingDialog(currentFrame, profileSetting);
         settingDialog.pack();
+
+        stravaDialog = new StravaDialog(currentFrame, stravaSetting);
+        stravaDialog.pack();
     }
 
     private JScrollPane createMapViewer(

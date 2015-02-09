@@ -4,6 +4,7 @@ import org.hifly.geomapviewer.domain.Bike;
 import org.hifly.geomapviewer.domain.LibrarySetting;
 import org.hifly.geomapviewer.domain.ProfileSetting;
 import org.hifly.geomapviewer.domain.TrackPref;
+import org.hifly.geomapviewer.domain.strava.StravaSetting;
 
 import java.io.*;
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.Map;
  * @author
  * @date 05/03/14
  */
+
+//TODO refactor read methods
 public class PrefStorage {
 
     public static void savePref(Object toSave, String filename) {
@@ -105,5 +108,29 @@ public class PrefStorage {
             }
         }
         return library;
+    }
+
+    public static StravaSetting readStravaSetting() {
+        File file = new File(System.getProperty("user.home") + "/.geomapviewer/preferences/strava.pref");
+        FileInputStream streamIn = null;
+        StravaSetting strava = null;
+        if (file != null && file.exists()) {
+            try {
+                streamIn = new FileInputStream(file);
+                ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
+                strava = (StravaSetting) objectinputstream.readObject();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (streamIn != null) {
+                try {
+                    streamIn.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return strava;
     }
 }

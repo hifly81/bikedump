@@ -1,6 +1,5 @@
 package org.hifly.geomapviewer.gui.dialog;
 
-import org.hifly.geomapviewer.domain.Bike;
 import org.hifly.geomapviewer.domain.Profile;
 import org.hifly.geomapviewer.domain.ProfileSetting;
 

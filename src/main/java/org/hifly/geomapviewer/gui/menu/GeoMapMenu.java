@@ -26,6 +26,7 @@ public class GeoMapMenu extends JMenuBar {
     private JMenuItem itemImportFile;
     private JMenuItem itemImportFolder;
     private JMenuItem itemOptionsSetting;
+    private JMenuItem iteamStravaSync;
     private JFrame currentFrame;
 
     public GeoMapMenu(JFrame currentFrame) {
@@ -76,6 +77,24 @@ public class GeoMapMenu extends JMenuBar {
         importMenu.add(importFile);
         importMenu.add(importFolder);
 
+        URL synchImageUrl = getClass().getResource("/img/sync.png");
+        ImageIcon synchImageIcon = new ImageIcon(synchImageUrl);
+        img = synchImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        synchImageIcon = new ImageIcon(img);
+        JMenu synchMenu = new JMenu("Synch");
+        synchMenu.setIcon(synchImageIcon);
+        synchMenu.setMnemonic(KeyEvent.VK_I);
+
+        URL stravaImageUrl = getClass().getResource("/img/strava.png");
+        ImageIcon stravaImageIcon = new ImageIcon(stravaImageUrl);
+        img = stravaImageIcon.getImage();
+        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+        stravaImageIcon = new ImageIcon(img);
+        JMenuItem strava = new JMenuItem("Strava...",stravaImageIcon);
+
+        synchMenu.add(strava);
+
         URL exitImageUrl = getClass().getResource("/img/quit.png");
         ImageIcon exitImageIcon = new ImageIcon(exitImageUrl);
         img = exitImageIcon.getImage();
@@ -94,11 +113,13 @@ public class GeoMapMenu extends JMenuBar {
         });
 
         file.add(importMenu);
+        file.add(synchMenu);
         file.addSeparator();
         file.add(exit);
 
         this.itemImportFile = importFile;
         this.itemImportFolder = importFolder;
+        this.iteamStravaSync = strava;
 
         return file;
     }
@@ -200,23 +221,16 @@ public class GeoMapMenu extends JMenuBar {
         return itemImportFile;
     }
 
-    public void setItemImportFile(JMenuItem itemImportFile) {
-        this.itemImportFile = itemImportFile;
-    }
-
     public JMenuItem getItemImportFolder() {
         return itemImportFolder;
-    }
-
-    public void setItemImportFolder(JMenuItem itemImportFolder) {
-        this.itemImportFolder = itemImportFolder;
     }
 
     public JMenuItem getItemOptionsSetting() {
         return itemOptionsSetting;
     }
 
-    public void setItemOptionsSetting(JMenuItem itemOptionsSetting) {
-        this.itemOptionsSetting = itemOptionsSetting;
+    public JMenuItem getIteamStravaSync() {
+        return iteamStravaSync;
     }
+
 }

@@ -3,15 +3,11 @@ package org.hifly.geomapviewer.storage;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import org.hifly.geomapviewer.domain.*;
-import org.hifly.geomapviewer.domain.gps.Coordinate;
 import org.hifly.geomapviewer.domain.gps.SlopeSegment;
-import org.hifly.geomapviewer.domain.gps.WaypointSegment;
+import org.hifly.geomapviewer.domain.strava.StravaSetting;
 
-import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +23,7 @@ public class GeoMapStorage {
     public static Map<String,TrackPref> tracksLibrary;
     public static ProfileSetting profileSetting;
     public static LibrarySetting librarySetting;
+    public static StravaSetting stravaSetting;
 
     static {
         FileInputStream streamIn = null;
@@ -45,6 +42,8 @@ public class GeoMapStorage {
             profileSetting = PrefStorage.readSavedProfileSetting();
             //load saved library
             librarySetting = PrefStorage.readLibrarySetting();
+            //load strava setting
+            stravaSetting = PrefStorage.readStravaSetting();
         }
         catch (Exception e) {}
         finally {
