@@ -12,7 +12,7 @@ import org.hifly.geomapviewer.gui.dialog.ScrollableDialog;
 import org.hifly.geomapviewer.gui.dialog.SettingDialog;
 import org.hifly.geomapviewer.gui.dialog.TipOfTheDay;
 import org.hifly.geomapviewer.gui.dialog.strava.StravaDialog;
-import org.hifly.geomapviewer.gui.events.PanelWindowAdapter;
+import org.hifly.geomapviewer.gui.events.QuitAppHandler;
 import org.hifly.geomapviewer.gui.events.TableSelectionHandler;
 import org.hifly.geomapviewer.gui.panel.*;
 import org.hifly.geomapviewer.gui.menu.GeoFileChooser;
@@ -71,7 +71,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         //layout
         setLayout(new BorderLayout());
         //exit behaviour
-        addWindowListener(new PanelWindowAdapter());
+        addWindowListener(new QuitAppHandler());
 
         //settings
         initSettings();

@@ -43,7 +43,7 @@ public class GeoMapStorage {
             //load saved library
             librarySetting = PrefStorage.readLibrarySetting();
             //load strava setting
-            stravaSetting = PrefStorage.readStravaSetting();
+            stravaSetting = StravaStorage.readStravaSetting();
         }
         catch (Exception e) {}
         finally {

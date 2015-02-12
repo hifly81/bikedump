@@ -110,27 +110,4 @@ public class PrefStorage {
         return library;
     }
 
-    public static StravaSetting readStravaSetting() {
-        File file = new File(System.getProperty("user.home") + "/.geomapviewer/preferences/strava.pref");
-        FileInputStream streamIn = null;
-        StravaSetting strava = null;
-        if (file != null && file.exists()) {
-            try {
-                streamIn = new FileInputStream(file);
-                ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
-                strava = (StravaSetting) objectinputstream.readObject();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            if (streamIn != null) {
-                try {
-                    streamIn.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return strava;
-    }
 }

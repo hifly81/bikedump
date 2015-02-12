@@ -1,7 +1,10 @@
 package org.hifly.geomapviewer.gui.events;
 
+import org.hifly.geomapviewer.domain.gps.SlopeSegment;
+import org.hifly.geomapviewer.storage.ClimbStorage;
 import org.hifly.geomapviewer.storage.GeoMapStorage;
 import org.hifly.geomapviewer.storage.PrefStorage;
+import org.hifly.geomapviewer.storage.StravaStorage;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -10,9 +13,9 @@ import java.awt.event.WindowEvent;
  * @author
  * @date 05/03/14
  */
-public class PanelWindowAdapter extends WindowAdapter {
+public class QuitAppHandler extends WindowAdapter {
 
-    public PanelWindowAdapter() {}
+    public QuitAppHandler() {}
 
     public void windowClosing(WindowEvent e) {
         if(GeoMapStorage.tracksLibrary != null) {
@@ -25,7 +28,12 @@ public class PanelWindowAdapter extends WindowAdapter {
             PrefStorage.savePref(GeoMapStorage.librarySetting, "library");
         }
         if(GeoMapStorage.stravaSetting != null) {
-            PrefStorage.savePref(GeoMapStorage.stravaSetting, "strava");
+            StravaStorage.saveActivities(GeoMapStorage.stravaSetting, "strava");
+        }
+        if(GeoMapStorage.savedClimbsList != null) {
+            for(SlopeSegment slope: GeoMapStorage.savedClimbsList) {
+                ClimbStorage.saveClimb(slope, slope.getName());
+            }
         }
         System.exit(0);
     }

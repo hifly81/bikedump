@@ -1,6 +1,6 @@
 package org.hifly.geomapviewer.gui.dialog.strava;
 
-import org.hifly.geomapviewer.domain.Bike;
+import org.hifly.geomapviewer.controller.StravaController;
 import org.hifly.geomapviewer.domain.strava.StravaAthlete;
 import org.hifly.geomapviewer.domain.strava.StravaSetting;
 import org.hifly.geomapviewer.storage.GeoMapStorage;
@@ -11,7 +11,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
+import java.util.Map;
 
 
 /**
@@ -25,6 +25,8 @@ public class StravaDialog extends JDialog {
     private StravaAccessTokenSelection stravaTokenSelection;
     private StravaActivitySelection stravaActivitySelection;
 
+    private JPanel syncPanel;
+
 
     public StravaDialog(Frame frame, final StravaSetting stravaSetting) {
         super(frame, true);
@@ -36,7 +38,7 @@ public class StravaDialog extends JDialog {
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Authentication", null, createAuthSettingPanel(), "Authentication");
-        tabbedPane.addTab("Sync", null, createSyncSettingPanel(), "Sync");
+        tabbedPane.addTab("Data", null, createSyncSettingPanel(), "Data");
 
         setContentPane(tabbedPane);
 
@@ -110,21 +112,8 @@ public class StravaDialog extends JDialog {
         JPanel panel = new JPanel();
 
         JPanel panel1 = new JPanel();
-        Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "Sync");
+        Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "Activities");
         panel1.setBorder(titleBorder);
-;
-
-        JLabel lastSync = new JLabel();
-        //TODO define date for last sync
-        lastSync.setText("Last sync:");
-
-        JButton buttonSync = new JButton("Sync");
-        buttonSync.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                //TODO run sync thread
-            }
-        });
 
         JLabel activitiesListLabel = new JLabel();
         activitiesListLabel.setText("<html><a href=\"\">strava activities list</a></html>");
@@ -154,17 +143,61 @@ public class StravaDialog extends JDialog {
             }
         });
 
-        panel1.add(lastSync);
-        panel1.add(buttonSync);
+        panel1.add(activitiesListLabel);
 
-        JPanel panel2 = new JPanel();
-        panel2.add(activitiesListLabel);
+        syncPanel = new JPanel();
+        JLabel sync = new JLabel();
+        sync.setText("<html><a href=\"\">sync</a></html>");
+        sync.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        sync.addMouseListener(new SyncListener());
+
+        syncPanel.add(sync);
 
         panel.add(panel1);
-        panel.add(panel2);
+        panel.add(syncPanel);
 
         return panel;
 
+    }
+
+    class SyncListener extends MouseAdapter{
+
+        public SyncListener () {
+            super();
+        }
+
+        public void mouseClicked(MouseEvent e) {
+            //find activities selected
+            final StravaAthlete athlete = stravaSetting.getCurrentAthleteSelected();
+            if(athlete.getActivitiesSelected() !=null && !athlete.getActivitiesSelected().isEmpty()) {
+                new SwingWorker<Void, String>() {
+                    final JLabel label = new JLabel("Loading... ", JLabel.CENTER);
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        syncPanel.add(label, BorderLayout.CENTER);
+                        label.setVisible(true);
+
+                        for (Map.Entry<String, String> entry : athlete.getActivitiesSelected().entrySet()) {
+                            //check if it's already in library, else load it
+                            StravaController.getInstance(athlete.getAccessToken()).getActivity(entry.getKey());
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        label.setVisible(false);
+                    }
+                }.execute();
+            }
+            else {
+                JOptionPane.showMessageDialog(currentFrame,
+                        "No activities selected",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
+        }
     }
 
 
