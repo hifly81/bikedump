@@ -10,7 +10,8 @@
 #target
 target
 
+noCommit
+
 #resources for demo
-src/test/java/org/hifly/geomapviewer/noCommit/
 src/test/java/org/openstreetmap/
 src/main/resources/hgt/
