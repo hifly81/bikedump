@@ -21,6 +21,7 @@ import java.util.List;
 public class WaypointElevationGraph extends WaypointGraph {
 
     private boolean singleColor = true;
+    private boolean bounds;
 
     public WaypointElevationGraph(List<List<WaypointSegment>> waypoints) {
         super(waypoints);
@@ -30,9 +31,10 @@ public class WaypointElevationGraph extends WaypointGraph {
         super(waypointDetails, detailGraph);
     }
 
-    public WaypointElevationGraph(List<Waypoint> waypointDetails, boolean detailGraph, boolean singleColor) {
+    public WaypointElevationGraph(List<Waypoint> waypointDetails, boolean detailGraph, boolean singleColor, boolean bounds) {
         super(waypointDetails, detailGraph);
         this.singleColor = singleColor;
+        this.bounds = bounds;
     }
 
     @Override
@@ -43,6 +45,7 @@ public class WaypointElevationGraph extends WaypointGraph {
             dataset = createSingleDataset();
         else
             dataset = createDataset();
+
 
         JFreeChart chart = ChartFactory.createXYLineChart(
                 "elevation/distance",
@@ -72,6 +75,16 @@ public class WaypointElevationGraph extends WaypointGraph {
             legendTitle.setBorder(new BlockBorder());
 
             chart.addLegend(legendTitle);
+
+            if(bounds) {
+                //set xy-axis range
+                plot.getDomainAxis().setRange(
+                        waypointDetails.get(0).getDistanceFromStartingPoint(),
+                        waypointDetails.get(waypointDetails.size() - 1).getDistanceFromStartingPoint());
+                plot.getRangeAxis().setRange(
+                        GPSUtility.roundDoubleStat(waypointDetails.get(0).getEle()),
+                        GPSUtility.roundDoubleStat(waypointDetails.get(waypointDetails.size() - 1).getEle()));
+            }
         }
 
         plot.setRenderer(new SlopeRenderer(dataset, singleColor));

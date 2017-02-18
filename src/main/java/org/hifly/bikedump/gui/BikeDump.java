@@ -4,7 +4,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.hifly.bikedump.controller.GPSController;
 import org.hifly.bikedump.controller.StravaController;
-import org.hifly.bikedump.domain.*;
+import org.hifly.bikedump.domain.LibrarySetting;
+import org.hifly.bikedump.domain.ProfileSetting;
+import org.hifly.bikedump.domain.Track;
+import org.hifly.bikedump.domain.TrackSelected;
 import org.hifly.bikedump.domain.gps.Coordinate;
 import org.hifly.bikedump.domain.gps.WaypointSegment;
 import org.hifly.bikedump.domain.strava.StravaSetting;
@@ -24,7 +27,8 @@ import org.hifly.bikedump.gui.panel.MapViewer;
 import org.hifly.bikedump.gui.panel.TrackTable;
 import org.hifly.bikedump.storage.DataHolder;
 import org.hifly.bikedump.storage.GeoMapStorage;
-import org.hifly.bikedump.timer.NewTrackTimer;
+import org.hifly.bikedump.task.LoadTrackExecutor;
+import org.hifly.bikedump.task.NewTrackTimer;
 import org.hifly.bikedump.utility.GUIUtility;
 import org.openstreetmap.gui.jmapviewer.OsmFileCacheTileLoader;
 import org.openstreetmap.gui.jmapviewer.OsmTileLoader;
@@ -48,7 +52,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 //TODO use resource bundles i18n
 public class BikeDump extends JFrame implements JMapViewerEventListener {
@@ -117,10 +120,22 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 }
                 List<Track> tracks = new ArrayList();
                 StringBuffer sb = new StringBuffer();
-                for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {
-                    File file = (File) iterator.next();
-                    addTrackToCache(coordinates, waypoint, tracks, file, sb);
+
+                LoadTrackExecutor loadTrackExecutor = new LoadTrackExecutor(
+                        false,
+                        files.iterator(),
+                        profileSetting,
+                        sb,
+                        coordinates,
+                        waypoint,
+                        tracks);
+                try {
+                    loadTrackExecutor.execute();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+
                 if (sb.length() > 0) {
                     ScrollableDialog dialog = new ScrollableDialog(null, sb.toString(), dimension.getKey() / 4, dimension.getValue() / 4);
                     dialog.showMessage();
@@ -199,10 +214,16 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                     if (DataHolder.listsWaypointSegment == null)
                         DataHolder.listsWaypointSegment = new ArrayList();
                     StringBuffer sb = new StringBuffer();
-                    for (Map.Entry<String, TrackPref> entry : GeoMapStorage.tracksLibrary.entrySet()) {
-                        File file = new File(entry.getKey());
-                        addTrackToCache(coordinates, waypoint, tracks, file, sb);
-                    }
+
+                    LoadTrackExecutor loadTrackExecutor = new LoadTrackExecutor(
+                            false,
+                            GeoMapStorage.tracksLibrary.entrySet().iterator(),
+                            profileSetting,
+                            sb,
+                            coordinates,
+                            waypoint,
+                            tracks);
+                    loadTrackExecutor.execute();
 
                     //TODO check for new files at regular interval --> TimerTask
                     checkNewTrack(coordinates, waypoint, tracks, sb);
@@ -304,17 +325,23 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         }
     }
 
-    public void checkNewTrack(List<List<Coordinate>> coordinates, List<Map<String, WaypointSegment>> waypoint, List<Track> tracks, StringBuffer sb) {
+    public void checkNewTrack(List<List<Coordinate>> coordinates, List<Map<String, WaypointSegment>> waypoint, List<Track> tracks, StringBuffer sb) throws Exception {
         if (GeoMapStorage.librarySetting != null && GeoMapStorage.librarySetting.isScanFolder()) {
             if (GeoMapStorage.librarySetting.getScannedDirs() != null && !GeoMapStorage.librarySetting.getScannedDirs().isEmpty()) {
                 for (String directory : GeoMapStorage.librarySetting.getScannedDirs()) {
                     Collection files = FileUtils.listFiles(new File(directory), null, true);
-                    for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {
-                        File file = (File) iterator.next();
-                        if (GeoMapStorage.tracksLibrary.get(file.getAbsolutePath()) == null) {
-                            addTrackToCache(coordinates, waypoint, tracks, file, sb);
-                        }
-                    }
+                    //only files not in cache
+
+                    LoadTrackExecutor loadTrackExecutor = new LoadTrackExecutor(
+                            true,
+                            files.iterator(),
+                            profileSetting,
+                            sb,
+                            coordinates,
+                            waypoint,
+                            tracks);
+                    loadTrackExecutor.execute();
+
                 }
             }
         }
@@ -547,56 +574,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private void addTrackToCache(
-            List<List<Coordinate>> coordinates,
-            List<Map<String, WaypointSegment>> waypoint,
-            List<Track> tracks,
-            File file,
-            StringBuffer sb) {
-
-        //TODO check if file already exists in Cache
-
-        if (file.exists()) {
-
-            String ext = FilenameUtils.getExtension(file.getAbsolutePath());
-            Track track;
-            Map.Entry<Track, StringBuffer> resultTrack;
-            //TODO check not based on extension
-            if (ext.equalsIgnoreCase("gpx"))
-                resultTrack = GPSController.extractTrackFromGpx(file.getAbsolutePath(), profileSetting);
-            else if (ext.equalsIgnoreCase("tcx"))
-                resultTrack = GPSController.extractTrackFromTcx(file.getAbsolutePath(), profileSetting);
-            else
-                return;
-
-            if (resultTrack != null && resultTrack.getValue().toString().equals("")) {
-                track = resultTrack.getKey();
-                if (track != null) {
-                    //add to map
-                    DataHolder.mapFilePathTrack.put(track.getName(), track.getFileName());
-                    //add to opened files map
-                    if (GeoMapStorage.tracksLibrary == null)
-                        GeoMapStorage.tracksLibrary = new HashMap();
-                    TrackPref trackPref = new TrackPref();
-                    Profile profile = profileSetting.getSelectedProfile();
-                    trackPref.setProfile(profile);
-
-                    GeoMapStorage.tracksLibrary.put(track.getFileName(), trackPref);
-                    coordinates.add(track.getCoordinates());
-                    waypoint.add(track.getCoordinatesNewKm());
-                    tracks.add(track);
-                    if(track.getCoordinatesNewKm() !=null && !track.getCoordinatesNewKm().isEmpty()) {
-                        List<WaypointSegment> listWaypoints =
-                                new ArrayList(track.getCoordinatesNewKm().values());
-                        DataHolder.listsWaypointSegment.add(listWaypoints);
-                    }
-                }
-            } else
-                sb.append(resultTrack.getValue().toString()).append("\n");
-        }
-
     }
 
     private JScrollPane createTableTracksViewer(List<Track> tracks) {

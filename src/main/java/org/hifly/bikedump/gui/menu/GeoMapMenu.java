@@ -195,7 +195,7 @@ public class GeoMapMenu extends JMenuBar {
                     temp.addActionListener(event -> {
                         //open graph
                         WaypointGraph waypointElevationGraph =
-                                new WaypointElevationGraph(slope.getWaypoints(), true, false);
+                                new WaypointElevationGraph(slope.getWaypoints(), true, false, true);
                         new GraphViewer(currentFrame, Arrays.asList(waypointElevationGraph));
                     });
                 }

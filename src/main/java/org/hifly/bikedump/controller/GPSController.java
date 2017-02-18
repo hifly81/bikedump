@@ -31,17 +31,17 @@ public class GPSController {
 
     protected static Logger log = LoggerFactory.getLogger(GPSController.class);
     private static DocumentBuilderFactory factory;
-    private static DocumentBuilder builder;
+    //private static DocumentBuilder builder;
     private static XPath xpath;
 
     static {
         factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
-        try {
+        /*try {
             builder = factory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             throw new IllegalStateException("Can't load xml parsers");
-        }
+        }    */
         XPathFactory xpathFactory = XPathFactory.newInstance();
         xpath = xpathFactory.newXPath();
     }
@@ -135,6 +135,8 @@ public class GPSController {
     }
 
     private static Document getXmlDocumentFromFileName(String filename) throws Exception {
+        DocumentBuilder builder = factory.newDocumentBuilder();
+
         Path path = Paths.get(filename);
         String filenamePart = path.getFileName().toString();
         //TODO consider URI from external sources

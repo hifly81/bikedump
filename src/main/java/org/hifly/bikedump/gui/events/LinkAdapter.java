@@ -50,7 +50,7 @@ public class LinkAdapter extends MouseAdapter implements MouseMotionListener {
                             List<Waypoint> slopeWaypoints = altimetricProfile.getWaypoints();
                             //open graph
                             WaypointGraph waypointElevationGraph =
-                                    new WaypointElevationGraph(slopeWaypoints, true, false);
+                                    new WaypointElevationGraph(slopeWaypoints, true, false, false);
                             new GraphViewer(currentFrame, Arrays.asList(waypointElevationGraph));
                         } else {
                             SlopeSegment slope;
@@ -84,7 +84,7 @@ public class LinkAdapter extends MouseAdapter implements MouseMotionListener {
                             } else {
                                 //open graph
                                 WaypointGraph waypointElevationGraph =
-                                        new WaypointElevationGraph(slopeWaypoints, true, false);
+                                        new WaypointElevationGraph(slopeWaypoints, true, false, true);
                                 new GraphViewer(currentFrame, Arrays.asList(waypointElevationGraph));
                             }
                         }

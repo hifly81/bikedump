@@ -1,4 +1,4 @@
-package org.hifly.bikedump.timer;
+package org.hifly.bikedump.task;
 
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.gps.Coordinate;
@@ -22,7 +22,11 @@ public class NewTrackTimer {
             List<Map<String, WaypointSegment>> waypoint = new ArrayList();
             List<Track> tracks = new ArrayList();
             StringBuffer sb = new StringBuffer();
-            bk.checkNewTrack(coordinates, waypoint, tracks, sb);
+            try {
+                bk.checkNewTrack(coordinates, waypoint, tracks, sb);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             if(!tracks.isEmpty()) {
                 Vector<Object> rowData;

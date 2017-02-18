@@ -16,7 +16,6 @@ public abstract class WaypointGraph {
     protected List<List<WaypointSegment>> waypoints;
     protected List<Waypoint> waypointDetails;
     protected boolean detailGraph;
-    protected JFreeChart chart;
 
     public WaypointGraph(List<List<WaypointSegment>> waypoints) {
         this.waypoints = waypoints;
