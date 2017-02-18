@@ -32,6 +32,7 @@ public class GPSController {
     protected static Logger log = LoggerFactory.getLogger(GPSController.class);
     private static DocumentBuilderFactory factory;
     private static DocumentBuilder builder;
+    private static XPath xpath;
 
     static {
         factory = DocumentBuilderFactory.newInstance();
@@ -41,6 +42,8 @@ public class GPSController {
         } catch (ParserConfigurationException e) {
             throw new IllegalStateException("Can't load xml parsers");
         }
+        XPathFactory xpathFactory = XPathFactory.newInstance();
+        xpath = xpathFactory.newXPath();
     }
 
     public static Map.Entry<Track, StringBuffer> extractTrackFromGpx(String filename, ProfileSetting profileSetting) {
@@ -52,8 +55,6 @@ public class GPSController {
         try {
             String gpxVersion = null;
             Document docForXpath = getXmlDocumentFromFileName(filename);
-            XPathFactory xpathFactory = XPathFactory.newInstance();
-            XPath xpath = xpathFactory.newXPath();
             XPathExpression expr = xpath.compile("//@version");
             Object evaluation = expr.evaluate(docForXpath, XPathConstants.STRING);
             if (evaluation != null)
@@ -102,8 +103,6 @@ public class GPSController {
         List<Track> tracks = null;
         try {
             Document docForXpath = getXmlDocumentFromFileName(filename);
-            XPathFactory xpathFactory = XPathFactory.newInstance();
-            XPath xpath = xpathFactory.newXPath();
             XPathExpression expr = xpath.compile("//TrainingCenterDatabase");
             Object result = expr.evaluate(docForXpath, XPathConstants.NODESET);
             NodeList nodes = (NodeList) result;
