@@ -88,7 +88,6 @@ public class GPSController {
             log.error("file is not GPX [" + sax.getMessage() + "]:" + filename);
         } catch (Exception ex) {
             ex.printStackTrace();
-            //TODO some tracks are not loaded, explore exception cause
             log.error("can't load [" + ex.getMessage() + "]:" + filename);
             sb.append("can't load:").append(filename);
         }
@@ -120,7 +119,6 @@ public class GPSController {
         } catch (SAXParseException sax) {
             log.error("file is not TCX [" + sax.getMessage() + "]:" + filename);
         } catch (Exception ex) {
-            //TODO some tracks are not loaded, explore exception cause
             log.error("can't load [" + ex.getMessage() + "]:" + filename);
             sb.append("can't load:").append(filename);
         }
@@ -139,7 +137,6 @@ public class GPSController {
     private static Document getXmlDocumentFromFileName(String filename) throws Exception {
         Path path = Paths.get(filename);
         String filenamePart = path.getFileName().toString();
-        //FIXME the evaluation via XPATH is really slow
         //TODO consider URI from external sources
         return builder.parse("file://" + StreamUtility.getPathFromAbsoulutePath(filename) + StreamUtility.encodeFilenameOmittingWhiteSpaces(filenamePart, "UTF-8"));
 

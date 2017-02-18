@@ -2,6 +2,7 @@ package org.hifly.bikedump.gui.panel;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.hifly.bikedump.domain.Track;
+import org.hifly.bikedump.domain.TrackSelected;
 import org.hifly.bikedump.gui.BikeDump;
 import org.hifly.bikedump.storage.DataHolder;
 
@@ -122,7 +123,7 @@ public class WorkoutCalendar extends JFrame {
                             cal.setTime(startDate);
                             int day = cal.get(Calendar.DAY_OF_MONTH);
                             if (day == (Integer) tableCalendar.getValueAt(row, col)) {
-                                DataHolder.tracksSelected.add(track.getName());
+                                DataHolder.tracksSelected.add(new TrackSelected(track.getFileName(), track.getName()));
                             }
                         }
                     }

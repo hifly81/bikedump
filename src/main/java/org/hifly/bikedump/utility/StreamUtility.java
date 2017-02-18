@@ -21,7 +21,6 @@ public class StreamUtility {
         }
     }
 
-
     public static String encodeFilename(String filename, String encoding) throws Exception {
         String splChars = ".*[#$%?@].*";
         if (filename.matches(splChars))

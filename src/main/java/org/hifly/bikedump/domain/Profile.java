@@ -50,4 +50,6 @@ public class Profile implements Serializable {
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
+
+
 }

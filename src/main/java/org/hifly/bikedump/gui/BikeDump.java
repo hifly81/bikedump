@@ -266,8 +266,14 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         if (!DataHolder.tracksSelected.isEmpty()) {
             if (!DataHolder.tracksLoaded.isEmpty()) {
                 List<Track> selectedTracks = new ArrayList();
-                //TODO change algo
-                selectedTracks.addAll(DataHolder.tracksLoaded.stream().filter(track -> DataHolder.tracksSelected.contains(track.getName())).collect(Collectors.toList()));
+                for(TrackSelected trackSelected: DataHolder.tracksSelected) {
+                    int index = DataHolder.tracksLoaded.indexOf(new Track(trackSelected.getFilename()));
+                    if(index != -1) {
+                        Track track = DataHolder.tracksLoaded.get(index);
+                        if (track != null)
+                            selectedTracks.add(track);
+                    }
+                }
 
                 if (!selectedTracks.isEmpty()) {
                     if (selectedTracks.size() == 1) {

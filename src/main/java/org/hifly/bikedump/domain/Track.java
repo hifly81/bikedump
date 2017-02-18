@@ -55,6 +55,14 @@ public class Track {
     private double climbingDistance;
     private boolean fromStrava;
 
+    public Track() {
+        super();
+    }
+
+    public Track(String filename) {
+        this.fileName = filename;
+    }
+
 
     public int getId() {
         return id;
@@ -326,5 +334,21 @@ public class Track {
 
     public void setFromStrava(boolean fromStrava) {
         this.fromStrava = fromStrava;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Track)) return false;
+
+        Track track = (Track) o;
+
+        return fileName.equals(track.fileName);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return fileName.hashCode();
     }
 }

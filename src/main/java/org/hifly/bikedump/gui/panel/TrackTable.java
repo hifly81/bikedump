@@ -28,7 +28,7 @@ public class TrackTable extends JTable {
         super();
         this.tracks = tracks;
         setModel(new TrackTableModel());
-        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(getModel());
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(getModel());
         setFillsViewportHeight(true);
         setRowSorter(sorter);
 
@@ -101,6 +101,7 @@ public class TrackTable extends JTable {
         this.getColumnModel().getColumn(2).setPreferredWidth(Math.round(tableSize.width*0.15f));
         this.getColumnModel().getColumn(3).setPreferredWidth(Math.round(tableSize.width*0.15f));
         this.getColumnModel().getColumn(4).setPreferredWidth(Math.round(tableSize.width*0.15f));
+
     }
 
     protected JTableHeader createDefaultTableHeader() {
@@ -114,7 +115,7 @@ public class TrackTable extends JTable {
         };
     }
 
-    class TrackTableModel extends AbstractTableModel {
+    public class TrackTableModel extends AbstractTableModel {
 
         private String[] columnNames = {"Date", "Name", "Distance", "Duration", "Speed", "Elevation"};
 
@@ -151,6 +152,10 @@ public class TrackTable extends JTable {
                 return String.format("%.2f", Double.isNaN(track.getRealElevation()) ? 0 : track.getRealElevation());
 
             return null;
+        }
+
+        public Track getTrackAt(int row) {
+            return tracks.get(row);
         }
     }
 
