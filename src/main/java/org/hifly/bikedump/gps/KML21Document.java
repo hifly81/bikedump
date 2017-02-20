@@ -58,7 +58,7 @@ public class KML21Document extends GPSDocument {
         author.setName("");
         author.setEmail("");
         resultTrack.setAuthor(author);
-        resultTrack.setAltimetricProfile(SlopeUtility.totalAltimetricProfile(waypoints, profileSetting));
+        resultTrack.setAltimetricProfile(SlopeUtility.totalAltimetricProfile(waypoints));
         resultTrack.setSlopes(SlopeUtility.extractSlope(waypoints, profileSetting));
         resultTrack.setCoordinates(coordinates);
         GPSUtility.GpsStats stats = GPSUtility.extractInfoFromWaypoints(waypoints, totalDistance);

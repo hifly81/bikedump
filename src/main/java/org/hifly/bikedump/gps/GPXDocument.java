@@ -1,6 +1,8 @@
 package org.hifly.bikedump.gps;
 
 import com.topografix.gpx.x1.x1.*;
+import com.topografix.gpx.x1.x1.impl.ExtensionsTypeImpl;
+import org.apache.xmlbeans.XmlObject;
 import org.hifly.bikedump.domain.Author;
 import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.Track;
@@ -48,8 +50,9 @@ public class GPXDocument extends GPSDocument {
                         double heart = 0;
                         //calculate heart element
                         //FIXME indexOf evalution is really slow: optimize
-                        ExtensionsType ext = current.getExtensions();
+                        /*ExtensionsTypeImpl ext = (ExtensionsTypeImpl)current.getExtensions();
                         if (ext != null) {
+                            XmlObject[] array = ext.selectChildren(null, "gpxtpx:hr");
                             int i1 = ext.toString().indexOf("<gpxtpx:hr>") + 11;
                             int i2 = ext.toString().indexOf("</gpxtpx:hr>");
                             try {
@@ -60,7 +63,7 @@ public class GPXDocument extends GPSDocument {
                             }
                             catch (Exception ex) {}
 
-                        }
+                        }    */
                         //add basic gps elements
                         createWaypointElement(
                                 currentLat, currentLon, lastLat, lastLon, distance,
@@ -124,7 +127,7 @@ public class GPXDocument extends GPSDocument {
         }
         resultTrack.setAuthor(author);
 
-        resultTrack.setAltimetricProfile(SlopeUtility.totalAltimetricProfile(waypoints, profileSetting));
+        resultTrack.setAltimetricProfile(SlopeUtility.totalAltimetricProfile(waypoints));
         resultTrack.setSlopes(SlopeUtility.extractSlope(waypoints, profileSetting));
         resultTrack.setCoordinates(coordinates);
         GPSUtility.GpsStats stats = GPSUtility.extractInfoFromWaypoints(waypoints, totalDistance);

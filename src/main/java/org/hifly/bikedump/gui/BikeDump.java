@@ -68,14 +68,15 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
     private JScrollPane folderMapScrollViewer, folderDetailViewer, folderTableViewer;
     public TrackTable trackTable = null;
     private String textForReport;
+    private static final String TITLE = "BikeDump v0.1";
 
     public BikeDump() {
         super();
         //panel dimension
         dimension = GUIUtility.getScreenDimension();
         setSize(dimension.getKey(), dimension.getValue());
-        setTitle("BikeDump v0.1");
-        setName("BikeDump v0.1");
+        setTitle(TITLE);
+        setName(TITLE);
         //layout
         setLayout(new BorderLayout());
         //exit behaviour
@@ -99,31 +100,25 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         //import file action
         JMenuItem itemImportFile = mainMenu.getItemImportFile();
         itemImportFile.addActionListener(event -> {
-            int returnVal = fileChooser.showOpenDialog(BikeDump.this);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = fileChooser.getSelectedFile();
-                reloadTrackFromFile(file);
-            }
+            if (fileChooser.showOpenDialog(BikeDump.this) == JFileChooser.APPROVE_OPTION)
+                reloadTrackFromFile(fileChooser.getSelectedFile());
         });
 
         //import folder action
         JMenuItem itemImportFolder = mainMenu.getItemImportFolder();
         itemImportFolder.addActionListener(event -> {
-            int returnVal = folderChooser.showOpenDialog(BikeDump.this);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
+            if (folderChooser.showOpenDialog(BikeDump.this) == JFileChooser.APPROVE_OPTION) {
                 File directory = folderChooser.getSelectedFile();
-                Collection files = FileUtils.listFiles(directory, null, true);
                 List<List<Coordinate>> coordinates = new ArrayList();
                 List<Map<String, WaypointSegment>> waypoint = new ArrayList();
-                if (DataHolder.listsWaypointSegment == null) {
+                if (DataHolder.listsWaypointSegment == null)
                     DataHolder.listsWaypointSegment = new ArrayList();
-                }
                 List<Track> tracks = new ArrayList();
                 StringBuffer sb = new StringBuffer();
 
                 LoadTrackExecutor loadTrackExecutor = new LoadTrackExecutor(
                         false,
-                        files.iterator(),
+                        FileUtils.listFiles(folderChooser.getSelectedFile(), null, true).iterator(),
                         profileSetting,
                         sb,
                         coordinates,
@@ -135,11 +130,8 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                     e.printStackTrace();
                 }
 
-
-                if (sb.length() > 0) {
-                    ScrollableDialog dialog = new ScrollableDialog(null, sb.toString(), dimension.getKey() / 4, dimension.getValue() / 4);
-                    dialog.showMessage();
-                }
+                if (sb.length() > 0)
+                    new ScrollableDialog(null, sb.toString(), dimension.getKey() / 4, dimension.getValue() / 4).showMessage();
 
                 //add dir to library
                 if (GeoMapStorage.librarySetting == null)
@@ -189,6 +181,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         //add menu
         setJMenuBar(mainMenu);
 
+        //loading GUI and track saved
         new SwingWorker<Void, String>() {
             final JLabel label = new JLabel("Loading... ", JLabel.CENTER);
             @Override
@@ -201,8 +194,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 List<Map<String, WaypointSegment>> waypoint = new ArrayList();
 
                 if(stravaSetting != null && stravaSetting.getCurrentAthleteSelected() != null) {
-                    Map<String, String> stravaActivities = stravaSetting.getCurrentAthleteSelected().getActivitiesSelected();
-                    for (Map.Entry<String, String> entry : stravaActivities.entrySet()) {
+                    for (Map.Entry<String, String> entry : stravaSetting.getCurrentAthleteSelected().getActivitiesSelected().entrySet()) {
                         Track trackFromStrava =
                                 StravaController.getInstance(stravaSetting.getCurrentAthleteSelected().getAccessToken()).getTrackFromStravaFile(System.getProperty("user.home") + "/.geomapviewer/strava/" + stravaSetting.getCurrentAthleteSelected().getAccessToken() + "/" + entry.getKey() + ".prop");
                         tracks.add(trackFromStrava);
@@ -248,12 +240,8 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
             @Override
             protected void done() {
                 label.setVisible(false);
-                TipOfTheDay tip = new TipOfTheDay();
-                tip.setVisible(true);
-
+                new TipOfTheDay().setVisible(true);
                 new NewTrackTimer(currentFrame);
-
-
             }
         }.execute();
 
@@ -329,12 +317,10 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         if (GeoMapStorage.librarySetting != null && GeoMapStorage.librarySetting.isScanFolder()) {
             if (GeoMapStorage.librarySetting.getScannedDirs() != null && !GeoMapStorage.librarySetting.getScannedDirs().isEmpty()) {
                 for (String directory : GeoMapStorage.librarySetting.getScannedDirs()) {
-                    Collection files = FileUtils.listFiles(new File(directory), null, true);
                     //only files not in cache
-
                     LoadTrackExecutor loadTrackExecutor = new LoadTrackExecutor(
                             true,
-                            files.iterator(),
+                            FileUtils.listFiles(new File(directory), null, true).iterator(),
                             profileSetting,
                             sb,
                             coordinates,
@@ -347,10 +333,8 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         }
 
         //List of loader results
-        if (sb.length() > 0) {
-            ScrollableDialog dialog = new ScrollableDialog(null, sb.toString(), dimension.getKey() / 2, dimension.getValue() / 2);
-            dialog.showMessage();
-        }
+        if (sb.length() > 0)
+            new ScrollableDialog(null, sb.toString(), dimension.getKey() / 2, dimension.getValue() / 2).showMessage();
     }
 
     @Override
@@ -493,9 +477,8 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         mapViewer.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
+                if (e.getButton() == MouseEvent.BUTTON1)
                     mapViewer.getAttribution().handleAttribution(e.getPoint(), true);
-                }
             }
         });
 
@@ -587,9 +570,8 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         table.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER)
                     loadSelectedTracks(table);
-                }
             }
 
             @Override
@@ -621,8 +603,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
     }
 
     public static void main(String[] args) throws Exception {
-        BikeDump viewer = new BikeDump();
-        viewer.setVisible(true);
+       new BikeDump().setVisible(true);
     }
 
 }

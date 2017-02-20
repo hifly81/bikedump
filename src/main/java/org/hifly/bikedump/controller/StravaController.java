@@ -56,7 +56,7 @@ public class StravaController {
             track.setStatsNewKm(GPSUtility.calculateStatsInUnit(track.getCoordinatesNewKm()));
         track.setMaxAltitude(stats.getMaxAltitude());
         track.setMinAltitude(stats.getMinAltitude());
-        track.setAltimetricProfile(SlopeUtility.totalAltimetricProfile(map.get("WAYPOINTS"), profileSetting));
+        track.setAltimetricProfile(SlopeUtility.totalAltimetricProfile(map.get("WAYPOINTS")));
         track.setSlopes(SlopeUtility.extractSlope(map.get("WAYPOINTS"), profileSetting));
         track.setClimbingSpeed(stats.getClimbingSpeed());
         track.setClimbingTimeMillis(stats.getClimbingTime());
@@ -73,14 +73,12 @@ public class StravaController {
         List<Coordinate> coordinates = new ArrayList();
         List<Waypoint> waypoints = new ArrayList();
         StringBuffer sb = new StringBuffer();
-        BufferedReader br = null;
         Double eleGained;
         Double lastEle = null;
         Double lastLat = null;
         Double lastLon = null;
         Double totalDistance = 0.0;
-        try {
-            br = new BufferedReader(new FileReader(trackFilename));
+        try (BufferedReader br = new BufferedReader(new FileReader(trackFilename))) {
             String line;
             while ((line = br.readLine()) != null) {
 
@@ -105,17 +103,15 @@ public class StravaController {
                 double distance = GPSUtility.haversine(latitude, longitude, lastLat, lastLon);
                 totalDistance += distance;
 
-                Waypoint waypoint =
-                        GPSUtility.createWaypointWrapper(
-                                latitude,
-                                longitude,
-                                distance,
-                                lastEle == null ? eleCurrent: lastEle,
-                                eleGained,
-                                totalDistance,
-                                0,
-                                currentTime);
-                waypoints.add(waypoint);
+                waypoints.add(GPSUtility.createWaypointWrapper(
+                        latitude,
+                        longitude,
+                        distance,
+                        lastEle == null ? eleCurrent: lastEle,
+                        eleGained,
+                        totalDistance,
+                        0,
+                        currentTime));
 
                 lastEle = eleCurrent;
                 lastLat = latitude;
@@ -125,13 +121,6 @@ public class StravaController {
 
         } catch (Exception ex) {
             sb.append("can't load:").append(trackFilename);
-        } finally {
-            if (br != null)
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
         }
 
         map.put("COORDINATES", coordinates);
@@ -143,12 +132,9 @@ public class StravaController {
     public Track getTrackFromStravaFile(String stravaFile) {
 
         Track track = new Track();
-
         Properties prop = new Properties();
-        InputStream input = null;
 
-        try {
-            input = new FileInputStream(stravaFile);
+        try(InputStream input = new FileInputStream(stravaFile)) {
             prop.load(input);
 
             track.setFromStrava(true);
@@ -176,14 +162,6 @@ public class StravaController {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
 
         return track;

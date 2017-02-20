@@ -15,10 +15,8 @@ import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,19 +29,13 @@ public class GPSController {
 
     protected static Logger log = LoggerFactory.getLogger(GPSController.class);
     private static DocumentBuilderFactory factory;
-    //private static DocumentBuilder builder;
     private static XPath xpath;
+    private static final String FILE_URI = "file://";
 
     static {
         factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
-        /*try {
-            builder = factory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new IllegalStateException("Can't load xml parsers");
-        }    */
-        XPathFactory xpathFactory = XPathFactory.newInstance();
-        xpath = xpathFactory.newXPath();
+        xpath = XPathFactory.newInstance().newXPath();
     }
 
     public static Map.Entry<Track, StringBuffer> extractTrackFromGpx(String filename, ProfileSetting profileSetting) {
@@ -55,8 +47,7 @@ public class GPSController {
         try {
             String gpxVersion = null;
             Document docForXpath = getXmlDocumentFromFileName(filename);
-            XPathExpression expr = xpath.compile("//@version");
-            Object evaluation = expr.evaluate(docForXpath, XPathConstants.STRING);
+            Object evaluation = xpath.compile("//@version").evaluate(docForXpath, XPathConstants.STRING);
             if (evaluation != null)
                 gpxVersion = (String) evaluation;
             else
@@ -102,8 +93,7 @@ public class GPSController {
         List<Track> tracks = null;
         try {
             Document docForXpath = getXmlDocumentFromFileName(filename);
-            XPathExpression expr = xpath.compile("//TrainingCenterDatabase");
-            Object result = expr.evaluate(docForXpath, XPathConstants.NODESET);
+            Object result = xpath.compile("//TrainingCenterDatabase").evaluate(docForXpath, XPathConstants.NODESET);
             NodeList nodes = (NodeList) result;
             if (nodes == null)
                 log.error("file is not TCX:" + filename);
@@ -136,11 +126,10 @@ public class GPSController {
 
     private static Document getXmlDocumentFromFileName(String filename) throws Exception {
         DocumentBuilder builder = factory.newDocumentBuilder();
-
         Path path = Paths.get(filename);
         String filenamePart = path.getFileName().toString();
         //TODO consider URI from external sources
-        return builder.parse("file://" + StreamUtility.getPathFromAbsoulutePath(filename) + StreamUtility.encodeFilenameOmittingWhiteSpaces(filenamePart, "UTF-8"));
+        return builder.parse(FILE_URI + StreamUtility.getPathFromAbsoulutePath(filename) + StreamUtility.encodeFilenameOmittingWhiteSpaces(filenamePart, "UTF-8"));
 
     }
 }
