@@ -3,6 +3,8 @@ bikedump
 
 Manage and extract stats from your bike gps gpx tcx routes.
 
+Provide integration with Strava activities
+
 ============
 External libraries and licensing
 
