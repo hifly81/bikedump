@@ -6,13 +6,15 @@ import java.io.*;
 
 public class StravaStorage {
 
+    private static final String STRAVA_DIR = System.getProperty("user.home") + "/.geomapviewer/strava/";
+
     public static void saveActivities(Object toSave, String filename) {
         //TODO md5 name
         FileOutputStream fos = null;
         try {
             fos =
                     new FileOutputStream(
-                            System.getProperty("user.home") + "/.geomapviewer/strava/" + filename + ".pref");
+                            STRAVA_DIR + filename + ".pref");
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(toSave);
             oos.close();
@@ -26,7 +28,7 @@ public class StravaStorage {
     }
 
     public static StravaSetting readStravaSetting() {
-        File file = new File(System.getProperty("user.home") + "/.geomapviewer/strava/strava.pref");
+        File file = new File(STRAVA_DIR + "strava.pref");
         FileInputStream streamIn = null;
         StravaSetting strava = null;
         if (file != null && file.exists()) {

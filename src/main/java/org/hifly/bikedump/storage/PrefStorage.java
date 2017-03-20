@@ -10,13 +10,15 @@ import java.util.Map;
 //TODO refactor read methods
 public class PrefStorage {
 
+    private static final String PREF_DIR = System.getProperty("user.home") + "/.geomapviewer/preferences/";
+
     public static void savePref(Object toSave, String filename) {
         //TODO md5 name
         FileOutputStream fos = null;
         try {
             fos =
                     new FileOutputStream(
-                            System.getProperty("user.home") + "/.geomapviewer/preferences/" + filename + ".pref");
+                            PREF_DIR + filename + ".pref");
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(toSave);
             oos.close();
@@ -30,7 +32,7 @@ public class PrefStorage {
     }
 
     public static Map<String, TrackPref> readOpenedTracks() {
-        File file = new File(System.getProperty("user.home") + "/.geomapviewer/preferences/tracks.pref");
+        File file = new File(PREF_DIR + "tracks.pref");
         FileInputStream streamIn = null;
         Map<String, TrackPref> map = null;
         if (file != null && file.exists()) {
@@ -54,7 +56,7 @@ public class PrefStorage {
     }
 
     public static ProfileSetting readSavedProfileSetting() {
-        File file = new File(System.getProperty("user.home") + "/.geomapviewer/preferences/profile.pref");
+        File file = new File(PREF_DIR + "profile.pref");
         FileInputStream streamIn = null;
         ProfileSetting profile = null;
         if (file != null && file.exists()) {
@@ -79,7 +81,7 @@ public class PrefStorage {
 
 
     public static LibrarySetting readLibrarySetting() {
-        File file = new File(System.getProperty("user.home") + "/.geomapviewer/preferences/library.pref");
+        File file = new File(PREF_DIR + "library.pref");
         FileInputStream streamIn = null;
         LibrarySetting library = null;
         if (file != null && file.exists()) {

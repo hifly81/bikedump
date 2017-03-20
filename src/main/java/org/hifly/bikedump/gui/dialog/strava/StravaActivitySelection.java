@@ -10,6 +10,9 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +21,8 @@ import java.util.Map;
 public class StravaActivitySelection extends JDialog {
 
     private StravaAthlete stravaAthlete;
-
     private JPanel activityPanel;
-
-    public JPanel getActivityPanel() {
-        return activityPanel;
-    }
-
+    private StravaActivitySelection currentFrame = this;
 
     public StravaActivitySelection(Frame frame, final StravaAthlete stravaAthlete) {
         super(frame, true);
@@ -49,6 +47,13 @@ public class StravaActivitySelection extends JDialog {
         Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "Strava Activity list");
         activityPanel.setBorder(titleBorder);
 
+        JLabel sync = new JLabel();
+        sync.setText("<html><a href=\"\">sync</a></html>");
+        sync.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        sync.addMouseListener(new SyncListener());
+
+        activityPanel.add(sync);
+
         JScrollPane panelScroll = new JScrollPane(activityPanel);
         panelScroll.setPreferredSize(new Dimension(500, 500));
         panelScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -61,6 +66,7 @@ public class StravaActivitySelection extends JDialog {
                 //This map must preserve insertion order
                 Map<String,StravaActivity> mapActivities = new LinkedTreeMap();
                 Map<String,String> mapActivitiesByName = new HashMap(activities.size());
+
                 for(StravaActivity activity:activities) {
                     JCheckBox temp = new JCheckBox(activity.getName() + "-" + activity.getDate());
                     temp.setSelected(activity.isSelected());
@@ -88,5 +94,74 @@ public class StravaActivitySelection extends JDialog {
 
         return panelScroll;
     }
+
+    class SyncListener extends MouseAdapter {
+
+        public SyncListener() {
+            super();
+        }
+
+        public void mouseClicked(MouseEvent e) {
+            //find activities selected
+            final StravaAthlete athlete = stravaAthlete;
+
+            new SwingWorker<Void, String>() {
+                final JLabel label = new JLabel("Loading... ", JLabel.CENTER);
+                List<StravaActivity> activities;
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    activityPanel.add(label, BorderLayout.CENTER);
+                    label.setVisible(true);
+
+                    activities = StravaController.getInstance(athlete.getAccessToken()).getAllActivities();
+                    if (activities != null && !activities.isEmpty()) {
+
+                        Component[] components = activityPanel.getComponents();
+                        if (components != null) {
+                            for (Component component : components)
+                                activityPanel.remove(component);
+                        }
+
+                        //This map must preserve insertion order
+                        Map<String, StravaActivity> mapActivities = new LinkedTreeMap();
+                        Map<String, String> mapActivitiesByName = new HashMap(activities.size());
+                        for (StravaActivity activity : activities) {
+                            JCheckBox temp = new JCheckBox(activity.getName() + "-" + activity.getDate());
+                            temp.setSelected(activity.isSelected());
+                            temp.addItemListener(new StravaActivityCheckListener(athlete));
+                            activityPanel.add(temp);
+
+                            //athlete --> activities
+                            mapActivities.put(activity.getId(), activity);
+                            //TODO is need????
+                            mapActivitiesByName.put(activity.getName() + "-" + activity.getDate(), activity.getId());
+
+                        }
+                        athlete.setActivities(mapActivities);
+                        athlete.setActivitiesByName(mapActivitiesByName);
+
+                        activityPanel.validate();
+                        activityPanel.repaint();
+                    }
+
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+
+                    label.setVisible(false);
+                    if (activities == null || activities.isEmpty())
+                        JOptionPane.showMessageDialog(currentFrame,
+                                "No activities selected",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                }
+            }.execute();
+
+        }
+    }
+
 
 }

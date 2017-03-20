@@ -4,6 +4,8 @@ import org.hifly.bikedump.domain.gps.SlopeSegment;
 import org.hifly.bikedump.graph.WaypointElevationGraph;
 import org.hifly.bikedump.graph.WaypointGraph;
 import org.hifly.bikedump.gui.dialog.GraphViewer;
+import org.hifly.bikedump.gui.events.QuitHandler;
+import org.hifly.bikedump.gui.events.QuitWindowHandler;
 import org.hifly.bikedump.storage.GeoMapStorage;
 import org.hifly.bikedump.utility.SlopeUtility;
 
@@ -99,9 +101,7 @@ public class GeoMapMenu extends JMenuBar {
         exit.setMnemonic(KeyEvent.VK_C);
         exit.setToolTipText("Exit application");
         exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
-
-        //TODO add quit listener --> saving
-        exit.addActionListener(event -> System.exit(0));
+        exit.addActionListener(new QuitHandler());
 
         file.add(importMenu);
         file.add(synchMenu);

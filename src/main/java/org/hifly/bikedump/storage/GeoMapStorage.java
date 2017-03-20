@@ -25,8 +25,7 @@ public class GeoMapStorage {
         FileInputStream streamIn = null;
         Input input = null;
         try {
-            //FIXME put .geomapviewer dir
-            streamIn = new FileInputStream(System.getProperty("user.home")+"/Dropbox/CYCLING_MTB/ROUTE/elevation_stats/storage_coordinates_kyro.db");
+            streamIn = new FileInputStream(System.getProperty("user.home")+"/.geomapviewer/coordinates/storage_coordinates_kyro.db");
             input = new Input(streamIn);
             Kryo kryo = new Kryo();
             gpsElevationMap = (Map<String, Double>)kryo.readObject(input, HashMap.class);
@@ -42,7 +41,9 @@ public class GeoMapStorage {
             //load strava setting
             stravaSetting = StravaStorage.readStravaSetting();
         }
-        catch (Exception e) {}
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         finally {
             try {
                 input.close();
@@ -52,5 +53,25 @@ public class GeoMapStorage {
             }
         }
 
+    }
+
+    public static void save() {
+        if(GeoMapStorage.tracksLibrary != null) {
+            PrefStorage.savePref(GeoMapStorage.tracksLibrary, "tracks");
+        }
+        if(GeoMapStorage.profileSetting != null) {
+            PrefStorage.savePref(GeoMapStorage.profileSetting, "profile");
+        }
+        if(GeoMapStorage.librarySetting != null) {
+            PrefStorage.savePref(GeoMapStorage.librarySetting, "library");
+        }
+        if(GeoMapStorage.stravaSetting != null) {
+            StravaStorage.saveActivities(GeoMapStorage.stravaSetting, "strava");
+        }
+        if(GeoMapStorage.savedClimbsList != null) {
+            for(SlopeSegment slope: GeoMapStorage.savedClimbsList) {
+                ClimbStorage.saveClimb(slope, slope.getName());
+            }
+        }
     }
 }
