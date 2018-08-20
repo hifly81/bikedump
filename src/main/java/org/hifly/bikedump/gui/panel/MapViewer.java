@@ -60,21 +60,22 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
                 for (int i = 0; i < listCoordinates.size(); i++) {
                     String key = GPSUtility.getKeyForCoordinatesMap(
                             String.valueOf(listCoordinates.get(i).getLat()) + "-" + String.valueOf(listCoordinates.get(i).getLon()));
-                    Double obj = GeoMapStorage.gpsElevationMap.get(key);
                     double ele = 0;
-                    if (obj == null) {
-                        if(mapFallBackElevation.containsKey(indexMap))
-                            ele = mapFallBackElevation.get(indexMap);
-                        else if(tempMap.values() != null) {
-                            ArrayList<WaypointSegment> list = new ArrayList(tempMap.values());
-                            mapFallBackElevation.put(indexMap, list.get(0).getEle());
-                            ele = mapFallBackElevation.get(indexMap);
+                    if(GeoMapStorage.gpsElevationMap != null) {
+                        Double obj = GeoMapStorage.gpsElevationMap.get(key);
+                        if (obj == null) {
+                            if (mapFallBackElevation.containsKey(indexMap))
+                                ele = mapFallBackElevation.get(indexMap);
+                            else if (tempMap.values() != null) {
+                                ArrayList<WaypointSegment> list = new ArrayList(tempMap.values());
+                                mapFallBackElevation.put(indexMap, list.get(0).getEle());
+                                ele = mapFallBackElevation.get(indexMap);
+                            } else
+                                //skip element
+                                log.warn("Elevation not found for:" + key);
+                        } else {
+                            ele = GeoMapStorage.gpsElevationMap.get(key);
                         }
-                        else
-                            //skip element
-                            log.warn("Elevation not found for:" + key);
-                    } else {
-                        ele = GeoMapStorage.gpsElevationMap.get(key);
                     }
                     if (listTemp.size() == 0) {
                         if (ele < limitFlat)

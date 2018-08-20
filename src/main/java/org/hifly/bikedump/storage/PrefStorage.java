@@ -16,9 +16,7 @@ public class PrefStorage {
         //TODO md5 name
         FileOutputStream fos = null;
         try {
-            fos =
-                    new FileOutputStream(
-                            PREF_DIR + filename + ".pref");
+            fos = new FileOutputStream(PREF_DIR + filename + ".pref");
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(toSave);
             oos.close();

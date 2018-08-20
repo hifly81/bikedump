@@ -241,7 +241,7 @@ public class SettingDialog extends JDialog {
         bikeNameLabel.setLabelFor(bikeNameField);
 
         //TODO load from external source
-        String[] bikeBrands = {"Cannondale", "Scott", "Torpado", "Trek", "Wilier"};
+        String[] bikeBrands = {"Bianchi", "Cannondale", "Canyon", "Kross", "Scott", "Specialiezed", "Torpado", "Trek", "Wilier"};
         bikeBrandsCombo = new JComboBox(bikeBrands);
         bikeBrandsCombo.setSelectedIndex(0);
         JLabel bikeBrandsLabel = new JLabel("Brand");
