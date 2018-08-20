@@ -19,6 +19,7 @@ import java.util.Map;
 public class GeoMapStorage {
 
     public static Map<String, Double> gpsElevationMap;
+    public static Map<String, Double> gpsElevationMapFallback = new HashMap<>();
     public static List<SlopeSegment> savedClimbsList;
     public static Map<String,TrackPref> tracksLibrary;
     public static ProfileSetting profileSetting;

@@ -2,6 +2,7 @@ package org.hifly.bikedump.utility;
 
 import org.hifly.bikedump.domain.gps.Waypoint;
 import org.hifly.bikedump.domain.gps.WaypointSegment;
+import org.hifly.bikedump.storage.GeoMapStorage;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -167,6 +168,7 @@ public class GPSUtility {
         Waypoint first = null;
         for (Waypoint waypoint : waypoints) {
             double elevation = waypoint.getEle();
+            GeoMapStorage.gpsElevationMapFallback.put(String.valueOf(waypoint.getLat()) + "-" + String.valueOf(waypoint.getLon()), waypoint.getEle());
             if (first != null) {
                 double eleGained = waypoint.getEle() - first.getEle();
                 if (eleGained > 0) {

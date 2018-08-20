@@ -50,12 +50,12 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
         double limitMountain = 800;
         double currentLimit = 0;
 
-        Map<Integer, Double> mapFallBackElevation = new HashMap();
 
         int indexMap = 0;
         if (coordinates != null) {
             for (List<ICoordinate> listCoordinates : coordinates) {
                 List<ICoordinate> listTemp = new ArrayList<>();
+
                 Map<String, WaypointSegment> tempMap = coordinatesNewKm.get(indexMap);
                 for (int i = 0; i < listCoordinates.size(); i++) {
                     String key = GPSUtility.getKeyForCoordinatesMap(
@@ -64,19 +64,23 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
                     if(GeoMapStorage.gpsElevationMap != null) {
                         Double obj = GeoMapStorage.gpsElevationMap.get(key);
                         if (obj == null) {
-                            if (mapFallBackElevation.containsKey(indexMap))
-                                ele = mapFallBackElevation.get(indexMap);
-                            else if (tempMap.values() != null) {
-                                ArrayList<WaypointSegment> list = new ArrayList(tempMap.values());
-                                mapFallBackElevation.put(indexMap, list.get(0).getEle());
-                                ele = mapFallBackElevation.get(indexMap);
-                            } else
+                            if(GeoMapStorage.gpsElevationMapFallback.containsKey(String.valueOf(listCoordinates.get(i).getLat()) + "-" + String.valueOf(listCoordinates.get(i).getLon())))
+                                ele = GeoMapStorage.gpsElevationMapFallback.get(String.valueOf(listCoordinates.get(i).getLat()) + "-" + String.valueOf(listCoordinates.get(i).getLon()));
+                            else
                                 //skip element
                                 log.warn("Elevation not found for:" + key);
                         } else {
                             ele = GeoMapStorage.gpsElevationMap.get(key);
                         }
                     }
+                    else {
+                        if(GeoMapStorage.gpsElevationMapFallback.containsKey(String.valueOf(listCoordinates.get(i).getLat()) + "-" + String.valueOf(listCoordinates.get(i).getLon())))
+                            ele = GeoMapStorage.gpsElevationMapFallback.get(String.valueOf(listCoordinates.get(i).getLat()) + "-" + String.valueOf(listCoordinates.get(i).getLon()));
+                        else
+                            //skip element
+                            log.warn("Elevation not found for:" + key);
+                    }
+
                     if (listTemp.size() == 0) {
                         if (ele < limitFlat)
                             currentLimit = limitFlat;
@@ -117,7 +121,7 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
                     Color color;
                     if (currentLimit <= limitFlat)
                         color = Color.GREEN;
-                    else if (currentLimit > limitFlat && currentLimit <= limitMountain)
+                    else if (currentLimit > limitFlat && currentLimit < limitMountain)
                         color = Color.YELLOW;
                     else
                         color = Color.RED;
