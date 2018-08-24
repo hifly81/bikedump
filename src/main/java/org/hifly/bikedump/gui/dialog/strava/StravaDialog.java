@@ -6,6 +6,7 @@ import org.hifly.bikedump.storage.GeoMapStorage;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -30,8 +31,8 @@ public class StravaDialog extends JDialog {
         setTitle("Geomapviewer - Strava options");
 
         JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Activities", null, createSyncSettingPanel(), "Activities");
         tabbedPane.addTab("Authentication", null, createAuthSettingPanel(), "Authentication");
-        tabbedPane.addTab("Data", null, createSyncSettingPanel(), "Data");
 
         setContentPane(tabbedPane);
 
@@ -46,16 +47,15 @@ public class StravaDialog extends JDialog {
 
     public JPanel createAuthSettingPanel() {
 
-        JPanel panel = new JPanel();
+        JPanel panel = createRootPanel();
+        panel.setPreferredSize(new Dimension(300, 150));
 
-        JPanel panel1 = new JPanel();
-        TitledBorder titleBorder = new TitledBorder(new LineBorder(Color.RED), "Auth");
+        JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        TitledBorder titleBorder = new TitledBorder(new LineBorder(Color.RED), "New Access Token");
         panel1.setBorder(titleBorder);
 
         final JTextField accessTokenField = new JTextField();
         accessTokenField.setPreferredSize(new Dimension(100, 24));
-        JLabel accessTokenLabel = new JLabel("New access token");
-        accessTokenLabel.setLabelFor(accessTokenField);
         JLabel accessTokenListLabel = new JLabel();
         accessTokenListLabel.setText("<html><a href=\"\">access token list</a></html>");
         accessTokenListLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -87,11 +87,12 @@ public class StravaDialog extends JDialog {
             }
         });
 
-        panel1.add(accessTokenLabel);
         panel1.add(accessTokenField);
         panel1.add(buttonSave);
 
-        JPanel panel2 = new JPanel();
+        JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        TitledBorder titleBorder2 = new TitledBorder(new LineBorder(Color.RED), "Access Token saved");
+        panel2.setBorder(titleBorder2);
         panel2.add(accessTokenListLabel);
 
         panel.add(panel1);
@@ -125,41 +126,13 @@ public class StravaDialog extends JDialog {
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                 } else {
-
-
-                    new SwingWorker<Void, String>() {
-                        final JLabel label = new JLabel("Loading... ", JLabel.CENTER);
-
-                        @Override
-                        protected Void doInBackground() throws Exception {
-
-                            activitiesListLabel.setVisible(false);
-
-                            panel1.add(label, BorderLayout.CENTER);
-                            label.setVisible(true);
-
-                            validate();
-                            repaint();
-
-                            //define dialogs
-                            stravaActivitySelection = new StravaActivitySelection(externalFrame, stravaSetting.getCurrentAthleteSelected());
-                            stravaActivitySelection.pack();
-                            stravaActivitySelection.setLocationRelativeTo(currentFrame);
-                            stravaActivitySelection.setVisible(true);
-
-                            return null;
-                        }
-
-                        @Override
-                        protected void done() {}
-                    }.execute();
-
+                    //define dialogs
+                    stravaActivitySelection = new StravaActivitySelection(externalFrame, stravaSetting.getCurrentAthleteSelected());
+                    stravaActivitySelection.pack();
+                    stravaActivitySelection.setLocationRelativeTo(currentFrame);
+                    stravaActivitySelection.setVisible(true);
                 }
-
-
             }
-
-
         });
 
         panel1.add(activitiesListLabel);
@@ -167,8 +140,15 @@ public class StravaDialog extends JDialog {
 
         return panel;
 
-
     }
+
+    private JPanel createRootPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        return panel;
+    }
+
 
 }
 

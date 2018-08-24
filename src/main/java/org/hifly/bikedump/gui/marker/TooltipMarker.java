@@ -19,10 +19,10 @@ public class TooltipMarker extends MapMarkerDot  {
         super(lat,lon);
 
         text =  "Lap: "+waypoint.getUnit();
-        text2 = TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", waypoint.getTimeSpent());
-        text3 = TimeUtility.toStringFromTimeDiff(waypoint.getTimeIncrement());
-        text4 = GPSUtility.roundDoubleStat(waypoint.getAvgSpeed()) + " km/h";
-        text5 = GPSUtility.roundDoubleStat(waypoint.getEleGained())+ " m";
+        text2 = "timestamp:" + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", waypoint.getTimeSpent());
+        text3 = "time spent:" + TimeUtility.toStringFromTimeDiff(waypoint.getTimeIncrement());
+        text4 = "avg speed:" + GPSUtility.roundDoubleStat(waypoint.getAvgSpeed()) + " km/h";
+        text5 = "elevation gained:" + GPSUtility.roundDoubleStat(waypoint.getEleGained())+ " m";
 
         this.waypoint = waypoint;
         this.mapViewer = viewer;
@@ -39,10 +39,10 @@ public class TooltipMarker extends MapMarkerDot  {
         if (g instanceof Graphics2D) {
             Graphics2D g2 = (Graphics2D) g;
             Composite oldComposite = g2.getComposite();
-            g2.draw(new Rectangle2D.Double(x, y, 105, 105));
+            g2.draw(new Rectangle2D.Double(x, y, 280, 80));
 
-            g.setFont(new Font("Arial", Font.BOLD, 10));
-            g.setColor(Color.BLUE);
+            g.setFont(new Font("Arial", Font.BOLD, 14));
+            g.setColor(Color.BLACK);
 
             g.drawString(text,(int)x+5,(int)y+15);
             g.drawString(text2,(int)x+5,(int)y+30);

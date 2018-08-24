@@ -48,7 +48,7 @@ public class StravaActivitySelection extends JDialog {
         activityPanel.setBorder(titleBorder);
 
         JLabel sync = new JLabel();
-        sync.setText("<html><a href=\"\">sync</a></html>");
+        sync.setText("<html><a href=\"\">sync new activities</a></html>");
         sync.setCursor(new Cursor(Cursor.HAND_CURSOR));
         sync.addMouseListener(new SyncListener());
 

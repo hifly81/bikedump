@@ -8,6 +8,7 @@ import org.hifly.bikedump.storage.GeoMapStorage;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -36,7 +37,7 @@ public class SettingDialog extends JDialog {
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("General", null, createGeneralSettingPanel(), "General settings");
-        tabbedPane.addTab("Physical", null, createPhysicalSettingPanel(), "Physical settings");
+        tabbedPane.addTab("Profile", null, createProfileSettingPanel(), "Profile settings");
         tabbedPane.addTab("Conversion", null, createConversionSettingPanel(), "Conversion settings");
         tabbedPane.addTab("Library", null, createLibrarySettingPanel(), "Library settings");
         tabbedPane.addTab("Bike", null, createBikeSettingPanel(), "Bike settings");
@@ -74,10 +75,10 @@ public class SettingDialog extends JDialog {
         return panel;
     }
 
-    public JPanel createPhysicalSettingPanel() {
-        JPanel panel = new JPanel();
+    public JPanel createProfileSettingPanel() {
+        JPanel panel = createRootPanel();
 
-        JPanel panel0 = new JPanel();
+        JPanel panel0 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "Profile saved");
         panel0.setBorder(titleBorder);
         if(profileSetting.getProfiles()!=null && !profileSetting.getProfiles().isEmpty()) {
@@ -110,7 +111,7 @@ public class SettingDialog extends JDialog {
         });
         panel0.add(profileList);
 
-        JPanel panel1 = new JPanel();
+        JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         titleBorder = new TitledBorder(new LineBorder(Color.RED), "New Profile definition");
         panel1.setBorder(titleBorder);
 
@@ -197,9 +198,9 @@ public class SettingDialog extends JDialog {
     }
 
     public JPanel createBikeSettingPanel() {
-        JPanel panel = new JPanel();
+        JPanel panel = createRootPanel();
 
-        JPanel panel0 = new JPanel();
+        JPanel panel0 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "Bikes saved");
         panel0.setBorder(titleBorder);
         if(profileSetting.getBikes()!=null && !profileSetting.getBikes().isEmpty()) {
@@ -232,7 +233,7 @@ public class SettingDialog extends JDialog {
         });
         panel0.add(bikeList);
 
-        JPanel panel1 = new JPanel();
+        JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         titleBorder = new TitledBorder(new LineBorder(Color.RED), "New Bike definition");
         panel1.setBorder(titleBorder);
 
@@ -329,6 +330,13 @@ public class SettingDialog extends JDialog {
 
         panel.add(panel1);
 
+        return panel;
+    }
+
+    private JPanel createRootPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
         return panel;
     }
 

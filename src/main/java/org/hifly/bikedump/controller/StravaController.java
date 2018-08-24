@@ -145,6 +145,8 @@ public class StravaController {
             track.setRealTime(Integer.valueOf(prop.getProperty("elapsed")) * 1000);
             track.setCalculatedElevation(Double.valueOf(prop.getProperty("elevation")));
             track.setRealElevation(Double.valueOf(prop.getProperty("elevation")));
+            track.setCalculatedDescent(Double.valueOf(prop.getProperty("descent")));
+            track.setRealDescent(Double.valueOf(prop.getProperty("descent")));
             track.setHeartFrequency(Double.valueOf(prop.getProperty("avgHeart")));
             track.setAvgTemperature(Double.valueOf(prop.getProperty("avgTemp")));
             track.setHeartMax(Double.valueOf(prop.getProperty("maxHeart")));
@@ -174,6 +176,7 @@ public class StravaController {
         String filename = System.getProperty("user.home") + "/.geomapviewer/strava/" + this.accessToken + "/" + activityId;
         File file = new File(filename);
         BufferedWriter bw = null;
+        double descent = 0;
         if (!file.exists()) {
             List<Stream> streams = getStreamByActivity(activityId, new String[]{"time", "latlng", "distance", "altitude", "heartrate", "temp"});
             /*0 - latlng
@@ -197,7 +200,24 @@ public class StravaController {
                                 line.append(temp.get(0).toString());
                                 line.append(";");
                                 line.append(temp.get(1).toString());
-                            } else {
+                            }
+                            else if (type.equalsIgnoreCase("altitude")) {
+                                if(descent == 0) {
+                                    List temp = (List) streams.get(k).getData();
+                                    double previousAlt = 0;
+                                    double currentAlt;
+                                    for (Object tmp : temp) {
+                                        currentAlt = (Double) tmp;
+                                        if (currentAlt < previousAlt) {
+                                            descent += (previousAlt - currentAlt);
+                                        }
+                                        previousAlt = currentAlt;
+                                    }
+                                }
+
+                                line.append(streams.get(k).getData().get(i).toString());
+                            }
+                            else {
                                 line.append(streams.get(k).getData().get(i).toString());
                             }
                             line.append(";");
@@ -231,6 +251,7 @@ public class StravaController {
                 PropUtility.insertInProperties(prop, "maxSpeed", String.valueOf(activity.getMaxSpeed()));
                 PropUtility.insertInProperties(prop, "moving", String.valueOf(activity.getMovingTimeSec()));
                 PropUtility.insertInProperties(prop, "distance", String.valueOf(activity.getDistance()));
+                PropUtility.insertInProperties(prop, "descent", String.valueOf(descent));
 
                 OutputStream out = null;
                 try {

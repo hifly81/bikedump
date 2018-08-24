@@ -147,7 +147,7 @@ public class TrackTable extends JTable {
             else if (col == 3)
                 return TimeUtility.toStringFromTimeDiff(track.getRealTime());
             else if (col == 4)
-                return String.format("%.2f", Double.isNaN(track.getCalculatedAvgSpeed()) ? 0 : track.getCalculatedAvgSpeed());
+                return String.format("%.2f", Double.isNaN(track.getCalculatedAvgSpeed()) ? 0 : track.getEffectiveAvgSpeed());
             else if (col == 5)
                 return String.format("%.2f", Double.isNaN(track.getRealElevation()) ? 0 : track.getRealElevation());
 
