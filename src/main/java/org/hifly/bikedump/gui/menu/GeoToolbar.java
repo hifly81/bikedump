@@ -56,20 +56,7 @@ public class GeoToolbar extends JToolBar {
         ImageIcon webImageIcon = new ImageIcon(webImageUrl);
         img = webImageIcon.getImage();
         img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
-        webImageIcon = new ImageIcon(img);
-        JButton resultButton = makeNavigationButton("Result","Result","Result",webImageIcon);
-        URL recordImageUrl = getClass().getResource("/img/trophy.png");
-        ImageIcon recordImageIcon = new ImageIcon(recordImageUrl);
-        img = recordImageIcon.getImage();
-        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
-        recordImageIcon = new ImageIcon(img);
-        JButton trophyButton = makeNavigationButton("Record","Record","Record",recordImageIcon);
-        URL targetImageUrl = getClass().getResource("/img/target.png");
-        ImageIcon targetImageIcon = new ImageIcon(targetImageUrl);
-        img = targetImageIcon.getImage();
-        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
-        targetImageIcon = new ImageIcon(img);
-        JButton targetButton = makeNavigationButton("Target","Target","Target",targetImageIcon);
+
 
         add(backButton);
         backButton.addActionListener(event -> {
@@ -107,15 +94,6 @@ public class GeoToolbar extends JToolBar {
 
         add(calendarButton);
         calendarButton.addActionListener(event -> new WorkoutCalendar(currentFrame));
-
-        //TODO resultButton connection
-        add(resultButton);
-
-        //TODO record section
-        add(trophyButton);
-
-        //TODO target section
-        add(targetButton);
 
     }
 

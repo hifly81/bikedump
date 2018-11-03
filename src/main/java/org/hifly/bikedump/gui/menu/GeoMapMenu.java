@@ -36,10 +36,6 @@ public class GeoMapMenu extends JMenuBar {
         ImageIcon helpImageIcon = new ImageIcon(helpImageUrl);
         Image img = helpImageIcon.getImage();
         img = img.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
-        helpImageIcon = new ImageIcon(img);
-        JMenu help = new JMenu("Help");
-        help.setIcon(helpImageIcon);
-        this.add(new JMenu("Help"));
     }
 
     private JMenu createFileMenu() {
