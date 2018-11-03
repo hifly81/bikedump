@@ -14,7 +14,7 @@ Before compiling add the libraries to maven repo:
 
 ```
 cd dist
-sh install-libs.sh"
+sh install-libs.sh
 ```
 
 ### Run: ###
