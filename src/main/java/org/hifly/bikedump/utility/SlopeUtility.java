@@ -57,6 +57,7 @@ public class SlopeUtility {
         return slopeSegment;
     }
 
+    //TODO review slope ranges
     public static List<SlopeSegment> extractSlope(List<Waypoint> waypoints, ProfileSetting profile) {
         List<SlopeSegment> list = new ArrayList();
         double accumulatedDistance = 0;
@@ -106,9 +107,13 @@ public class SlopeUtility {
                         if (accumulatedDistance < descentDistance) {
                             gradientFirst = waypoint;
                             waypointStartIndex = i;
+                        } else {
+                            gradientLast = waypoint;
+                            waypointEndIndex = i;
                         }
                     }
                 }
+
                 accumulatedDistance += waypoint.getDistance();
 
             }

@@ -50,8 +50,6 @@ public class DetailViewer extends JScrollPane {
         String imgSave = null;
         String imgSun = null;
         String imgSunset = null;
-        String imgEdit = null;
-        String imgGraph = null;
         try {
             URL imgMountainUrl = getClass().getResource("/img/mountain.png");
             imgMountain = imgMountainUrl.toExternalForm();
@@ -65,35 +63,15 @@ public class DetailViewer extends JScrollPane {
             URL imgSunsetUrl = getClass().getResource("/img/sunset.png");
             imgSunset = imgSunsetUrl.toExternalForm();
 
-            URL imgEditUrl = getClass().getResource("/img/edit.png");
-            imgEdit = imgEditUrl.toExternalForm();
-
-            URL imgGraphUrl = getClass().getResource("/img/bar-chart-icon.png");
-            imgGraph = imgGraphUrl.toExternalForm();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        try {
-            //TODO change URL format and include img;
-            textPane.addHyperlinkImg(
-                    new URL("http://geomapviewer.com?edit=" + track.getFileName()), imgEdit, "Edit", Color.BLUE);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            //TODO change URL format and include img;
-            textPane.addHyperlinkImg(
-                    new URL("http://geomapviewer.com?graph=" + track.getFileName()), imgGraph, "Graph", Color.BLUE);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
 
         appendTextToBuffer("<p><b>" + track.getName() + "</b><br>");
         appendTextToReportBuffer(track.getName());
-        String sportTypeSection = "Sport type:" + track.getSportType();
+        String sportTypeSection = "Sport type:" + (track.getSportType() == null?"":track.getSportType());
         appendTextToBuffer(sportTypeSection + "<br>");
         appendTextToReportBuffer(sportTypeSection);
         String avgTemperatureSection = "Avg Temperature:" + track.getAvgTemperature();

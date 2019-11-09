@@ -2,8 +2,8 @@ package org.hifly.bikedump.report;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
@@ -24,7 +24,7 @@ public class PdfReport {
         PDFont pdfFont = PDType1Font.HELVETICA;
         float fontSize = 20;
 
-        PDRectangle mediabox = page.findMediaBox();
+        PDRectangle mediabox = page.getArtBox();
         float margin = 72;
 
         float startX = mediabox.getLowerLeftX() + margin;
