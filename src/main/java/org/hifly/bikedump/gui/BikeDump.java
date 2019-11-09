@@ -41,6 +41,8 @@ import org.openstreetmap.gui.jmapviewer.tilesources.BingAerialTileSource;
 import org.openstreetmap.gui.jmapviewer.tilesources.MapQuestOpenAerialTileSource;
 import org.openstreetmap.gui.jmapviewer.tilesources.MapQuestOsmTileSource;
 import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,11 +52,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 
 //TODO use resource bundles i18n
 public class BikeDump extends JFrame implements JMapViewerEventListener {
+
+    private Logger log = LoggerFactory.getLogger(BikeDump.class);
 
     private ProfileSetting profileSetting;
     private SettingDialog settingDialog = null;
@@ -163,11 +170,23 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         });
 
         //strava sync menu item
-        JMenuItem itemStravaSync = mainMenu.getIteamStravaSync();
+        JMenuItem itemStravaSync = mainMenu.getItemStravaSync();
         itemStravaSync.addActionListener(event -> {
             stravaDialog.setLocationRelativeTo(currentFrame);
             stravaDialog.setVisible(true);
+        });
 
+        //try sample action
+        JMenuItem itemTrySample = mainMenu.getItemTrySample();
+        itemTrySample.addActionListener(event -> {
+            URL res = getClass().getClassLoader().getResource("samples/vfassa.gpx");
+            File file;
+            try {
+                file = Paths.get(res.toURI()).toFile();
+                reloadTrackFromFile(file);
+            } catch (URISyntaxException e) {
+                log.warn("Can't load sample gpx {}", e);
+            }
         });
 
         //profile setting menu item
@@ -184,6 +203,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         //loading GUI and track saved
         new SwingWorker<Void, String>() {
             final JLabel label = new JLabel("Loading... ", JLabel.CENTER);
+
             @Override
             protected Void doInBackground() throws Exception {
                 add(label, BorderLayout.CENTER);
@@ -193,7 +213,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 List<List<Coordinate>> coordinates = new ArrayList();
                 List<Map<String, WaypointSegment>> waypoint = new ArrayList();
 
-                if(stravaSetting != null && stravaSetting.getCurrentAthleteSelected() != null) {
+                if (stravaSetting != null && stravaSetting.getCurrentAthleteSelected() != null) {
                     for (Map.Entry<String, String> entry : stravaSetting.getCurrentAthleteSelected().getActivitiesSelected().entrySet()) {
                         Track trackFromStrava =
                                 StravaController.getInstance(stravaSetting.getCurrentAthleteSelected().getAccessToken()).getTrackFromStravaFile(System.getProperty("user.home") + "/.geomapviewer/strava/" + stravaSetting.getCurrentAthleteSelected().getAccessToken() + "/" + entry.getKey() + ".prop");
@@ -275,9 +295,9 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         if (!DataHolder.tracksSelected.isEmpty()) {
             if (!DataHolder.tracksLoaded.isEmpty()) {
                 List<Track> selectedTracks = new ArrayList();
-                for(TrackSelected trackSelected: DataHolder.tracksSelected) {
+                for (TrackSelected trackSelected : DataHolder.tracksSelected) {
                     int index = DataHolder.tracksLoaded.indexOf(new Track(trackSelected.getFilename()));
-                    if(index != -1) {
+                    if (index != -1) {
                         Track track = DataHolder.tracksLoaded.get(index);
                         if (track != null)
                             selectedTracks.add(track);
@@ -287,13 +307,13 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 if (!selectedTracks.isEmpty()) {
                     if (selectedTracks.size() == 1) {
                         Track track = selectedTracks.get(0);
-                        if(track.isFromStrava())
+                        if (track.isFromStrava())
                             reloadTrackPanelFromStrava(track, stravaSetting.getCurrentAthleteSelected().getAccessToken());
                         else
                             reloadTrackFromFile(new File(selectedTracks.get(0).getFileName()));
                     } else {
                         List<Track> tracksToLoad = new ArrayList();
-                        for(Track track: selectedTracks)
+                        for (Track track : selectedTracks)
                             if (track.isFromStrava())
                                 tracksToLoad.add(StravaController.getInstance(stravaSetting.getCurrentAthleteSelected().getAccessToken()).getFullInfoFromStrava(track, profileSetting));
                             else
@@ -400,8 +420,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 mapViewer = new MapViewer(null, null, 10, resultList.get(0).get(0).getLat(), resultList.get(0).get(0).getLon());
             else
                 mapViewer = new MapViewer(resultList, waypoints, 20);
-        }
-        else
+        } else
             mapViewer = new MapViewer(resultList, waypoints, 20);
         pane.getViewport().add(mapViewer);
         mapViewer.addJMVListener(this);
@@ -575,10 +594,12 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
             }
 
             @Override
-            public void keyTyped(KeyEvent e) {}
+            public void keyTyped(KeyEvent e) {
+            }
 
             @Override
-            public void keyReleased(KeyEvent e) {}
+            public void keyReleased(KeyEvent e) {
+            }
         });
 
         trackTable = table;
@@ -603,7 +624,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
     }
 
     public static void main(String[] args) throws Exception {
-       new BikeDump().setVisible(true);
+        new BikeDump().setVisible(true);
     }
 
 }

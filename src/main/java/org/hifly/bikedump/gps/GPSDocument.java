@@ -95,10 +95,10 @@ public abstract class GPSDocument {
         long diffMillis = 0;
         if(currentTime!=null && lastTime!=null)
             diffMillis = currentTime.getTime() - lastTime.getTime();
-        Double eleCurrent = elevationMap.get(GPSUtility.getKeyForCoordinatesMap(currentLat + "-" + currentLon));
+        Double eleCurrent = elevationMap != null? elevationMap.get(GPSUtility.getKeyForCoordinatesMap(currentLat + "-" + currentLon)): 0.0;
         if (currentLat != lastLat && currentLon != lastLon) {
             totalTimeDiff += diffMillis;
-            Double eleLast = elevationMap.get(GPSUtility.getKeyForCoordinatesMap(lastLat + "-" + lastLon));
+            Double eleLast = elevationMap != null? elevationMap.get(GPSUtility.getKeyForCoordinatesMap(lastLat + "-" + lastLon)) : 0.0;
             if (eleCurrent != null && eleLast != null) {
                 Double eleGained = eleCurrent - eleLast;
                 if (eleGained > 0)

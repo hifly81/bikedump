@@ -3,6 +3,7 @@ package org.hifly.bikedump.gui.menu;
 import org.hifly.bikedump.domain.gps.SlopeSegment;
 import org.hifly.bikedump.graph.WaypointElevationGraph;
 import org.hifly.bikedump.graph.WaypointGraph;
+import org.hifly.bikedump.gui.BikeDump;
 import org.hifly.bikedump.gui.dialog.GraphViewer;
 import org.hifly.bikedump.gui.events.QuitHandler;
 import org.hifly.bikedump.gui.events.QuitWindowHandler;
@@ -24,6 +25,7 @@ public class GeoMapMenu extends JMenuBar {
     private JMenuItem itemImportFolder;
     private JMenuItem itemOptionsSetting;
     private JMenuItem iteamStravaSync;
+    private JMenuItem trySample;
     private JFrame currentFrame;
 
     public GeoMapMenu(JFrame currentFrame) {
@@ -88,6 +90,9 @@ public class GeoMapMenu extends JMenuBar {
 
         synchMenu.add(strava);
 
+        JMenuItem trySample = new JMenuItem("Try Sample", null);
+        trySample.setMnemonic(KeyEvent.VK_S);
+
         URL exitImageUrl = getClass().getResource("/img/quit.png");
         ImageIcon exitImageIcon = new ImageIcon(exitImageUrl);
         img = exitImageIcon.getImage();
@@ -102,11 +107,14 @@ public class GeoMapMenu extends JMenuBar {
         file.add(importMenu);
         file.add(synchMenu);
         file.addSeparator();
+        file.add(trySample);
+        file.addSeparator();
         file.add(exit);
 
         this.itemImportFile = importFile;
         this.itemImportFolder = importFolder;
         this.iteamStravaSync = strava;
+        this.trySample = trySample;
 
         return file;
     }
@@ -211,8 +219,12 @@ public class GeoMapMenu extends JMenuBar {
         return itemOptionsSetting;
     }
 
-    public JMenuItem getIteamStravaSync() {
+    public JMenuItem getItemStravaSync() {
         return iteamStravaSync;
+    }
+
+    public JMenuItem getItemTrySample() {
+        return trySample;
     }
 
 }

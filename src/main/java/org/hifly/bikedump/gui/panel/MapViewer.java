@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.List;
 
 public class MapViewer extends JMapViewer implements MouseListener, MouseMotionListener {
-    protected Logger log = LoggerFactory.getLogger(MapViewer.class);
+    private Logger log = LoggerFactory.getLogger(MapViewer.class);
 
     public Map<String,WaypointSegment>  mapCircleCoordinates = new Hashtable<>();
     public TooltipMarker lastOpenedMarker = null;
