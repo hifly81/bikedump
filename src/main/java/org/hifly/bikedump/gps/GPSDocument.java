@@ -18,9 +18,9 @@ import java.util.Map;
 public abstract class GPSDocument {
 
     protected Logger log = LoggerFactory.getLogger(GPSDocument.class);
-    protected List<Track> result = new ArrayList();
-    protected List<Coordinate> coordinates = new ArrayList();
-    protected List<Waypoint> waypoints = new ArrayList();
+    protected List<Track> result = new ArrayList<>();
+    protected List<Coordinate> coordinates = new ArrayList<>();
+    protected List<Waypoint> waypoints = new ArrayList<>();
     protected Map<String, Double> elevationMap = GeoMapStorage.gpsElevationMap;
     protected Date startTime, endTime = null;
     protected ProfileSetting profileSetting;
@@ -117,16 +117,7 @@ public abstract class GPSDocument {
             addCalculatedElevationElement(currentCalcEle, lastCalcEle);
         }
         else {
-            if (eleCurrent != null)
-                addWaypointElement(currentLat,currentLon,distance,eleCurrent,0.0,currentTime, heart, totalDistance);
-            else {
-                if(currentCalcEle != null && lastCalcEle != null) {
-                    Double eleGained = currentCalcEle.doubleValue() - lastCalcEle.doubleValue();
-                    addWaypointElement(currentLat, currentLon, distance, currentCalcEle.doubleValue(), eleGained, currentTime, heart, totalDistance);
-                }  else
-                    addWaypointElement(currentLat, currentLon, distance, 0.0, 0.0, currentTime, heart, totalDistance);
-            }
-
+            addWaypointElement(currentLat, currentLon, distance, eleCurrent, 0.0, currentTime, heart, totalDistance);
         }
     }
 

@@ -21,6 +21,9 @@ import java.util.*;
 import java.util.List;
 
 public class MapViewer extends JMapViewer implements MouseListener, MouseMotionListener {
+   
+    private static final long serialVersionUID = 24L;
+
     private Logger log = LoggerFactory.getLogger(MapViewer.class);
 
     public Map<String,WaypointSegment>  mapCircleCoordinates = new Hashtable<>();

@@ -15,6 +15,9 @@ import java.util.*;
 import java.util.List;
 
 public class WorkoutCalendar extends JFrame {
+
+    private static final long serialVersionUID = 27L;
+
     private BikeDump mapViewer;
     private WorkoutCalendar currentFrame;
 
@@ -24,7 +27,7 @@ public class WorkoutCalendar extends JFrame {
     static JComboBox cmbYear;
     static DefaultTableModel tableModelCalendar;
     static int realYear, realMonth, realDay, currentYear, currentMonth;
-    static Map<Integer, List<Track>> mapTrackByDay = new HashMap();
+    static Map<Integer, List<Track>> mapTrackByDay = new HashMap<>();
     static HashMap<String, List<Track>> tracksByMonth = DataHolder.getTracksByMonth();
 
     //TODO derive dimension from parent
@@ -44,6 +47,8 @@ public class WorkoutCalendar extends JFrame {
         btnPrev = new JButton("&lt;&lt;");
         btnNext = new JButton("&gt;&gt;");
         tableModelCalendar = new DefaultTableModel() {
+            private static final long serialVersionUID = 28L;
+
             public boolean isCellEditable(int rowIndex, int mColIndex) {
                 return false;
             }
@@ -204,21 +209,21 @@ public class WorkoutCalendar extends JFrame {
                     cal.setTime(startDate);
                     int key = cal.get(Calendar.DAY_OF_MONTH);
                     List<Track> tracksTemp;
-                    if (!mapTrackByDay.containsKey(key)) {
-                        tracksTemp = new ArrayList();
-                    } else {
+                    if (!mapTrackByDay.containsKey(key))
+                        tracksTemp = new ArrayList<>();
+                    else
                         tracksTemp = mapTrackByDay.get(key);
-                    }
                     tracksTemp.add(track);
-                    if (!mapTrackByDay.containsKey(key)) {
+                    if (!mapTrackByDay.containsKey(key))
                         mapTrackByDay.put(key, tracksTemp);
-                    }
                 }
             }
         }
     }
 
     static class CellCalendarRenderer extends DefaultTableCellRenderer {
+        
+        private static final long serialVersionUID = 29L;
 
         static ImageIcon imgBikeIcon;
 

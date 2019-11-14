@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class StravaAthlete implements Serializable {
 
+    private static final long serialVersionUID = 8L;
+
     private String accessToken;
     private boolean selected;
     private Map<String, StravaActivity> activities;

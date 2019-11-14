@@ -68,10 +68,10 @@ public class StravaController {
 
     public Map<String, List> getInfoFromStrava(Date trackStart, String trackFilename) {
 
-        Map<String, List> map = new HashMap();
+        Map<String, List> map = new HashMap<>();
 
-        List<Coordinate> coordinates = new ArrayList();
-        List<Waypoint> waypoints = new ArrayList();
+        List<Coordinate> coordinates = new ArrayList<>();
+        List<Waypoint> waypoints = new ArrayList<>();
         StringBuffer sb = new StringBuffer();
         Double eleGained;
         Double lastEle = null;

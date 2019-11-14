@@ -5,6 +5,8 @@ import java.util.Date;
 
 public class Waypoint implements Serializable {
 
+    private static final long serialVersionUID = 3L;
+    
     private double distance = 0;
     private double gradient = 0;
     private double lat;

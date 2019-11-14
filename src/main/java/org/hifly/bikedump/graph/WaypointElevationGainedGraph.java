@@ -47,7 +47,7 @@ public class WaypointElevationGainedGraph extends WaypointGraph {
 
     @Override
     public IntervalXYDataset createDataset() {
-        List<XYSeries> series = new ArrayList(waypoints.size());
+        List<XYSeries> series = new ArrayList<>(waypoints.size());
         //TODO real name
         int index = 0;
         for(List<WaypointSegment> waypoint:waypoints) {

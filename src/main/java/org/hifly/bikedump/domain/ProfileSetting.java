@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.List;
 
 public class ProfileSetting implements Serializable {
+   
+    private static final long serialVersionUID = 6L;
+    
     private String unitSystem;
     private List<Profile> profiles;
     private List<Bike> bikes;

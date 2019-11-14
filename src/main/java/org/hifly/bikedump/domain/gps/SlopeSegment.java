@@ -7,6 +7,9 @@ import java.util.Date;
 import java.util.List;
 
 public class SlopeSegment implements Serializable {
+
+    private static final long serialVersionUID = 2L;
+
     protected double startLatitude;
     protected double endLatitude;
     protected double startLongitude;

@@ -14,6 +14,8 @@ import java.util.Map;
 
 public class GraphViewer extends JDialog {
 
+    private static final long serialVersionUID = 12L;
+
     private Map.Entry<Integer, Integer> dimension;
 
     public GraphViewer(final JFrame rootFrame, List<WaypointGraph> graphs) {
@@ -51,7 +53,7 @@ public class GraphViewer extends JDialog {
 
     private JSplitPane arrangePanel(List<WaypointGraph> graphs) {
         JSplitPane splitPaneMain = null;
-        List<JScrollPane> listTemp = new ArrayList(graphs.size());
+        List<JScrollPane> listTemp = new ArrayList<>(graphs.size());
         for(WaypointGraph graph:graphs) {
             JScrollPane scrollPanel =
                     new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -67,7 +69,7 @@ public class GraphViewer extends JDialog {
 
         //number of container panel
         int numberOfSplitPanel = listTemp.size()/2 + listTemp.size()%2;
-        List<JSplitPane> listTempSplit = new ArrayList(numberOfSplitPanel);
+        List<JSplitPane> listTempSplit = new ArrayList<>(numberOfSplitPanel);
         for(int i=0;i<graphs.size();i+=2) {
             JSplitPane splitPane = new JSplitPane(
                     JSplitPane.HORIZONTAL_SPLIT,listTemp.get(i),

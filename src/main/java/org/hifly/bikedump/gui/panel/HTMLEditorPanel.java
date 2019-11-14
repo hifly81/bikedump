@@ -5,14 +5,15 @@ import javax.swing.text.*;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import java.awt.*;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 
 public class HTMLEditorPanel extends JTextPane {
 
-    public HTMLEditorPanel () {
+    private static final long serialVersionUID = 23L;
+
+    public HTMLEditorPanel() {
         super();
         setContentType("text/html");
 

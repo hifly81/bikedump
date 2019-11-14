@@ -18,9 +18,9 @@ public class NewTrackTimer {
     class FindNewTrack extends TimerTask {
 
         public void run() {
-            List<List<Coordinate>> coordinates = new ArrayList();
-            List<Map<String, WaypointSegment>> waypoint = new ArrayList();
-            List<Track> tracks = new ArrayList();
+            List<List<Coordinate>> coordinates = new ArrayList<>();
+            List<Map<String, WaypointSegment>> waypoint = new ArrayList<>();
+            List<Track> tracks = new ArrayList<>();
             StringBuffer sb = new StringBuffer();
             try {
                 bk.checkNewTrack(coordinates, waypoint, tracks, sb);
@@ -32,7 +32,7 @@ public class NewTrackTimer {
                 Vector<Object> rowData;
                 SimpleDateFormat dt1 = new SimpleDateFormat(TimeUtility.ITA_DATE_FORMAT);
                 for(Track track:tracks) {
-                    rowData = new Vector(6);
+                    rowData = new Vector<>(6);
                     String startDate;
                     if (track.getStartDate() == null)
                         startDate = "";

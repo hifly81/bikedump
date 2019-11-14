@@ -16,6 +16,8 @@ import java.util.List;
 
 public class BikeSelection extends JDialog {
 
+    private static final long serialVersionUID = 11L;
+    
     private ProfileSetting profileSetting;
     private JPanel panelRadio = null;
 

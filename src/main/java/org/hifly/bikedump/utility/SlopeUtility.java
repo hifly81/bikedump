@@ -10,16 +10,14 @@ import java.util.*;
 
 public class SlopeUtility {
 
-    private static List<SlopeSegment> newSlopes;
-
     public static Map<String,List<SlopeSegment>> organizeSlopesBySteepness(List<SlopeSegment> slopes) {
         if(slopes!=null && !slopes.isEmpty()) {
-            Map<String,List<SlopeSegment>> map = new HashMap(5);
-            List<SlopeSegment> slopes1 = new ArrayList();
-            List<SlopeSegment> slopes2 = new ArrayList();
-            List<SlopeSegment> slopes3 = new ArrayList();
-            List<SlopeSegment> slopes4 = new ArrayList();
-            List<SlopeSegment> slopes5 = new ArrayList();
+            Map<String,List<SlopeSegment>> map = new HashMap<>(5);
+            List<SlopeSegment> slopes1 = new ArrayList<>();
+            List<SlopeSegment> slopes2 = new ArrayList<>();
+            List<SlopeSegment> slopes3 = new ArrayList<>();
+            List<SlopeSegment> slopes4 = new ArrayList<>();
+            List<SlopeSegment> slopes5 = new ArrayList<>();
 
             for(SlopeSegment slope: slopes) {
                 double gradient = slope.getGradient();
@@ -59,7 +57,7 @@ public class SlopeUtility {
 
     //TODO review slope ranges
     public static List<SlopeSegment> extractSlope(List<Waypoint> waypoints, ProfileSetting profile) {
-        List<SlopeSegment> list = new ArrayList();
+        List<SlopeSegment> list = new ArrayList<>();
         double accumulatedDistance = 0;
         double descentDistance = 0;
         double limitDescent = 1.5;
@@ -72,7 +70,6 @@ public class SlopeUtility {
         int waypointEndIndex = 0;
 
         //get bikeWeight
-        //TODO remove bike constants
         double bikeWeight = 9;
         List<Bike> bikes = profile.getBikes();
         if(bikes!=null && !bikes.isEmpty()) {
@@ -143,7 +140,7 @@ public class SlopeUtility {
                             lastSlope.setEndElevation(gradientLast.getEle());
                             lastSlope.setEndDistance(gradientLast.getDistanceFromStartingPoint());
                             //calculate waypoint for slope
-                            List<Waypoint> waypointsTemp = new ArrayList();
+                            List<Waypoint> waypointsTemp = new ArrayList<>();
                             for(int z = waypointStartIndex; z < waypointEndIndex; z++)
                                 waypointsTemp.add(waypoints.get(z));
                             //in case of combined a list of waypoints is already present
@@ -205,7 +202,7 @@ public class SlopeUtility {
                     lastSlope.setEndElevation(gradientLast.getEle());
                     lastSlope.setEndDistance(gradientLast.getDistanceFromStartingPoint());
                     //calculate waypoint for slope
-                    List<Waypoint> waypointsTemp = new ArrayList();
+                    List<Waypoint> waypointsTemp = new ArrayList<>();
                     for(int z = waypointStartIndex; z < waypointEndIndex; z++)
                         waypointsTemp.add(waypoints.get(z));
                     //in case of combined a list of waypoints is already present
@@ -310,7 +307,7 @@ public class SlopeUtility {
                 slope.setVam((slope.getElevation() / TimeUtility.getTimeDiffSecond(calLast, calFirst)) * 3600);
 
                 //calculate waypoint for slope
-                List<Waypoint> waypointsTemp = new ArrayList();
+                List<Waypoint> waypointsTemp = new ArrayList<>();
                 for (int z = waypointStartIndex; z < waypointEndIndex; z++)
                     waypointsTemp.add(waypoints.get(z));
                 slope.setWaypoints(waypointsTemp);

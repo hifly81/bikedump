@@ -22,6 +22,8 @@ import java.util.List;
 //TODO use a templating manager e.g freemarker
 public class DetailViewer extends JScrollPane {
 
+    private static final long serialVersionUID = 22L;
+
     private Track track;
     private JFrame currentFrame;
     private StringBuffer text4HTML = new StringBuffer();
@@ -117,9 +119,11 @@ public class DetailViewer extends JScrollPane {
         String maxHeartSection = "Max Heart:" + GPSUtility.roundDoubleStat(track.getHeartMax());
         appendTextToBuffer("Max Heart:" + GPSUtility.roundDoubleStat(track.getHeartMax()) + "<br>");
         appendTextToReportBuffer(maxHeartSection);
-        appendTextToBuffer("<br><hr>");
-        appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
 
+
+        appendTextToBuffer("<hr>");
+
+        appendTextToBuffer("<p><b>Altimetic Profile</b></p>");
         String deviceElevationSection = "Device elevation:" + GPSUtility.roundDoubleStat(track.getCalculatedElevation());
         appendTextToBuffer(deviceElevationSection + "<br>");
         appendTextToReportBuffer(deviceElevationSection);
@@ -148,10 +152,6 @@ public class DetailViewer extends JScrollPane {
         appendTextToBuffer(climbingSpeedSection + "<br>");
         appendTextToReportBuffer(climbingSpeedSection);
 
-
-        String climbingProfile = "Climbing total profile";
-        appendTextToBuffer(climbingProfile + "<br>");
-        appendTextToReportBuffer(climbingProfile);
         textPane.append(null, flushBuffer());
         try {
             textPane.addHyperlinkImg(
@@ -161,15 +161,12 @@ public class DetailViewer extends JScrollPane {
         }
         handler.setAltimetricProfile(track.getAltimetricProfile());
 
-
-        appendTextToBuffer("<br>");
         String slopesSize = track.getSlopes() != null ? String.valueOf(track.getSlopes().size()) : "0";
         String climbsSection = "Climbs (" + slopesSize + " )";
         appendTextToBuffer("<p><b>" + climbsSection + "</b><br><br>");
         appendTextToReportBuffer(climbsSection);
-        //write
-        textPane.append(null, flushBuffer());
 
+        textPane.append(null, flushBuffer());
 
         long totalSlopeDuration = 0;
         double totalSlopeElevation = 0;
@@ -180,7 +177,7 @@ public class DetailViewer extends JScrollPane {
         double totalVam = 0;
 
         if (track.getSlopes() != null && !track.getSlopes().isEmpty()) {
-            List<SlopeSegment> listSlopes = new ArrayList();
+            List<SlopeSegment> listSlopes = new ArrayList<>();
             for (int z = 0; z < track.getSlopes().size(); z++) {
                 SlopeSegment slope = track.getSlopes().get(z);
                 listSlopes.add(slope);

@@ -34,12 +34,20 @@ public class PrefStorage {
         FileInputStream streamIn = null;
         Map<String, TrackPref> map = null;
         if (file != null && file.exists()) {
+            ObjectInputStream objectinputstream = null;
             try {
                 streamIn = new FileInputStream(file);
-                ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
+                objectinputstream = new ObjectInputStream(streamIn);
                 map = (Map<String, TrackPref>) objectinputstream.readObject();
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    if(objectinputstream != null)
+                        objectinputstream.close();
+                } catch(Exception ex2) {
+                    ex2.printStackTrace();
+                }
             }
 
             if (streamIn != null) {
@@ -56,11 +64,12 @@ public class PrefStorage {
     public static ProfileSetting readSavedProfileSetting() {
         File file = new File(PREF_DIR + "profile.pref");
         FileInputStream streamIn = null;
+        ObjectInputStream objectinputstream = null;
         ProfileSetting profile = null;
         if (file != null && file.exists()) {
             try {
                 streamIn = new FileInputStream(file);
-                ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
+                objectinputstream = new ObjectInputStream(streamIn);
                 profile = (ProfileSetting) objectinputstream.readObject();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -73,6 +82,14 @@ public class PrefStorage {
                     e.printStackTrace();
                 }
             }
+
+            if (objectinputstream != null) {
+                try {
+                    objectinputstream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return profile;
     }
@@ -81,11 +98,12 @@ public class PrefStorage {
     public static LibrarySetting readLibrarySetting() {
         File file = new File(PREF_DIR + "library.pref");
         FileInputStream streamIn = null;
+        ObjectInputStream objectinputstream = null;
         LibrarySetting library = null;
         if (file != null && file.exists()) {
             try {
                 streamIn = new FileInputStream(file);
-                ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
+                objectinputstream = new ObjectInputStream(streamIn);
                 library = (LibrarySetting) objectinputstream.readObject();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -94,6 +112,14 @@ public class PrefStorage {
             if (streamIn != null) {
                 try {
                     streamIn.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (objectinputstream != null) {
+                try {
+                    objectinputstream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

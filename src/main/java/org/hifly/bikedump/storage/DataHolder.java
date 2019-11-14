@@ -10,13 +10,13 @@ import java.util.*;
 
 public class DataHolder {
 
-    public static Map<String, String> mapFilePathTrack = new HashMap();
+    public static Map<String, String> mapFilePathTrack = new HashMap<>();
     public static List<Track> tracksLoaded;
     public static List<List<WaypointSegment>> listsWaypointSegment;
     public static HashSet<TrackSelected> tracksSelected;
 
     public static HashMap<String, List<Track>> getTracksByMonth() {
-        HashMap<String, List<Track>> tracksByMonth = new HashMap();
+        HashMap<String, List<Track>> tracksByMonth = new HashMap<>();
         if (CollectionUtils.isNotEmpty(tracksLoaded)) {
             Calendar cal = Calendar.getInstance();
             Date startDate;
@@ -29,7 +29,7 @@ public class DataHolder {
                     String key = month + "-" + year;
                     List<Track> tracks;
                     if (!tracksByMonth.containsKey(key))
-                        tracks = new ArrayList();
+                        tracks = new ArrayList<>();
                     else
                         tracks = tracksByMonth.get(key);
                     tracks.add(track);

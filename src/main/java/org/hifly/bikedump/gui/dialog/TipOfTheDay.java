@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class TipOfTheDay extends JDialog {
+    
+    private static final long serialVersionUID = 16L;
 
     public TipOfTheDay() {
         initUI();
@@ -18,7 +20,7 @@ public class TipOfTheDay extends JDialog {
 
         JPanel topPanel = new JPanel(new BorderLayout(0, 0));
         topPanel.setMaximumSize(new Dimension(450, 0));
-        JLabel hint = new JLabel("GeoMapViewer Productivity Hints");
+        JLabel hint = new JLabel("BikeDump Productivity Hints");
         hint.setBorder(BorderFactory.createEmptyBorder(0, 25, 0, 0));
         topPanel.add(hint);
 

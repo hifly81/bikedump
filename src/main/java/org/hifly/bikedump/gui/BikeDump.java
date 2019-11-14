@@ -61,6 +61,8 @@ import java.util.List;
 //TODO use resource bundles i18n
 public class BikeDump extends JFrame implements JMapViewerEventListener {
 
+    private static final long serialVersionUID = 10L;
+
     private Logger log = LoggerFactory.getLogger(BikeDump.class);
 
     private ProfileSetting profileSetting;
@@ -116,11 +118,11 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         itemImportFolder.addActionListener(event -> {
             if (folderChooser.showOpenDialog(BikeDump.this) == JFileChooser.APPROVE_OPTION) {
                 File directory = folderChooser.getSelectedFile();
-                List<List<Coordinate>> coordinates = new ArrayList();
-                List<Map<String, WaypointSegment>> waypoint = new ArrayList();
+                List<List<Coordinate>> coordinates = new ArrayList<>();
+                List<Map<String, WaypointSegment>> waypoint = new ArrayList<>();
                 if (DataHolder.listsWaypointSegment == null)
-                    DataHolder.listsWaypointSegment = new ArrayList();
-                List<Track> tracks = new ArrayList();
+                    DataHolder.listsWaypointSegment = new ArrayList<>();
+                List<Track> tracks = new ArrayList<>();
                 StringBuffer sb = new StringBuffer();
 
                 LoadTrackExecutor loadTrackExecutor = new LoadTrackExecutor(
@@ -144,7 +146,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 if (GeoMapStorage.librarySetting == null)
                     GeoMapStorage.librarySetting = new LibrarySetting();
                 if (GeoMapStorage.librarySetting.getScannedDirs() == null)
-                    GeoMapStorage.librarySetting.setScannedDirs(new ArrayList());
+                    GeoMapStorage.librarySetting.setScannedDirs(new ArrayList<>());
                 boolean foundDir = false;
                 for (String dir : GeoMapStorage.librarySetting.getScannedDirs()) {
                     if (dir.equalsIgnoreCase(directory.getAbsolutePath())) {
@@ -209,9 +211,9 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 add(label, BorderLayout.CENTER);
                 label.setVisible(true);
 
-                List<Track> tracks = new ArrayList();
-                List<List<Coordinate>> coordinates = new ArrayList();
-                List<Map<String, WaypointSegment>> waypoint = new ArrayList();
+                List<Track> tracks = new ArrayList<>();
+                List<List<Coordinate>> coordinates = new ArrayList<>();
+                List<Map<String, WaypointSegment>> waypoint = new ArrayList<>();
 
                 if (stravaSetting != null && stravaSetting.getCurrentAthleteSelected() != null) {
                     for (Map.Entry<String, String> entry : stravaSetting.getCurrentAthleteSelected().getActivitiesSelected().entrySet()) {
@@ -224,7 +226,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 //load saved elements
                 if (GeoMapStorage.tracksLibrary != null) {
                     if (DataHolder.listsWaypointSegment == null)
-                        DataHolder.listsWaypointSegment = new ArrayList();
+                        DataHolder.listsWaypointSegment = new ArrayList<>();
                     StringBuffer sb = new StringBuffer();
 
                     LoadTrackExecutor loadTrackExecutor = new LoadTrackExecutor(
@@ -294,7 +296,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
     public void loadSelectedTracks(TrackTable table) {
         if (!DataHolder.tracksSelected.isEmpty()) {
             if (!DataHolder.tracksLoaded.isEmpty()) {
-                List<Track> selectedTracks = new ArrayList();
+                List<Track> selectedTracks = new ArrayList<>();
                 for (TrackSelected trackSelected : DataHolder.tracksSelected) {
                     int index = DataHolder.tracksLoaded.indexOf(new Track(trackSelected.getFilename()));
                     if (index != -1) {
@@ -312,7 +314,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                         else
                             reloadTrackFromFile(new File(selectedTracks.get(0).getFileName()));
                     } else {
-                        List<Track> tracksToLoad = new ArrayList();
+                        List<Track> tracksToLoad = new ArrayList<>();
                         for (Track track : selectedTracks)
                             if (track.isFromStrava())
                                 tracksToLoad.add(StravaController.getInstance(stravaSetting.getCurrentAthleteSelected().getAccessToken()).getFullInfoFromStrava(track, profileSetting));
@@ -377,7 +379,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         stravaSetting = GeoMapStorage.stravaSetting;
         if (stravaSetting == null) {
             stravaSetting = new StravaSetting();
-            stravaSetting.setStravaAthletes(new ArrayList());
+            stravaSetting.setStravaAthletes(new ArrayList<>());
         }
 
     }
@@ -398,9 +400,9 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         JScrollPane scrollPanel = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         JPanel panel = new JPanel();
 
-        List<List<ICoordinate>> resultList = new ArrayList();
+        List<List<ICoordinate>> resultList = new ArrayList<>();
         if (coordinates != null && !coordinates.isEmpty()) {
-            List<ICoordinate> list = new ArrayList();
+            List<ICoordinate> list = new ArrayList<>();
             for (List<Coordinate> listCoordinates : coordinates) {
                 for (Coordinate coordinate : listCoordinates) {
                     org.openstreetmap.gui.jmapviewer.Coordinate temp =
@@ -523,7 +525,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
     private void reloadTrackPanelFromStrava(Track track, String accessToken) {
         track = StravaController.getInstance(accessToken).getFullInfoFromStrava(track, profileSetting);
-        reloadTrack(new AbstractMap.SimpleImmutableEntry(track, new StringBuffer("")));
+        reloadTrack(new AbstractMap.SimpleImmutableEntry<>(track, new StringBuffer("")));
     }
 
     private void reloadTrackFromFile(File file) {
@@ -552,14 +554,14 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
             if (track != null) {
                 //add to map
                 DataHolder.mapFilePathTrack.put(track.getName(), track.getFileName());
-                List<List<Coordinate>> coordinates = new ArrayList();
-                List<Map<String, WaypointSegment>> waypoint = new ArrayList();
-                List<Track> tracks = new ArrayList(1);
+                List<List<Coordinate>> coordinates = new ArrayList<>();
+                List<Map<String, WaypointSegment>> waypoint = new ArrayList<>();
+                List<Track> tracks = new ArrayList<>(1);
                 tracks.add(track);
                 coordinates.add(track.getCoordinates());
                 waypoint.add(track.getCoordinatesNewKm());
-                DataHolder.listsWaypointSegment = new ArrayList(1);
-                List<WaypointSegment> listWaypoints = new ArrayList(track.getCoordinatesNewKm().values());
+                DataHolder.listsWaypointSegment = new ArrayList<>(1);
+                List<WaypointSegment> listWaypoints = new ArrayList<>(track.getCoordinatesNewKm().values());
                 DataHolder.listsWaypointSegment.add(listWaypoints);
 
                 JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint, false);
@@ -584,7 +586,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         table.getSelectionModel().addListSelectionListener(
                 //TODO if track is already selected dont load again
                 //TODO if a list of track is shown, when load the single track don't redraw the table list
-                new TableSelectionHandler(table, new HashSet()));
+                new TableSelectionHandler(table, new HashSet<>()));
 
         table.addKeyListener(new KeyListener() {
             @Override

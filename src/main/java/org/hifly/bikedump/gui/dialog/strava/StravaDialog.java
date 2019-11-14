@@ -16,6 +16,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class StravaDialog extends JDialog {
+ 
+    private static final long serialVersionUID = 15L;
+    
     private StravaDialog currentFrame = this;
     private Frame externalFrame = null;
     private StravaSetting stravaSetting;

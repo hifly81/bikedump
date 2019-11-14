@@ -19,6 +19,8 @@ import java.util.Date;
 
 public class GeoToolbar extends JToolBar {
 
+    private static final long serialVersionUID = 20L;
+
     private BikeDump currentFrame;
 
     public GeoToolbar(BikeDump currentFrame) {

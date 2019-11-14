@@ -5,6 +5,8 @@ import java.util.List;
 
 public class LibrarySetting implements Serializable {
 
+    private static final long serialVersionUID = 4L;
+
     private List<String> scannedDirs;
     private boolean scanFolder;
 

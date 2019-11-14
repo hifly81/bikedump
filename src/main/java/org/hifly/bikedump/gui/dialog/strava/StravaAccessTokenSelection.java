@@ -17,6 +17,8 @@ import java.util.List;
 
 public class StravaAccessTokenSelection extends JDialog {
 
+    private static final long serialVersionUID = 14L;
+
     private StravaSetting stravaSetting;
     private JPanel panelRadio = null;
 

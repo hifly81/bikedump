@@ -30,11 +30,12 @@ public class StravaStorage {
     public static StravaSetting readStravaSetting() {
         File file = new File(STRAVA_DIR + "strava.pref");
         FileInputStream streamIn = null;
+        ObjectInputStream objectinputstream = null;
         StravaSetting strava = null;
         if (file != null && file.exists()) {
             try {
                 streamIn = new FileInputStream(file);
-                ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
+                objectinputstream = new ObjectInputStream(streamIn);
                 strava = (StravaSetting) objectinputstream.readObject();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -43,6 +44,14 @@ public class StravaStorage {
             if (streamIn != null) {
                 try {
                     streamIn.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (objectinputstream != null) {
+                try {
+                    objectinputstream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

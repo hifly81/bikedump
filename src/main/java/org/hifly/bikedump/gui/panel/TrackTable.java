@@ -13,8 +13,9 @@ import java.util.List;
 
 public class TrackTable extends JTable {
 
-    private List<Track> tracks;
+    private static final long serialVersionUID = 25L;
 
+    private List<Track> tracks;
 
     protected String[] columnToolTips = {
             "Date of the track",
@@ -106,6 +107,9 @@ public class TrackTable extends JTable {
 
     protected JTableHeader createDefaultTableHeader() {
         return new JTableHeader(columnModel) {
+        
+            private static final long serialVersionUID = 25L;
+
             public String getToolTipText(MouseEvent e) {
                 java.awt.Point p = e.getPoint();
                 int index = columnModel.getColumnIndexAtX(p.x);
@@ -117,7 +121,9 @@ public class TrackTable extends JTable {
 
     public class TrackTableModel extends AbstractTableModel {
 
-        private String[] columnNames = {"Date", "Name", "Distance", "Duration", "Speed", "Elevation"};
+        private static final long serialVersionUID = 26L;
+
+        private String[] columnNames = { "Date", "Name", "Distance", "Duration", "Speed", "Elevation" };
 
         public int getColumnCount() {
             return columnNames.length;

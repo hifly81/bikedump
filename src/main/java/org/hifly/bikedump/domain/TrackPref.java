@@ -5,6 +5,8 @@ import java.io.Serializable;
 
 public class TrackPref implements Serializable {
 
+    private static final long serialVersionUID = 10L;
+
     private Profile profile;
     private Bike bike;
 

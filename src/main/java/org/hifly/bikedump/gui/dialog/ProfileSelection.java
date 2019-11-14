@@ -16,6 +16,8 @@ import java.util.List;
 
 public class ProfileSelection extends JDialog {
 
+    private static final long serialVersionUID = 13L;
+    
     private ProfileSetting profileSetting;
     private JPanel panelRadio = null;
 

@@ -13,6 +13,8 @@ import java.util.Map;
 
 public class AggregateDetailViewer extends JScrollPane {
 
+    private static final long serialVersionUID = 21L;
+
     private List<Track> tracks;
     private JFrame currentFrame;
 
@@ -48,12 +50,12 @@ public class AggregateDetailViewer extends JScrollPane {
         String trackNameMaxAltitude = null;
         String trackNameMinAltitude = null;
 
-        Map<String, WaypointSegment> fastests = new HashMap(tracks.size());
-        Map<String, WaypointSegment> slowests = new HashMap(tracks.size());
-        Map<String, WaypointSegment> shortests = new HashMap(tracks.size());
-        Map<String, WaypointSegment> longests = new HashMap(tracks.size());
-        Map<String, WaypointSegment> lessElevateds = new HashMap(tracks.size());
-        Map<String, WaypointSegment> mostElevateds = new HashMap(tracks.size());
+        Map<String, WaypointSegment> fastests = new HashMap<>(tracks.size());
+        Map<String, WaypointSegment> slowests = new HashMap<>(tracks.size());
+        Map<String, WaypointSegment> shortests = new HashMap<>(tracks.size());
+        Map<String, WaypointSegment> longests = new HashMap<>(tracks.size());
+        Map<String, WaypointSegment> lessElevateds = new HashMap<>(tracks.size());
+        Map<String, WaypointSegment> mostElevateds = new HashMap<>(tracks.size());
 
         WaypointSegment fastest = null;
         String fastestString = null;

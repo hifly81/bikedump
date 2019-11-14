@@ -53,7 +53,7 @@ public class WaypointAvgSpeedGraph extends WaypointGraph {
 
     @Override
     public XYSeriesCollection createDataset() {
-        List<XYSeries> series = new ArrayList(waypoints.size());
+        List<XYSeries> series = new ArrayList<>(waypoints.size());
         //TODO real name
         int index = 0;
         for(List<WaypointSegment> waypoint:waypoints) {

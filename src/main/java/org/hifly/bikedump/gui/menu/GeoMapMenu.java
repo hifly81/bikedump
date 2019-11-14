@@ -3,10 +3,8 @@ package org.hifly.bikedump.gui.menu;
 import org.hifly.bikedump.domain.gps.SlopeSegment;
 import org.hifly.bikedump.graph.WaypointElevationGraph;
 import org.hifly.bikedump.graph.WaypointGraph;
-import org.hifly.bikedump.gui.BikeDump;
 import org.hifly.bikedump.gui.dialog.GraphViewer;
 import org.hifly.bikedump.gui.events.QuitHandler;
-import org.hifly.bikedump.gui.events.QuitWindowHandler;
 import org.hifly.bikedump.storage.GeoMapStorage;
 import org.hifly.bikedump.utility.SlopeUtility;
 
@@ -20,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 public class GeoMapMenu extends JMenuBar {
+
+    private static final long serialVersionUID = 19L;
 
     private JMenuItem itemImportFile;
     private JMenuItem itemImportFolder;

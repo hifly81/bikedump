@@ -5,6 +5,8 @@ import java.io.Serializable;
 
 public class Profile implements Serializable {
 
+    private static final long serialVersionUID = 5L;
+
     private String name;
     private Double weight = 72.0;
     private Double height = 180.0;

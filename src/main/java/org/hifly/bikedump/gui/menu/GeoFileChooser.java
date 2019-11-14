@@ -6,6 +6,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class GeoFileChooser extends JFileChooser {
 
+    private static final long serialVersionUID = 17L;
+
     public GeoFileChooser() {
         super();
         init();

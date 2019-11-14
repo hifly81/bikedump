@@ -40,21 +40,28 @@ public class ClimbStorage {
             root = Files.createDirectories(path).toFile();
         }
         Collection files = FileUtils.listFiles(root, null, true);
-        List<SlopeSegment> slopes = new ArrayList();
+        List<SlopeSegment> slopes = new ArrayList<>();
         FileInputStream streamIn = null;
         for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {
             File file = (File) iterator.next();
             String ext = FilenameUtils.getExtension(file.getAbsolutePath());
             if (ext.equalsIgnoreCase("db")) {
+                ObjectInputStream objectinputstream = null;
                 try {
                     streamIn = new FileInputStream(file);
-                    ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
+                    objectinputstream = new ObjectInputStream(streamIn);
                     SlopeSegment slope = (SlopeSegment) objectinputstream.readObject();
                     slopes.add(slope);
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    try {
+                        if(objectinputstream != null)
+                            objectinputstream.close();
+                    } catch(Exception ex2) {
+                        ex2.printStackTrace();
+                    }
                 }
-
             }
 
         }

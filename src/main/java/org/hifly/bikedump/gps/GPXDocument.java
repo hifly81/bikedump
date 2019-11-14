@@ -1,8 +1,6 @@
 package org.hifly.bikedump.gps;
 
 import com.topografix.gpx.x1.x1.*;
-import com.topografix.gpx.x1.x1.impl.ExtensionsTypeImpl;
-import org.apache.xmlbeans.XmlObject;
 import org.hifly.bikedump.domain.Author;
 import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.Track;

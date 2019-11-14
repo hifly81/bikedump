@@ -12,13 +12,14 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 public class StravaActivitySelection extends JDialog {
+
+    private static final long serialVersionUID = 15L;
 
     private StravaAthlete stravaAthlete;
     private JPanel activityPanel;
@@ -64,8 +65,8 @@ public class StravaActivitySelection extends JDialog {
             List<StravaActivity> activities = StravaController.getInstance(stravaAthlete.getAccessToken()).getAllActivities();
             if(activities!=null && !activities.isEmpty()) {
                 //This map must preserve insertion order
-                Map<String,StravaActivity> mapActivities = new LinkedTreeMap();
-                Map<String,String> mapActivitiesByName = new HashMap(activities.size());
+                Map<String,StravaActivity> mapActivities = new LinkedTreeMap<>();
+                Map<String,String> mapActivitiesByName = new HashMap<>(activities.size());
 
                 for(StravaActivity activity:activities) {
                     JCheckBox temp = new JCheckBox(activity.getName() + "-" + activity.getDate());
@@ -124,8 +125,8 @@ public class StravaActivitySelection extends JDialog {
                         }
 
                         //This map must preserve insertion order
-                        Map<String, StravaActivity> mapActivities = new LinkedTreeMap();
-                        Map<String, String> mapActivitiesByName = new HashMap(activities.size());
+                        Map<String, StravaActivity> mapActivities = new LinkedTreeMap<>();
+                        Map<String, String> mapActivitiesByName = new HashMap<>(activities.size());
                         for (StravaActivity activity : activities) {
                             JCheckBox temp = new JCheckBox(activity.getName() + "-" + activity.getDate());
                             temp.setSelected(activity.isSelected());

@@ -149,7 +149,7 @@ public class GPSUtility {
         double limitMinHeart = 10000000;
         double limitMaxHeart = 0;
 
-        Map<String, WaypointSegment> mapKm = new LinkedHashMap();
+        Map<String, WaypointSegment> mapKm = new LinkedHashMap<>();
 
         int kmTotalDistance = (int) totalDistance;
         int[] elements = new int[kmTotalDistance];
@@ -261,7 +261,7 @@ public class GPSUtility {
     }
 
     public static HashMap<String, WaypointSegment> calculateStatsInUnit(Map<String, WaypointSegment> waypoints) {
-        HashMap<String, WaypointSegment> mapResult = new HashMap(6);
+        HashMap<String, WaypointSegment> mapResult = new HashMap<>(6);
 
         double limitFastestKm = 0;
         double limitSlowestKm = 1000;

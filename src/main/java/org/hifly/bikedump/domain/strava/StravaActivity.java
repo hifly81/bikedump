@@ -5,6 +5,9 @@ import java.io.Serializable;
 
 public class StravaActivity implements Serializable {
 
+ 
+    private static final long serialVersionUID = 7L;
+    
     private String id;
     private String name;
     private String date;

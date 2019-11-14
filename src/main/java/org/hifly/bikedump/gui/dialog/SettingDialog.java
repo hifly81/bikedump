@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SettingDialog extends JDialog {
+ 
+    private static final long serialVersionUID = 14L;
+
     private SettingDialog currentFrame = this;
     private Frame externalFrame = null;
     private BikeSelection bikeSelectionDialog;
@@ -152,7 +155,7 @@ public class SettingDialog extends JDialog {
                 //TODO check if profiles already exist
                 List<Profile> profiles = profileSetting.getProfiles();
                 if (profiles == null)
-                    profiles = new ArrayList();
+                    profiles = new ArrayList<>();
                 Profile profile = new Profile();
                 profile.setName(profileNameField.getText());
                 profile.setWeight((Double) spinnerWeight.getValue());
@@ -274,9 +277,8 @@ public class SettingDialog extends JDialog {
             public void mouseClicked(MouseEvent e) {
                 //TODO check if bike already exist
                 List<Bike> bikes = profileSetting.getBikes();
-                if (bikes == null) {
-                    bikes = new ArrayList();
-                }
+                if (bikes == null)
+                    bikes = new ArrayList<>();
                 Bike bike = new Bike();
                 bike.setBikeBrand(bikeBrandsCombo.getSelectedItem().toString());
                 bike.setBikeModel(bikeModelField.getText());

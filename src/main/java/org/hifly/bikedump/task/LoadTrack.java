@@ -62,7 +62,7 @@ public class LoadTrack implements Runnable {
                     DataHolder.mapFilePathTrack.put(track.getName(), track.getFileName());
                     //add to opened files map
                     if (GeoMapStorage.tracksLibrary == null)
-                        GeoMapStorage.tracksLibrary = new HashMap();
+                        GeoMapStorage.tracksLibrary = new HashMap<>();
                     TrackPref trackPref = new TrackPref();
                     Profile profile = profileSetting.getSelectedProfile();
                     trackPref.setProfile(profile);
@@ -73,7 +73,7 @@ public class LoadTrack implements Runnable {
                     tracks.add(track);
                     if(track.getCoordinatesNewKm() !=null && !track.getCoordinatesNewKm().isEmpty()) {
                         List<WaypointSegment> listWaypoints =
-                                new ArrayList(track.getCoordinatesNewKm().values());
+                                new ArrayList<>(track.getCoordinatesNewKm().values());
                         DataHolder.listsWaypointSegment.add(listWaypoints);
                     }
                 }
