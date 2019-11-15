@@ -83,7 +83,7 @@ public class GPSController {
             sb.append("can't load:").append(filename);
         }
 
-        return new AbstractMap.SimpleImmutableEntry(track, sb);
+        return new AbstractMap.SimpleImmutableEntry<>(track, sb);
     }
 
     public static Map.Entry<Track, StringBuffer> extractTrackFromTcx(String filename, ProfileSetting profileSetting) {
@@ -116,7 +116,7 @@ public class GPSController {
         //TODO manage a list of tracks: a single file can contain multiple tracks
         if (tracks != null && !tracks.isEmpty())
             track = tracks.get(0);
-        return new AbstractMap.SimpleImmutableEntry(track, sb);
+        return new AbstractMap.SimpleImmutableEntry<>(track, sb);
     }
 
     public static Map.Entry<Track, StringBuffer> extractTrackFromKml(String filename, ProfileSetting profileSetting) {

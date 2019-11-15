@@ -15,3 +15,7 @@ noCommit
 #resources for demo
 src/test/java/org/openstreetmap/
 src/main/resources/hgt/
+
+.classpath
+.project
+.settings/

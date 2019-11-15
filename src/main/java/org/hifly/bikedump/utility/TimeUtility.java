@@ -62,8 +62,7 @@ public class TimeUtility {
         SunriseSunsetCalculator calculator = new SunriseSunsetCalculator(location, "Europe/Rome");
         String officialSunrise = calculator.getOfficialSunriseForDate(c1);
         String officialSunset = calculator.getOfficialSunsetForDate(c1);
-        return new AbstractMap.SimpleImmutableEntry(
-                officialSunrise, officialSunset);
+        return new AbstractMap.SimpleImmutableEntry<>(officialSunrise, officialSunset);
     }
 
 

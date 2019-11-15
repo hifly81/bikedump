@@ -49,8 +49,7 @@ public class StravaDocument extends GPSDocument {
         }
 
         try(BufferedReader br = new BufferedReader(new FileReader(gpsFile))) {
-            int i = 0;
-            for(String line; (line = br.readLine()) != null; i++) {
+            for(String line; (line = br.readLine()) != null;) {
                 String[] lineElements = line.split(";");
                 double currentLat = Double.valueOf(lineElements[0]);
                 double currentLon = Double.valueOf(lineElements[1]);

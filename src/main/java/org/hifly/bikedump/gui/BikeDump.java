@@ -445,16 +445,16 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         JButton button = new JButton("Fit map markers");
         button.addActionListener(e -> mapViewer.setDisplayToFitMapMarkers());
 
-        JComboBox tileSourceSelector = new JComboBox(new TileSource[]{new OsmTileSource.Mapnik(),
+        JComboBox tileSourceSelector = new JComboBox<>(new TileSource[]{new OsmTileSource.Mapnik(),
                 new OsmTileSource.CycleMap(), new BingAerialTileSource(), new MapQuestOsmTileSource(), new MapQuestOpenAerialTileSource()});
         tileSourceSelector.addItemListener(e -> mapViewer.setTileSource((TileSource) e.getItem()));
 
         JComboBox tileLoaderSelector;
         try {
-            tileLoaderSelector = new JComboBox(new TileLoader[]{new OsmFileCacheTileLoader(mapViewer),
+            tileLoaderSelector = new JComboBox<>(new TileLoader[]{new OsmFileCacheTileLoader(mapViewer),
                     new OsmTileLoader(mapViewer)});
         } catch (IOException e) {
-            tileLoaderSelector = new JComboBox(new TileLoader[]{new OsmTileLoader(mapViewer)});
+            tileLoaderSelector = new JComboBox<>(new TileLoader[]{new OsmTileLoader(mapViewer)});
         }
         tileLoaderSelector.addItemListener(e -> mapViewer.setTileLoader((TileLoader) e.getItem()));
         mapViewer.setTileLoader((TileLoader) tileLoaderSelector.getSelectedItem());
