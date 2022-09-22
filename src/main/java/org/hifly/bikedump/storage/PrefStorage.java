@@ -7,10 +7,12 @@ import org.hifly.bikedump.domain.TrackPref;
 import java.io.*;
 import java.util.Map;
 
+import static org.hifly.bikedump.utility.Constants.HOME_FOLDER_NAME;
+
 //TODO refactor read methods
 public class PrefStorage {
 
-    private static final String PREF_DIR = System.getProperty("user.home") + "/.geomapviewer/preferences/";
+    private static final String PREF_DIR = System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "preferences" + File.separator;
 
     public static void savePref(Object toSave, String filename) {
         //TODO md5 name

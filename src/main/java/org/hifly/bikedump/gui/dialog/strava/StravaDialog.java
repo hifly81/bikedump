@@ -31,7 +31,7 @@ public class StravaDialog extends JDialog {
         this.externalFrame = frame;
         this.stravaSetting = stravaSetting;
 
-        setTitle("Geomapviewer - Strava options");
+        setTitle("BikeDump - Strava options");
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Activities", null, createSyncSettingPanel(), "Activities");

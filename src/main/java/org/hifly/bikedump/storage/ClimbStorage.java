@@ -10,9 +10,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static org.hifly.bikedump.utility.Constants.HOME_FOLDER_NAME;
+
 public class ClimbStorage {
 
-    private static final String CLIMB_DIR = System.getProperty("user.home") + "/.geomapviewer/climb/";
+    private static final String CLIMB_DIR = System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "climb" + File.separator;
 
     public static void saveClimb(SlopeSegment slope, String slopeName) {
         //TODO md5 name

@@ -62,8 +62,12 @@ public class BikeSelection extends JDialog {
 
                 panelRadio.add(temp);
                 panelRadio.add(bikeDelete);
+
+                panelRadio.setVisible(true);
             }
 
+        } else {
+            panelRadio.setVisible(false);
         }
 
         panel.add(panelRadio);
@@ -115,6 +119,10 @@ public class BikeSelection extends JDialog {
                 validate();
                 repaint();
 
+            }
+
+            if(bikes.size() == 0) {
+                panelRadio.setVisible(false);
             }
         }
     }

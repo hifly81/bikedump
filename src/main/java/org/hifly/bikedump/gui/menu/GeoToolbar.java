@@ -17,6 +17,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 
+import static org.hifly.bikedump.utility.Constants.HOME_FOLDER_NAME;
+
 public class GeoToolbar extends JToolBar {
 
     private static final long serialVersionUID = 20L;
@@ -88,7 +90,7 @@ public class GeoToolbar extends JToolBar {
             if (currentFrame.getTextForReport() != null && !currentFrame.getTextForReport().isEmpty()) {
                 try {
                     PdfReport report = new PdfReport(currentFrame.getTextForReport());
-                    String fileName = System.getProperty("user.home") + "/.geomapviewer/report" + new Date().getTime() + ".pdf";
+                    String fileName = System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "report" + new Date().getTime() + ".pdf";
                     File tmpPdf = new File(fileName);
                     report.saveReport(fileName);
                     if (Desktop.isDesktopSupported())

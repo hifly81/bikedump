@@ -28,7 +28,7 @@ public class CircleMarker extends MapMarkerDot  {
     public void paint(Graphics g, Point position, int radio) {
 
         int size_h = radio;
-        int size = size_h * 2;
+        int size = size_h * 4;
 
         if (g instanceof Graphics2D && getBackColor()!=null) {
             Graphics2D g2 = (Graphics2D) g;
@@ -42,9 +42,11 @@ public class CircleMarker extends MapMarkerDot  {
             // Draw centered text
             FontMetrics fm = g.getFontMetrics();
             double textWidth = fm.getStringBounds(text, g).getWidth();
+            g.setFont(new Font("Arial", Font.BOLD, 10));
+
             g.setColor(Color.BLACK);
-            int positionX =  (int) (position.x - textWidth/2);
-            int positionY =   (position.y + fm.getMaxAscent() / 2);
+            int positionX =  (int) (position.x - textWidth / 8);
+            int positionY =   (position.y + fm.getMaxAscent());
 
             g.drawString(text,positionX,positionY);
             g2.setComposite(oldComposite);
@@ -52,8 +54,6 @@ public class CircleMarker extends MapMarkerDot  {
         }
         g.setColor(getColor());
         g.drawOval(position.x - size_h, position.y - size_h, size, size);
-
-        //mapViewer.mapCircleCoordinates.put(String.valueOf(position.x) + "-" + String.valueOf(position.y), this.waypoint);
 
         if(getLayer() ==null ||getLayer().isVisibleTexts())
             paintText(g, position);

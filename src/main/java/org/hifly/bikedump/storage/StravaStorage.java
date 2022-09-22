@@ -4,9 +4,11 @@ import org.hifly.bikedump.domain.strava.StravaSetting;
 
 import java.io.*;
 
+import static org.hifly.bikedump.utility.Constants.HOME_FOLDER_NAME;
+
 public class StravaStorage {
 
-    private static final String STRAVA_DIR = System.getProperty("user.home") + "/.geomapviewer/strava/";
+    private static final String STRAVA_DIR = System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "strava" + File.separator;
 
     public static void saveActivities(Object toSave, String filename) {
         //TODO md5 name

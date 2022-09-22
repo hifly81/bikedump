@@ -34,6 +34,7 @@ public class GeoMapMenu extends JMenuBar {
         this.add(createFileMenu());
         this.add(createSettingMenu());
         this.add(createLibraryMenu());
+        this.add(createHelpMenu());
         URL helpImageUrl = getClass().getResource("/img/help.png");
         ImageIcon helpImageIcon = new ImageIcon(helpImageUrl);
         Image img = helpImageIcon.getImage();
@@ -186,6 +187,20 @@ public class GeoMapMenu extends JMenuBar {
 
 
         return library;
+    }
+
+    private JMenu createHelpMenu() {
+        JMenu help = new JMenu("Help");
+        help.setMnemonic(KeyEvent.VK_H);
+
+        //TODO add about panel
+        JMenuItem aboutMenuItem = new JMenuItem("About", null);
+        aboutMenuItem.setMnemonic(KeyEvent.VK_P);
+        aboutMenuItem.setToolTipText("About");
+
+        help.add(aboutMenuItem);
+
+        return help;
     }
 
     private void addSavedClimbs(Map<String, List<SlopeSegment>> savedClimbs, JMenu climbsItem) {

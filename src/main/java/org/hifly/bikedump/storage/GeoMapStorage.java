@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hifly.bikedump.utility.Constants.HOME_FOLDER_NAME;
+
 public class GeoMapStorage {
 
     public static Map<String, Double> gpsElevationMap;
@@ -30,31 +32,31 @@ public class GeoMapStorage {
         FileInputStream streamIn = null;
         Input input = null;
         try {
-            Path pathA = Paths.get(System.getProperty("user.home")+"/.geomapviewer");
+            Path pathA = Paths.get(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME);
             if(Files.notExists(pathA))
-                new File(System.getProperty("user.home")+"/.geomapviewer").mkdirs();
+                new File(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME).mkdirs();
 
-            Path pathB = Paths.get(System.getProperty("user.home")+"/.geomapviewer/coordinates");
+            Path pathB = Paths.get(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "coordinates");
             if(Files.notExists(pathB))
-                new File(System.getProperty("user.home")+"/.geomapviewer/coordinates").mkdirs();
+                new File(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "coordinates").mkdirs();
 
-            Path pathC = Paths.get(System.getProperty("user.home")+"/.geomapviewer/climb");
+            Path pathC = Paths.get(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "climb");
             if(Files.notExists(pathC))
-                new File(System.getProperty("user.home")+"/.geomapviewer/climb").mkdirs();
+                new File(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "climb").mkdirs();
 
-            Path pathD = Paths.get(System.getProperty("user.home")+"/.geomapviewer/preferences");
+            Path pathD = Paths.get(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "preferences");
             if(Files.notExists(pathD))
-                new File(System.getProperty("user.home")+"/.geomapviewer/preferences").mkdirs();
+                new File(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "preferences").mkdirs();
 
-            Path pathE = Paths.get(System.getProperty("user.home")+"/.geomapviewer/strava");
+            Path pathE = Paths.get(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "strava");
             if(Files.notExists(pathE))
-                new File(System.getProperty("user.home")+"/.geomapviewer/strava").mkdirs();
+                new File(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "strava").mkdirs();
 
 
-            Path path = Paths.get(System.getProperty("user.home")+"/.geomapviewer/coordinates/storage_coordinates_kyro.db");
+            Path path = Paths.get(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "coordinates/storage_coordinates_kyro.db");
             if (Files.exists(path)) {
                 // file exist
-                streamIn = new FileInputStream(System.getProperty("user.home")+"/.geomapviewer/coordinates/storage_coordinates_kyro.db");
+                streamIn = new FileInputStream(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "coordinates/storage_coordinates_kyro.db");
                 input = new Input(streamIn);
                 Kryo kryo = new Kryo();
                 gpsElevationMap = (Map<String, Double>)kryo.readObject(input, HashMap.class);

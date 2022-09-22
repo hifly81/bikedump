@@ -155,7 +155,7 @@ public class DetailViewer extends JScrollPane {
         textPane.append(null, flushBuffer());
         try {
             textPane.addHyperlinkImg(
-                    new URL("http://geomapviewer.com?climbProfile=" + track.getFileName()), imgMountain, "View climb profile", Color.BLUE);
+                    new URL("http://bikedump.com?climbProfile=" + track.getFileName()), imgMountain, "View climb profile", Color.BLUE);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -184,9 +184,9 @@ public class DetailViewer extends JScrollPane {
                 try {
                     //TODO change URL format and include img;
                     textPane.addHyperlinkImg(
-                            new URL("http://geomapviewer.com?slopeIndex=" + z), imgMountain, "View climb detail", Color.BLUE);
+                            new URL("http://bikedump.com?slopeIndex=" + z), imgMountain, "View climb detail", Color.BLUE);
                     textPane.addHyperlinkImg(
-                            new URL("http://geomapviewer.com/save/?slopeIndex=" + z), imgSave, "Save climb", Color.BLUE);
+                            new URL("http://bikedump.com/save/?slopeIndex=" + z), imgSave, "Save climb", Color.BLUE);
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }

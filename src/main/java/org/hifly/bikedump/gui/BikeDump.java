@@ -72,7 +72,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
     private BikeDump currentFrame = this;
     protected MapViewer mapViewer;
     private JSplitPane mainPanel = new JSplitPane();
-    private JLabel zoomLabel, zoomValue, measureLabel, measureValue;
     private Map.Entry<Integer, Integer> dimension;
     private JScrollPane folderMapScrollViewer, folderDetailViewer, folderTableViewer;
     public TrackTable trackTable = null;
@@ -115,6 +114,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         itemImportFile.addActionListener(event -> {
             if (fileChooser.showOpenDialog(BikeDump.this) == JFileChooser.APPROVE_OPTION)
                 reloadTrackFromFile(fileChooser.getSelectedFile());
+                mapViewer.setDisplayToFitMapMarkers();
         });
 
         //import folder action
@@ -190,6 +190,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
             try {
                 file = Paths.get(res.toURI()).toFile();
                 reloadTrackFromFile(file);
+                mapViewer.setDisplayToFitMapMarkers();
             } catch (URISyntaxException e) {
                 log.warn("Can't load sample gpx {}", e);
             }
@@ -222,7 +223,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 if (stravaSetting != null && stravaSetting.getCurrentAthleteSelected() != null) {
                     for (Map.Entry<String, String> entry : stravaSetting.getCurrentAthleteSelected().getActivitiesSelected().entrySet()) {
                         Track trackFromStrava =
-                                StravaController.getInstance(stravaSetting.getCurrentAthleteSelected().getAccessToken()).getTrackFromStravaFile(System.getProperty("user.home") + "/.geomapviewer/strava/" + stravaSetting.getCurrentAthleteSelected().getAccessToken() + "/" + entry.getKey() + ".prop");
+                                StravaController.getInstance(stravaSetting.getCurrentAthleteSelected().getAccessToken()).getTrackFromStravaFile(System.getProperty("user.home") + File.separator + "strava" + File.separator + stravaSetting.getCurrentAthleteSelected().getAccessToken() + File.separator + entry.getKey() + ".prop");
                         tracks.add(trackFromStrava);
                     }
                 }
@@ -315,8 +316,11 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                         Track track = selectedTracks.get(0);
                         if (track.isFromStrava())
                             reloadTrackPanelFromStrava(track, stravaSetting.getCurrentAthleteSelected().getAccessToken());
-                        else
+                        else {
                             reloadTrackFromFile(new File(selectedTracks.get(0).getFileName()));
+                            mapViewer.setDisplayToFitMapMarkers();
+                        }
+
                     } else {
                         List<Track> tracksToLoad = new ArrayList<>();
                         for (Track track : selectedTracks)
@@ -367,10 +371,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
     public void processCommand(JMVCommandEvent command) {
         if (command.getCommand().equals(JMVCommandEvent.COMMAND.ZOOM) ||
                 command.getCommand().equals(JMVCommandEvent.COMMAND.MOVE)) {
-            if (measureValue != null)
-                measureValue.setText(String.format("%s", mapViewer.getMeterPerPixel()));
-            if (zoomValue != null)
-                zoomValue.setText(String.format("%s", mapViewer.getZoom()));
+            //FIXME new zoom value
         }
     }
 
@@ -431,26 +432,18 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         pane.getViewport().add(mapViewer);
         mapViewer.addJMVListener(this);
 
-
         JPanel panelTop = new JPanel();
         JPanel panelBottom = new JPanel();
-
-        measureLabel = new JLabel("Meters/Pixels: ");
-        measureValue = new JLabel(String.format("%s", mapViewer.getMeterPerPixel()));
-
-        zoomLabel = new JLabel("Zoom: ");
-        zoomValue = new JLabel(String.format("%s", mapViewer.getZoom()));
+        JLabel helpLabel = new JLabel("Use right mouse button to move,left double click or mouse wheel to zoom.");
 
         panel.setLayout(new BorderLayout());
         panel.add(panelTop, BorderLayout.NORTH);
         panel.add(pane, BorderLayout.CENTER);
         panel.add(panelBottom, BorderLayout.SOUTH);
-        JLabel helpLabel = new JLabel("Use right mouse button to move,left double click or mouse wheel to zoom.");
         JButton button = new JButton("Fit map markers");
         button.addActionListener(e -> mapViewer.setDisplayToFitMapMarkers());
 
-        /*JComboBox tileSourceSelector = new JComboBox<>(new TileSource[]{new OsmTileSource.Mapnik(),
-                new OsmTileSource.CycleMap(), new BingAerialTileSource(), new MapQuestOsmTileSource()});*/
+
         JComboBox tileSourceSelector = new JComboBox<>(new TileSource[]{new OsmTileSource.Mapnik(), new BingAerialTileSource()});
         tileSourceSelector.addItemListener(e -> mapViewer.setTileSource((TileSource) e.getItem()));
 
@@ -493,10 +486,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         panelBottom.add(button);
         panelBottom.add(helpLabel);
 
-        panelTop.add(zoomLabel);
-        panelTop.add(zoomValue);
-        panelTop.add(measureLabel);
-        panelTop.add(measureValue);
+        panelTop.add(helpLabel);
 
         mapViewer.setTileGridVisible(true);
 

@@ -36,7 +36,7 @@ public class SettingDialog extends JDialog {
         this.externalFrame = frame;
         this.profileSetting = profileSetting;
 
-        setTitle("Geomapviewer options");
+        setTitle("BikeDump options");
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("General", null, createGeneralSettingPanel(), "General settings");
@@ -212,6 +212,8 @@ public class SettingDialog extends JDialog {
                 panel0.add(bikeSelected);
             });
 
+        } else {
+            panel0.setVisible(false);
         }
         JLabel bikeList = new JLabel();
         bikeList.setText("<html><a href=\"\">bike list</a></html>");
@@ -287,6 +289,7 @@ public class SettingDialog extends JDialog {
                 bike.setBikeWeight((Double) spinnerBikeWeight.getValue());
                 bikes.add(bike);
                 profileSetting.setBikes(bikes);
+                panel0.setVisible(true);
             }
         });
 

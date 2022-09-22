@@ -42,7 +42,7 @@ public class TooltipMarker extends MapMarkerDot  {
             g2.draw(new Rectangle2D.Double(x, y, 280, 80));
 
             g.setFont(new Font("Arial", Font.BOLD, 14));
-            g.setColor(Color.BLACK);
+            g.setColor(Color.BLUE);
 
             g.drawString(text,(int)x+5,(int)y+15);
             g.drawString(text2,(int)x+5,(int)y+30);

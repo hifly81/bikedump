@@ -21,6 +21,8 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.hifly.bikedump.utility.Constants.HOME_FOLDER_NAME;
+
 public class StravaController {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -173,7 +175,7 @@ public class StravaController {
     //TODO use a token with private grants; public doesn't show private zones
     public String getActivityData(StravaActivity activity) {
         String activityId = activity.getId();
-        String filename = System.getProperty("user.home") + "/.geomapviewer/strava/" + this.accessToken + "/" + activityId;
+        String filename = System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "strava" + File.separator + this.accessToken + File.separator + activityId;
         File file = new File(filename);
         BufferedWriter bw = null;
         double descent = 0;
@@ -255,7 +257,7 @@ public class StravaController {
 
                 OutputStream out = null;
                 try {
-                    String filenameProp = System.getProperty("user.home") + "/.geomapviewer/strava/" + this.accessToken + "/" + activityId + ".prop";
+                    String filenameProp = System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "strava" + File.separator + this.accessToken + File.separator + activityId + ".prop";
                     File fileProp = new File(filenameProp);
                     Files.touch(fileProp);
                     out = new FileOutputStream(fileProp);
