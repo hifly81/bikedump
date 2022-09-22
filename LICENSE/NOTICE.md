@@ -1,3 +1,5 @@
+# Licensing
+
 bikedump uses these external libraries:
 
 | Library          | Link                                                 | License                          |      
