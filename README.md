@@ -10,6 +10,9 @@ Provide integration with Strava activities.
 
 see img folder
 
+## Prerequisites
+
+java >= 11
 
 ## Compile, Test, Run
 
