@@ -81,6 +81,10 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
     public BikeDump() {
         super();
+
+        //fix a user-agent
+        System.setProperty ("http.agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36");
+
         //panel dimension
         dimension = GUIUtility.getScreenDimension();
         setSize(dimension.getKey(), dimension.getValue());
@@ -445,8 +449,9 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         JButton button = new JButton("Fit map markers");
         button.addActionListener(e -> mapViewer.setDisplayToFitMapMarkers());
 
-        JComboBox tileSourceSelector = new JComboBox<>(new TileSource[]{new OsmTileSource.Mapnik(),
-                new OsmTileSource.CycleMap(), new BingAerialTileSource(), new MapQuestOsmTileSource()});
+        /*JComboBox tileSourceSelector = new JComboBox<>(new TileSource[]{new OsmTileSource.Mapnik(),
+                new OsmTileSource.CycleMap(), new BingAerialTileSource(), new MapQuestOsmTileSource()});*/
+        JComboBox tileSourceSelector = new JComboBox<>(new TileSource[]{new OsmTileSource.Mapnik(), new BingAerialTileSource()});
         tileSourceSelector.addItemListener(e -> mapViewer.setTileSource((TileSource) e.getItem()));
 
         JComboBox tileLoaderSelector;
