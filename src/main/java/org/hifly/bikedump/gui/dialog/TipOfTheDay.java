@@ -43,9 +43,7 @@ public class TipOfTheDay extends JDialog {
 
         pane.setContentType("text/html");
         //FIXME random text from a list
-        String text = "<p><b>Closing windows using the mouse wheel</b></p>" +
-                "<p>Clicking with the mouse wheel on an editor tab closes the window. " +
-                "This method works also with dockable windows or Log window tabs.</p>";
+        String text = "<p><b>Try Sample</b></p><p>Load a simple GPX file clicking on: File-->Try Sample</p>";
         pane.setText(text);
         pane.setEditable(false);
         textPanel.add(pane);
