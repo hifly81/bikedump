@@ -15,7 +15,6 @@
 
     <properties>
         <slf4j.version>1.6.1</slf4j.version>
-        <log4j.version>1.2.16</log4j.version>
         <maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
     </properties>
 
@@ -150,12 +149,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>${slf4j.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
