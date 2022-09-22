@@ -46,5 +46,5 @@ bikedump uses these external libraries:
 
 
 For additional details see:
-[NOTICE file](LICENSE/NOTICE)
+[NOTICE file](LICENSE/NOTICE.md)
 
