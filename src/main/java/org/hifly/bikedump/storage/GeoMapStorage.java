@@ -4,7 +4,6 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import org.hifly.bikedump.domain.*;
 import org.hifly.bikedump.domain.gps.SlopeSegment;
-import org.hifly.bikedump.domain.strava.StravaSetting;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,7 +25,6 @@ public class GeoMapStorage {
     public static Map<String,TrackPref> tracksLibrary;
     public static ProfileSetting profileSetting;
     public static LibrarySetting librarySetting;
-    public static StravaSetting stravaSetting;
 
     static {
         FileInputStream streamIn = null;
@@ -48,11 +46,6 @@ public class GeoMapStorage {
             if(Files.notExists(pathD))
                 new File(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "preferences").mkdirs();
 
-            Path pathE = Paths.get(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "strava");
-            if(Files.notExists(pathE))
-                new File(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "strava").mkdirs();
-
-
             Path path = Paths.get(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "coordinates/storage_coordinates_kyro.db");
             if (Files.exists(path)) {
                 // file exist
@@ -71,8 +64,7 @@ public class GeoMapStorage {
             profileSetting = PrefStorage.readSavedProfileSetting();
             //load saved library
             librarySetting = PrefStorage.readLibrarySetting();
-            //load strava setting
-            stravaSetting = StravaStorage.readStravaSetting();
+
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -99,9 +91,6 @@ public class GeoMapStorage {
         }
         if(GeoMapStorage.librarySetting != null) {
             PrefStorage.savePref(GeoMapStorage.librarySetting, "library");
-        }
-        if(GeoMapStorage.stravaSetting != null) {
-            StravaStorage.saveActivities(GeoMapStorage.stravaSetting, "strava");
         }
         if(GeoMapStorage.savedClimbsList != null) {
             for(SlopeSegment slope: GeoMapStorage.savedClimbsList) {

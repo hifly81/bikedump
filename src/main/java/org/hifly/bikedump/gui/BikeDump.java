@@ -3,18 +3,15 @@ package org.hifly.bikedump.gui;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.hifly.bikedump.controller.GPSController;
-import org.hifly.bikedump.controller.StravaController;
 import org.hifly.bikedump.domain.LibrarySetting;
 import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.TrackSelected;
 import org.hifly.bikedump.domain.gps.Coordinate;
 import org.hifly.bikedump.domain.gps.WaypointSegment;
-import org.hifly.bikedump.domain.strava.StravaSetting;
 import org.hifly.bikedump.gui.dialog.ScrollableDialog;
 import org.hifly.bikedump.gui.dialog.SettingDialog;
 import org.hifly.bikedump.gui.dialog.TipOfTheDay;
-import org.hifly.bikedump.gui.dialog.strava.StravaDialog;
 import org.hifly.bikedump.gui.events.QuitWindowHandler;
 import org.hifly.bikedump.gui.events.TableSelectionHandler;
 import org.hifly.bikedump.gui.menu.GeoFileChooser;
@@ -38,8 +35,6 @@ import org.openstreetmap.gui.jmapviewer.interfaces.JMapViewerEventListener;
 import org.openstreetmap.gui.jmapviewer.interfaces.TileLoader;
 import org.openstreetmap.gui.jmapviewer.interfaces.TileSource;
 import org.openstreetmap.gui.jmapviewer.tilesources.BingAerialTileSource;
-import org.openstreetmap.gui.jmapviewer.tilesources.MapQuestOpenAerialTileSource;
-import org.openstreetmap.gui.jmapviewer.tilesources.MapQuestOsmTileSource;
 import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,8 +62,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
     private ProfileSetting profileSetting;
     private SettingDialog settingDialog = null;
-    private StravaSetting stravaSetting = null;
-    private StravaDialog stravaDialog = null;
     private BikeDump currentFrame = this;
     protected MapViewer mapViewer;
     private JSplitPane mainPanel = new JSplitPane();
@@ -175,12 +168,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
             }
         });
 
-        //strava sync menu item
-        JMenuItem itemStravaSync = mainMenu.getItemStravaSync();
-        itemStravaSync.addActionListener(event -> {
-            stravaDialog.setLocationRelativeTo(currentFrame);
-            stravaDialog.setVisible(true);
-        });
 
         //try sample action
         JMenuItem itemTrySample = mainMenu.getItemTrySample();
@@ -220,13 +207,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 List<List<Coordinate>> coordinates = new ArrayList<>();
                 List<Map<String, WaypointSegment>> waypoint = new ArrayList<>();
 
-                if (stravaSetting != null && stravaSetting.getCurrentAthleteSelected() != null) {
-                    for (Map.Entry<String, String> entry : stravaSetting.getCurrentAthleteSelected().getActivitiesSelected().entrySet()) {
-                        Track trackFromStrava =
-                                StravaController.getInstance(stravaSetting.getCurrentAthleteSelected().getAccessToken()).getTrackFromStravaFile(System.getProperty("user.home") + File.separator + "strava" + File.separator + stravaSetting.getCurrentAthleteSelected().getAccessToken() + File.separator + entry.getKey() + ".prop");
-                        tracks.add(trackFromStrava);
-                    }
-                }
 
                 //load saved elements
                 if (GeoMapStorage.tracksLibrary != null) {
@@ -313,21 +293,12 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
                 if (!selectedTracks.isEmpty()) {
                     if (selectedTracks.size() == 1) {
-                        Track track = selectedTracks.get(0);
-                        if (track.isFromStrava())
-                            reloadTrackPanelFromStrava(track, stravaSetting.getCurrentAthleteSelected().getAccessToken());
-                        else {
-                            reloadTrackFromFile(new File(selectedTracks.get(0).getFileName()));
-                            mapViewer.setDisplayToFitMapMarkers();
-                        }
-
+                        reloadTrackFromFile(new File(selectedTracks.get(0).getFileName()));
+                        mapViewer.setDisplayToFitMapMarkers();
                     } else {
                         List<Track> tracksToLoad = new ArrayList<>();
                         for (Track track : selectedTracks)
-                            if (track.isFromStrava())
-                                tracksToLoad.add(StravaController.getInstance(stravaSetting.getCurrentAthleteSelected().getAccessToken()).getFullInfoFromStrava(track, profileSetting));
-                            else
-                                tracksToLoad.add(track);
+                            tracksToLoad.add(track);
 
                         JScrollPane detailViewer = new AggregateDetailViewer(tracksToLoad, currentFrame);
                         JScrollPane tableViewer = createTableTracksViewer(tracksToLoad);
@@ -381,12 +352,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         if (profileSetting == null)
             profileSetting = new ProfileSetting();
 
-        stravaSetting = GeoMapStorage.stravaSetting;
-        if (stravaSetting == null) {
-            stravaSetting = new StravaSetting();
-            stravaSetting.setStravaAthletes(new ArrayList<>());
-        }
-
     }
 
     private void initDialogs() {
@@ -394,8 +359,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         settingDialog = new SettingDialog(currentFrame, profileSetting);
         settingDialog.pack();
 
-        stravaDialog = new StravaDialog(currentFrame, stravaSetting);
-        stravaDialog.pack();
     }
 
     private JScrollPane createMapViewer(
@@ -516,11 +479,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
         scrollPanel.getViewport().add(panel);
         return scrollPanel;
-    }
-
-    private void reloadTrackPanelFromStrava(Track track, String accessToken) {
-        track = StravaController.getInstance(accessToken).getFullInfoFromStrava(track, profileSetting);
-        reloadTrack(new AbstractMap.SimpleImmutableEntry<>(track, new StringBuffer("")));
     }
 
     private void reloadTrackFromFile(File file) {

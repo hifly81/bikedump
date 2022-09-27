@@ -53,7 +53,6 @@ public class Track {
     protected long climbingTimeMillis;
     protected double climbingSpeed;
     private double climbingDistance;
-    private boolean fromStrava;
 
     public Track() {
         super();
@@ -326,14 +325,6 @@ public class Track {
                 "Slopes:"+slopes+"<br>"+
                 "Waypoint KM:"+coordinatesNewKm+"<br>"+
                 author;
-    }
-
-    public boolean isFromStrava() {
-        return fromStrava;
-    }
-
-    public void setFromStrava(boolean fromStrava) {
-        this.fromStrava = fromStrava;
     }
 
     @Override
