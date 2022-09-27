@@ -34,10 +34,8 @@ public class TrackTable extends JTable {
         setRowSorter(sorter);
 
         final Comparator<Object> ascendingColumn0 = (o1, o2) -> {
-
             String s1 = (String) o1;
             String s2 = (String) o2;
-
 
             if (s1.equals("") && !s2.equals(""))
                 return 1;
@@ -64,7 +62,6 @@ public class TrackTable extends JTable {
             String s1 = (String) o1;
             String s2 = (String) o2;
 
-
             if (s1.equals("") && !s2.equals(""))
                 return 1;
             else if (!s1.equals("") && s2.equals(""))
@@ -76,7 +73,6 @@ public class TrackTable extends JTable {
                         s1 = s1.replaceAll(",",".");
                         s2 = s2.replaceAll(",",".");
                         return
-
                                 Double.valueOf(s1).compareTo(Double.valueOf(s2));
                 }
             }
@@ -91,7 +87,7 @@ public class TrackTable extends JTable {
         sorter.setComparator(5, ascendingColumn2);
         sorter.toggleSortOrder(0);
         setRowSelectionAllowed(true);
-        setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setFont(new Font("Arial", Font.PLAIN, 10));
         setIntercellSpacing(new Dimension(10,0));
         getColumnModel().setColumnMargin(10);
@@ -103,6 +99,10 @@ public class TrackTable extends JTable {
         this.getColumnModel().getColumn(3).setPreferredWidth(Math.round(tableSize.width*0.15f));
         this.getColumnModel().getColumn(4).setPreferredWidth(Math.round(tableSize.width*0.15f));
 
+    }
+
+    public String getToolTipText(MouseEvent e) {
+        return "Select the row and press Enter to show details";
     }
 
     protected JTableHeader createDefaultTableHeader() {

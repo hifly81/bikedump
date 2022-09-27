@@ -37,7 +37,10 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
             double initialLat,
             double initialLon) {
         this(coordinates, coordinatesNewKm, zoomLevel);
-        setDisplayPositionByLatLon(initialLat, initialLon, zoomLevel);
+        setDisplayPosition(
+                (int)initialLat,
+                (int)initialLon,
+                zoomLevel);
     }
 
     public MapViewer(
@@ -158,9 +161,9 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
 
         //final settings for mapviewer
         if (coordinates != null && !coordinates.isEmpty()) {
-            setDisplayPositionByLatLon(
-                    coordinates.get(0).get(0).getLat(),
-                    coordinates.get(0).get(0).getLon(), zoomLevel);
+            setDisplayPosition(
+                    (int)coordinates.get(0).get(0).getLat(),
+                    (int)coordinates.get(0).get(0).getLon(), zoomLevel);
         }
         setZoom(zoomLevel);
         setDisplayToFitMapMarkers();
@@ -179,7 +182,7 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        Coordinate position = getPosition(me.getPoint());
+        ICoordinate position = getPosition(me.getPoint());
 
         WaypointSegment waypoint = this.mapCircleCoordinates.get(position.getLat() + "-" + position.getLon());
         if(waypoint == null) {

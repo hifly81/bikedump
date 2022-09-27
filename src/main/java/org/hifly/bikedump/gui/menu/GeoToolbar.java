@@ -89,13 +89,24 @@ public class GeoToolbar extends JToolBar {
         reportButton.addActionListener(event -> {
             if (currentFrame.getTextForReport() != null && !currentFrame.getTextForReport().isEmpty()) {
                 try {
-                    PdfReport report = new PdfReport(currentFrame.getTextForReport());
                     String fileName = System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "report" + new Date().getTime() + ".pdf";
-                    File tmpPdf = new File(fileName);
+                    JOptionPane jop = new JOptionPane();
+                    jop.setMessageType(JOptionPane.PLAIN_MESSAGE);
+                    jop.setMessage("Report will be stored in:\n" + fileName);
+                    JDialog dialog = jop.createDialog(null, "Message");
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (Exception e) {
+                        }
+                        dialog.dispose();
+                        dialog.setVisible(false);
+                    }).start();
+
+                    dialog.setVisible(true);
+                    PdfReport report = new PdfReport(currentFrame.getTextForReport());
                     report.saveReport(fileName);
-                    if (Desktop.isDesktopSupported())
-                        Desktop.getDesktop().open(tmpPdf);
-                    //TODO define a delete method on exit
+
 
                 } catch (Exception ex) {
                     //TODO define exception
@@ -107,6 +118,8 @@ public class GeoToolbar extends JToolBar {
         calendarButton.addActionListener(event -> new WorkoutCalendar(currentFrame));
 
     }
+
+
 
     private JButton makeNavigationButton(String actionCommand, String toolTipText, String altText, ImageIcon icon) {
         JButton button;

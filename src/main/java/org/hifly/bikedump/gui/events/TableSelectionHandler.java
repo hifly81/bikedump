@@ -2,6 +2,7 @@ package org.hifly.bikedump.gui.events;
 
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.TrackSelected;
+import org.hifly.bikedump.gui.BikeDump;
 import org.hifly.bikedump.gui.panel.TrackTable;
 import org.hifly.bikedump.storage.DataHolder;
 
@@ -13,9 +14,11 @@ import java.util.HashSet;
 public class TableSelectionHandler implements ListSelectionListener {
 
     private TrackTable table;
+    private BikeDump bikeDump;
 
-    public TableSelectionHandler(TrackTable table, HashSet<TrackSelected> selectedTrackNames) {
+    public TableSelectionHandler(BikeDump bikeDump, TrackTable table, HashSet<TrackSelected> selectedTrackNames) {
           this.table = table;
+          this.bikeDump = bikeDump;
           DataHolder.tracksSelected = selectedTrackNames;
     }
 
@@ -32,8 +35,10 @@ public class TableSelectionHandler implements ListSelectionListener {
                 if (lsm.isSelectedIndex(i)) {
                     //this method finds the index inside the model regardless of sorting
                     Track track = ((TrackTable.TrackTableModel)table.getModel()).getTrackAt(table.convertRowIndexToModel(i));
-                    if (track != null)
+                    if (track != null) {
                         DataHolder.tracksSelected.add(new TrackSelected(track.getFileName()));
+                        bikeDump.loadSelectedTracks(table);
+                    }
                 }
             }
         }

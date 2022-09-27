@@ -27,14 +27,12 @@ import org.hifly.bikedump.storage.GeoMapStorage;
 import org.hifly.bikedump.task.LoadTrackExecutor;
 import org.hifly.bikedump.task.NewTrackTimer;
 import org.hifly.bikedump.utility.GUIUtility;
-import org.openstreetmap.gui.jmapviewer.OsmFileCacheTileLoader;
 import org.openstreetmap.gui.jmapviewer.OsmTileLoader;
 import org.openstreetmap.gui.jmapviewer.events.JMVCommandEvent;
 import org.openstreetmap.gui.jmapviewer.interfaces.ICoordinate;
 import org.openstreetmap.gui.jmapviewer.interfaces.JMapViewerEventListener;
 import org.openstreetmap.gui.jmapviewer.interfaces.TileLoader;
 import org.openstreetmap.gui.jmapviewer.interfaces.TileSource;
-import org.openstreetmap.gui.jmapviewer.tilesources.BingAerialTileSource;
 import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +44,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -407,16 +404,11 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         button.addActionListener(e -> mapViewer.setDisplayToFitMapMarkers());
 
 
-        JComboBox tileSourceSelector = new JComboBox<>(new TileSource[]{new OsmTileSource.Mapnik(), new BingAerialTileSource()});
+        JComboBox tileSourceSelector = new JComboBox<>(new TileSource[]{new OsmTileSource.Mapnik()});
         tileSourceSelector.addItemListener(e -> mapViewer.setTileSource((TileSource) e.getItem()));
 
-        JComboBox tileLoaderSelector;
-        try {
-            tileLoaderSelector = new JComboBox<>(new TileLoader[]{new OsmFileCacheTileLoader(mapViewer),
-                    new OsmTileLoader(mapViewer)});
-        } catch (IOException e) {
-            tileLoaderSelector = new JComboBox<>(new TileLoader[]{new OsmTileLoader(mapViewer)});
-        }
+        JComboBox tileLoaderSelector = new JComboBox<>(new TileLoader[]{new OsmTileLoader(mapViewer)});
+
         tileLoaderSelector.addItemListener(e -> mapViewer.setTileLoader((TileLoader) e.getItem()));
         mapViewer.setTileLoader((TileLoader) tileLoaderSelector.getSelectedItem());
 
@@ -438,7 +430,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         panelBottom.add(showTileGrid);
 
         final JCheckBox showZoomControls = new JCheckBox("Show zoom controls");
-        showZoomControls.setSelected(mapViewer.getZoomContolsVisible());
         showZoomControls.addActionListener(e -> mapViewer.setZoomContolsVisible(showZoomControls.isSelected()));
         panelBottom.add(showZoomControls);
 
@@ -539,7 +530,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         table.getSelectionModel().addListSelectionListener(
                 //TODO if track is already selected dont load again
                 //TODO if a list of track is shown, when load the single track don't redraw the table list
-                new TableSelectionHandler(table, new HashSet<>()));
+                new TableSelectionHandler(currentFrame, table, new HashSet<>()));
 
         table.addKeyListener(new KeyListener() {
             @Override

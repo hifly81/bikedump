@@ -18,6 +18,14 @@
         <maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>josm</id>
+            <name>JOSM repo</name>
+            <url>https://josm.openstreetmap.de/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.xmlbeans</groupId>
@@ -65,14 +73,9 @@
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>org.openstreetmap.gui.jmapviewer</groupId>
+            <groupId>org.openstreetmap.jmapviewer</groupId>
             <artifactId>jmapviewer</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jdesktop</groupId>
-            <artifactId>appframework</artifactId>
-            <version>1.0.3</version>
+            <version>1.18</version>
         </dependency>
         <dependency>
             <groupId>jfree</groupId>
@@ -100,9 +103,9 @@
             <version>4.47</version>
         </dependency>
         <dependency>
-            <groupId>com.luckycatlabs.sunrisesunset</groupId>
-            <artifactId>sunrisesunset</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>com.luckycatlabs</groupId>
+            <artifactId>SunriseSunsetCalculator</artifactId>
+            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
