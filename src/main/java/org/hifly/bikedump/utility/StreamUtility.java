@@ -1,6 +1,5 @@
 package org.hifly.bikedump.utility;
 
-
 import java.io.File;
 import java.net.URLEncoder;
 

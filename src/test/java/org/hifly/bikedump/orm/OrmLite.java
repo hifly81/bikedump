@@ -8,18 +8,10 @@ import com.j256.ormlite.table.TableUtils;
 import junit.framework.Assert;
 import org.hifly.bikedump.domain.Author;
 import org.hifly.bikedump.domain.Track;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-/**
- * @author
- * @date 26/01/14
- */
 public class OrmLite {
-
-    Logger log = LoggerFactory.getLogger(OrmLite.class);
 
     @org.junit.Test
     public void testOrmLite() throws Exception {

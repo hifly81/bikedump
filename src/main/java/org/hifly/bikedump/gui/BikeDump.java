@@ -27,11 +27,9 @@ import org.hifly.bikedump.storage.GeoMapStorage;
 import org.hifly.bikedump.task.LoadTrackExecutor;
 import org.hifly.bikedump.task.NewTrackTimer;
 import org.hifly.bikedump.utility.GUIUtility;
-import org.openstreetmap.gui.jmapviewer.OsmTileLoader;
 import org.openstreetmap.gui.jmapviewer.events.JMVCommandEvent;
 import org.openstreetmap.gui.jmapviewer.interfaces.ICoordinate;
 import org.openstreetmap.gui.jmapviewer.interfaces.JMapViewerEventListener;
-import org.openstreetmap.gui.jmapviewer.interfaces.TileLoader;
 import org.openstreetmap.gui.jmapviewer.interfaces.TileSource;
 import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource;
 import org.slf4j.Logger;
@@ -47,8 +45,10 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 //TODO use resource bundles i18n
 public class BikeDump extends JFrame implements JMapViewerEventListener {
@@ -66,7 +66,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
     private JScrollPane folderMapScrollViewer, folderDetailViewer, folderTableViewer;
     public TrackTable trackTable = null;
     private String textForReport;
-    private static final String TITLE = "BikeDump v0.1";
+    private static final String TITLE = "BikeDump v0.2";
 
     public BikeDump() {
         super();
@@ -343,13 +343,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         }
     }
 
-    private void initSettings() {
-        //saved pref
-        profileSetting = GeoMapStorage.profileSetting;
-        if (profileSetting == null)
-            profileSetting = new ProfileSetting();
-
-    }
+    private void initSettings() {}
 
     private void initDialogs() {
         //define dialogs
@@ -407,13 +401,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         JComboBox tileSourceSelector = new JComboBox<>(new TileSource[]{new OsmTileSource.Mapnik()});
         tileSourceSelector.addItemListener(e -> mapViewer.setTileSource((TileSource) e.getItem()));
 
-        JComboBox tileLoaderSelector = new JComboBox<>(new TileLoader[]{new OsmTileLoader(mapViewer)});
-
-        tileLoaderSelector.addItemListener(e -> mapViewer.setTileLoader((TileLoader) e.getItem()));
-        mapViewer.setTileLoader((TileLoader) tileLoaderSelector.getSelectedItem());
-
         panelTop.add(tileSourceSelector);
-        panelTop.add(tileLoaderSelector);
 
         final JCheckBox showMapMarker = new JCheckBox("Map markers visible");
         showMapMarker.setSelected(mapViewer.getMapMarkersVisible());

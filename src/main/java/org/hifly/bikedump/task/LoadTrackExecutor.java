@@ -1,6 +1,5 @@
 package org.hifly.bikedump.task;
 
-
 import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.TrackPref;

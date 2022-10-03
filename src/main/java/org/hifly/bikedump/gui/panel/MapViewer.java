@@ -6,7 +6,6 @@ import org.hifly.bikedump.gui.marker.LineMarker;
 import org.hifly.bikedump.gui.marker.TooltipMarker;
 import org.hifly.bikedump.storage.GeoMapStorage;
 import org.hifly.bikedump.utility.GPSUtility;
-import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
 import org.openstreetmap.gui.jmapviewer.interfaces.ICoordinate;
@@ -74,7 +73,7 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
                                 ele = GeoMapStorage.gpsElevationMapFallback.get(String.valueOf(listCoordinates.get(i).getLat()) + "-" + String.valueOf(listCoordinates.get(i).getLon()));
                             else
                                 //skip element
-                                log.warn("Elevation not found for:" + key);
+                                log.debug("Elevation not found for:" + key);
                         } else {
                             ele = GeoMapStorage.gpsElevationMap.get(key);
                         }
@@ -84,7 +83,7 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
                             ele = GeoMapStorage.gpsElevationMapFallback.get(String.valueOf(listCoordinates.get(i).getLat()) + "-" + String.valueOf(listCoordinates.get(i).getLon()));
                         else
                             //skip element
-                            log.warn("Elevation not found for:" + key);
+                            log.debug("Elevation not found for:" + key);
                     }
 
                     if (listTemp.size() == 0) {

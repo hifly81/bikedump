@@ -24,10 +24,20 @@ cd dist
 sh install-libs.sh
 ```
 
-### Run: ###
+```
+mvn clean compile
+```
+
+### Executable jar: ###
 
 ```
-mvn clean compile && mvn exec:java -Dexec.mainClass="org.hifly.bikedump.gui.BikeDump"
+mvn clean package
+```
+
+### Run BikeDump: ###
+
+```
+java -jar target/bikedump-0.2-release.jar
 ```
 
 ## External libraries: LICENSE

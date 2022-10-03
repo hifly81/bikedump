@@ -1,7 +1,6 @@
 package org.hifly.bikedump.storage;
 
 import org.hifly.bikedump.domain.LibrarySetting;
-import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.TrackPref;
 
 import java.io.*;
@@ -62,40 +61,6 @@ public class PrefStorage {
         }
         return map;
     }
-
-    public static ProfileSetting readSavedProfileSetting() {
-        File file = new File(PREF_DIR + "profile.pref");
-        FileInputStream streamIn = null;
-        ObjectInputStream objectinputstream = null;
-        ProfileSetting profile = null;
-        if (file != null && file.exists()) {
-            try {
-                streamIn = new FileInputStream(file);
-                objectinputstream = new ObjectInputStream(streamIn);
-                profile = (ProfileSetting) objectinputstream.readObject();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            if (streamIn != null) {
-                try {
-                    streamIn.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (objectinputstream != null) {
-                try {
-                    objectinputstream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return profile;
-    }
-
 
     public static LibrarySetting readLibrarySetting() {
         File file = new File(PREF_DIR + "library.pref");

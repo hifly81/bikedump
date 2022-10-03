@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.List;
 
-/**
- * @author
- * @date 24/02/14
- */
+
 //TODO use a templating manager e.g freemarker
 public class DetailViewer extends JScrollPane {
 

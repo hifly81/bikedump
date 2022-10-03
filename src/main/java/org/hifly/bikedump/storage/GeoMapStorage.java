@@ -23,7 +23,6 @@ public class GeoMapStorage {
     public static Map<String, Double> gpsElevationMapFallback = new HashMap<>();
     public static List<SlopeSegment> savedClimbsList;
     public static Map<String,TrackPref> tracksLibrary;
-    public static ProfileSetting profileSetting;
     public static LibrarySetting librarySetting;
 
     static {
@@ -60,8 +59,6 @@ public class GeoMapStorage {
             savedClimbsList = ClimbStorage.readSavedClimbs();
             //load opened tracks
             tracksLibrary = PrefStorage.readOpenedTracks();
-            //load saved profile
-            profileSetting = PrefStorage.readSavedProfileSetting();
             //load saved library
             librarySetting = PrefStorage.readLibrarySetting();
 
@@ -85,9 +82,6 @@ public class GeoMapStorage {
     public static void save() {
         if(GeoMapStorage.tracksLibrary != null) {
             PrefStorage.savePref(GeoMapStorage.tracksLibrary, "tracks");
-        }
-        if(GeoMapStorage.profileSetting != null) {
-            PrefStorage.savePref(GeoMapStorage.profileSetting, "profile");
         }
         if(GeoMapStorage.librarySetting != null) {
             PrefStorage.savePref(GeoMapStorage.librarySetting, "library");

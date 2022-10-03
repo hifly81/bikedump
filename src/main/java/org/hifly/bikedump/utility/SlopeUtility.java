@@ -1,7 +1,5 @@
 package org.hifly.bikedump.utility;
 
-import org.hifly.bikedump.domain.Bike;
-import org.hifly.bikedump.domain.Profile;
 import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.gps.SlopeSegment;
 import org.hifly.bikedump.domain.gps.Waypoint;
@@ -71,15 +69,6 @@ public class SlopeUtility {
 
         //get bikeWeight
         double bikeWeight = 9;
-        List<Bike> bikes = profile.getBikes();
-        if(bikes!=null && !bikes.isEmpty()) {
-            for(Bike bike:bikes) {
-                if(bike.isSelected()) {
-                    bikeWeight = bike.getBikeWeight();
-                    break;
-                }
-            }
-        }
 
         for (int i=0; i<waypoints.size(); i++) {
             Waypoint waypoint = waypoints.get(i);
@@ -159,16 +148,6 @@ public class SlopeUtility {
                             lastSlope.setAvgSpeed(speed);
 
                             double power = 0.0;
-                            if(profile.getSelectedProfile() != null) {
-                                power = PowerUtility.calculatePower(
-                                        profile.getSelectedProfile().getWeight(),
-                                        bikeWeight,
-                                        lastSlope.getDistance(),
-                                        lastSlope.getGradient(),
-                                        lastSlope.getAvgSpeed()
-                                );
-                            }
-
                             lastSlope.setPower(power);
                             lastSlope.setVam((lastSlope.getElevation()/TimeUtility.getTimeDiffSecond(calLast, calFirst))*3600);
 
@@ -220,16 +199,6 @@ public class SlopeUtility {
                     lastSlope.setAvgSpeed(speed);
 
                     double power = 0.0;
-                    if(profile.getSelectedProfile() != null) {
-                        power = PowerUtility.calculatePower(
-                                profile.getSelectedProfile().getWeight(),
-                                bikeWeight,
-                                lastSlope.getDistance(),
-                                lastSlope.getGradient(),
-                                lastSlope.getAvgSpeed()
-                        );
-                    }
-
                     lastSlope.setPower(power);
                     lastSlope.setVam((lastSlope.getElevation()/TimeUtility.getTimeDiffSecond(calLast, calFirst))*3600);
 
@@ -253,19 +222,9 @@ public class SlopeUtility {
             int waypointEndIndex,
             ProfileSetting profileSetting) {
 
-        Profile profile = profileSetting.getSelectedProfile();
         //get bikeWeight
         //TODO remove bike constants
         double bikeWeight = 9;
-        List<Bike> bikes = profileSetting.getBikes();
-        if(bikes!=null && !bikes.isEmpty()) {
-            for(Bike bike:bikes) {
-                if(bike.isSelected()) {
-                    bikeWeight = bike.getBikeWeight();
-                    break;
-                }
-            }
-        }
 
         try {
             double gradient = ((gradientLast.getEle() - gradientFirst.getEle()) / (accDistance * 1000)) * 100;
@@ -295,14 +254,7 @@ public class SlopeUtility {
                 slope.setEndDistance(gradientLast.getDistanceFromStartingPoint());
                 slope.setAvgSpeed(speed);
 
-                double power = PowerUtility.calculatePower(
-                        profile == null ? 0 : profile.getWeight(),
-                        bikeWeight,
-                        slope.getDistance(),
-                        slope.getGradient(),
-                        slope.getAvgSpeed()
-                );
-
+                double power = 0.0;
                 slope.setPower(power);
                 slope.setVam((slope.getElevation() / TimeUtility.getTimeDiffSecond(calLast, calFirst)) * 3600);
 

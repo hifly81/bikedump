@@ -70,11 +70,6 @@ public abstract class GPSDocument {
         }
     }
 
-    protected void addHeart(double heartValue) {
-        totalHeart+=heartValue;
-        heart+=1;
-    }
-
     protected void addCoordinateElement(double currentLat, double currentLon) {
         Coordinate coordinate = new Coordinate(currentLat, currentLon);
         coordinates.add(coordinate);

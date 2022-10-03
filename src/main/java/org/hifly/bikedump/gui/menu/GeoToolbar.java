@@ -32,12 +32,12 @@ public class GeoToolbar extends JToolBar {
     }
 
     private void addButtons() {
-        URL backImageUrl = getClass().getResource("/img/back.png");
+        URL backImageUrl = getClass().getResource("/img/home.png");
         ImageIcon backImageIcon = new ImageIcon(backImageUrl);
         Image img = backImageIcon.getImage();
         img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
         backImageIcon = new ImageIcon(img);
-        JButton backButton = makeNavigationButton("Back","Back","Back",backImageIcon);
+        JButton backButton = makeNavigationButton("Home","Home","Home",backImageIcon);
         URL graphImageUrl = getClass().getResource("/img/bar-chart-icon.png");
         ImageIcon graphImageIcon = new ImageIcon(graphImageUrl);
         img = graphImageIcon.getImage();
@@ -92,7 +92,8 @@ public class GeoToolbar extends JToolBar {
                     String fileName = System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "report" + new Date().getTime() + ".pdf";
                     JOptionPane jop = new JOptionPane();
                     jop.setMessageType(JOptionPane.PLAIN_MESSAGE);
-                    jop.setMessage("Report will be stored in:\n" + fileName);
+                    String reportName = currentFrame.getTextForReport().split("\\$\\$\\$")[0];
+                    jop.setMessage(reportName + "\nReport will be stored in:\n" + fileName);
                     JDialog dialog = jop.createDialog(null, "Message");
                     new Thread(() -> {
                         try {

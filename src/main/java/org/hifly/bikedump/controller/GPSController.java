@@ -70,7 +70,7 @@ public class GPSController {
             long time1 = System.currentTimeMillis();
             tracks = doc.extractTrack(filename);
             long time2 = System.currentTimeMillis();
-            log.info("Extract info from Track Duration [" + filename + "]:" + (time2 - time1));
+            log.debug("Extract info from Track Duration [" + filename + "]:" + (time2 - time1));
 
             //TODO manage a list of tracks: a single file can contain multiple tracks
             if (tracks != null && !tracks.isEmpty())
@@ -101,7 +101,7 @@ public class GPSController {
             long time1 = System.currentTimeMillis();
             tracks = doc.extractTrack(filename);
             long time2 = System.currentTimeMillis();
-            log.info("Extract info from Track Duration [" + filename + "]:" + (time2 - time1));
+            log.debug("Extract info from Track Duration [" + filename + "]:" + (time2 - time1));
 
             //TODO manage a list of tracks: a single file can contain multiple tracks
             if (tracks != null && !tracks.isEmpty())
@@ -117,11 +117,6 @@ public class GPSController {
         if (tracks != null && !tracks.isEmpty())
             track = tracks.get(0);
         return new AbstractMap.SimpleImmutableEntry<>(track, sb);
-    }
-
-    public static Map.Entry<Track, StringBuffer> extractTrackFromKml(String filename, ProfileSetting profileSetting) {
-        //TODO KML implementation
-        return null;
     }
 
     private static Document getXmlDocumentFromFileName(String filename) throws Exception {

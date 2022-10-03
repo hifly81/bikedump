@@ -1,6 +1,5 @@
 package org.hifly.bikedump.storage;
 
-
 import org.apache.commons.collections.CollectionUtils;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.TrackSelected;

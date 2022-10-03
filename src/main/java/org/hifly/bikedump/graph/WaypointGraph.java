@@ -7,10 +7,6 @@ import org.jfree.data.xy.XYDataset;
 
 import java.util.List;
 
-/**
- * @author
- * @date 18/02/14
- */
 public abstract class WaypointGraph {
 
     protected List<List<WaypointSegment>> waypoints;

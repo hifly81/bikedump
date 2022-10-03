@@ -30,26 +30,26 @@ public class TooltipMarker extends MapMarkerDot  {
         this.y = y;
     }
 
-    public TooltipMarker(Color color, double lat, double lon) {
-        super(color,lat,lon);
-    }
-
     @Override
     public void paint(Graphics g, Point position, int radio) {
         if (g instanceof Graphics2D) {
-            Graphics2D g2 = (Graphics2D) g;
-            Composite oldComposite = g2.getComposite();
-            g2.draw(new Rectangle2D.Double(x, y, 280, 80));
 
-            g.setFont(new Font("Arial", Font.BOLD, 14));
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setPaint(new Color(220, 220, 220));
+            RenderingHints rh = new RenderingHints(
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            rh.put(RenderingHints.KEY_RENDERING,
+                    RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHints(rh);
+            g2d.fillRect((int) x, (int) y, 280, 80);
+            g.setFont(new Font("Arial", Font.PLAIN, 16));
             g.setColor(Color.BLUE);
-
             g.drawString(text,(int)x+5,(int)y+15);
             g.drawString(text2,(int)x+5,(int)y+30);
             g.drawString(text3,(int)x+5,(int)y+45);
             g.drawString(text4,(int)x+5,(int)y+60);
             g.drawString(text5,(int)x+5,(int)y+75);
-            g2.setComposite(oldComposite);
 
         }
     }

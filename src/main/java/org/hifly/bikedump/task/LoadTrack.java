@@ -1,9 +1,7 @@
 package org.hifly.bikedump.task;
 
-
 import org.apache.commons.io.FilenameUtils;
 import org.hifly.bikedump.controller.GPSController;
-import org.hifly.bikedump.domain.Profile;
 import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.TrackPref;
@@ -64,8 +62,7 @@ public class LoadTrack implements Runnable {
                     if (GeoMapStorage.tracksLibrary == null)
                         GeoMapStorage.tracksLibrary = new HashMap<>();
                     TrackPref trackPref = new TrackPref();
-                    Profile profile = profileSetting.getSelectedProfile();
-                    trackPref.setProfile(profile);
+
 
                     GeoMapStorage.tracksLibrary.put(track.getFileName(), trackPref);
                     coordinates.add(track.getCoordinates());
