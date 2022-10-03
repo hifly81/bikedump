@@ -38,7 +38,7 @@ public class GPSController {
         xpath = XPathFactory.newInstance().newXPath();
     }
 
-    public static Map.Entry<Track, StringBuffer> extractTrackFromGpx(String filename, ProfileSetting profileSetting) {
+    public static Map.Entry<Track, StringBuffer> extractTrackFromGpx(String filename) {
         Track track = null;
         StringBuffer sb = new StringBuffer();
         List<Track> tracks;
@@ -55,10 +55,10 @@ public class GPSController {
 
             switch (gpxVersion) {
                 case "1.1":
-                    doc = new GPXDocument(profileSetting);
+                    doc = new GPXDocument();
                     break;
                 case "1.0":
-                    doc = new GPX10Document(profileSetting);
+                    doc = new GPX10Document();
                     break;
                 default:
                     String error = "version of GPX is not compatible [" + gpxVersion + "]:" + filename;
@@ -86,10 +86,10 @@ public class GPSController {
         return new AbstractMap.SimpleImmutableEntry<>(track, sb);
     }
 
-    public static Map.Entry<Track, StringBuffer> extractTrackFromTcx(String filename, ProfileSetting profileSetting) {
+    public static Map.Entry<Track, StringBuffer> extractTrackFromTcx(String filename) {
         Track track = null;
         StringBuffer sb = new StringBuffer();
-        TCX2Document doc = new TCX2Document(profileSetting);
+        TCX2Document doc = new TCX2Document();
         List<Track> tracks = null;
         try {
             Document docForXpath = getXmlDocumentFromFileName(filename);

@@ -15,8 +15,8 @@ import java.util.List;
 
 public class GPXDocument extends GPSDocument {
 
-    public GPXDocument(ProfileSetting profileSetting) {
-        super(profileSetting);
+    public GPXDocument() {
+        super();
     }
 
     @Override
@@ -126,7 +126,7 @@ public class GPXDocument extends GPSDocument {
         resultTrack.setAuthor(author);
 
         resultTrack.setAltimetricProfile(SlopeUtility.totalAltimetricProfile(waypoints));
-        resultTrack.setSlopes(SlopeUtility.extractSlope(waypoints, profileSetting));
+        resultTrack.setSlopes(SlopeUtility.extractSlope(waypoints));
         resultTrack.setCoordinates(coordinates);
         GPSUtility.GpsStats stats = GPSUtility.extractInfoFromWaypoints(waypoints, totalDistance);
         resultTrack.setCoordinatesNewKm(stats.getWaypointsKm());

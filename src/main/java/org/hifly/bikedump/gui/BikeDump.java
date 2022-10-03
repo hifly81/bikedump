@@ -4,7 +4,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.hifly.bikedump.controller.GPSController;
 import org.hifly.bikedump.domain.LibrarySetting;
-import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.TrackSelected;
 import org.hifly.bikedump.domain.gps.Coordinate;
@@ -14,10 +13,10 @@ import org.hifly.bikedump.gui.dialog.SettingDialog;
 import org.hifly.bikedump.gui.dialog.TipOfTheDay;
 import org.hifly.bikedump.gui.events.QuitWindowHandler;
 import org.hifly.bikedump.gui.events.TableSelectionHandler;
-import org.hifly.bikedump.gui.menu.GeoFileChooser;
-import org.hifly.bikedump.gui.menu.GeoFolderChooser;
-import org.hifly.bikedump.gui.menu.GeoMapMenu;
-import org.hifly.bikedump.gui.menu.GeoToolbar;
+import org.hifly.bikedump.gui.menu.FileChooser;
+import org.hifly.bikedump.gui.menu.FolderChooser;
+import org.hifly.bikedump.gui.menu.TopMenu;
+import org.hifly.bikedump.gui.menu.Toolbar;
 import org.hifly.bikedump.gui.panel.AggregateDetailViewer;
 import org.hifly.bikedump.gui.panel.DetailViewer;
 import org.hifly.bikedump.gui.panel.MapViewer;
@@ -57,7 +56,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
     private Logger log = LoggerFactory.getLogger(BikeDump.class);
 
-    private ProfileSetting profileSetting;
     private SettingDialog settingDialog = null;
     private BikeDump currentFrame = this;
     protected MapViewer mapViewer;
@@ -91,13 +89,13 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         initDialogs();
 
         //create toolbar
-        GeoToolbar toolBar = new GeoToolbar(currentFrame);
+        Toolbar toolBar = new Toolbar(currentFrame);
         add(toolBar, BorderLayout.PAGE_START);
 
         //create menu and its events
-        GeoMapMenu mainMenu = new GeoMapMenu(currentFrame);
-        final GeoFileChooser fileChooser = new GeoFileChooser();
-        final GeoFolderChooser folderChooser = new GeoFolderChooser();
+        TopMenu mainMenu = new TopMenu(currentFrame);
+        final FileChooser fileChooser = new FileChooser();
+        final FolderChooser folderChooser = new FolderChooser();
 
         //import file action
         JMenuItem itemImportFile = mainMenu.getItemImportFile();
@@ -122,7 +120,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 LoadTrackExecutor loadTrackExecutor = new LoadTrackExecutor(
                         false,
                         FileUtils.listFiles(folderChooser.getSelectedFile(), null, true).iterator(),
-                        profileSetting,
                         sb,
                         coordinates,
                         waypoint,
@@ -214,7 +211,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                     LoadTrackExecutor loadTrackExecutor = new LoadTrackExecutor(
                             false,
                             GeoMapStorage.tracksLibrary.entrySet().iterator(),
-                            profileSetting,
                             sb,
                             coordinates,
                             waypoint,
@@ -319,7 +315,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                     LoadTrackExecutor loadTrackExecutor = new LoadTrackExecutor(
                             true,
                             FileUtils.listFiles(new File(directory), null, true).iterator(),
-                            profileSetting,
                             sb,
                             coordinates,
                             waypoint,
@@ -347,7 +342,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
     private void initDialogs() {
         //define dialogs
-        settingDialog = new SettingDialog(currentFrame, profileSetting);
+        settingDialog = new SettingDialog(currentFrame);
         settingDialog.pack();
 
     }
@@ -464,9 +459,9 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         String ext = FilenameUtils.getExtension(file.getAbsolutePath());
         Map.Entry<Track, StringBuffer> resultTrack;
         if (ext.equalsIgnoreCase("gpx"))
-            resultTrack = GPSController.extractTrackFromGpx(file.getAbsolutePath(), profileSetting);
+            resultTrack = GPSController.extractTrackFromGpx(file.getAbsolutePath());
         else if (ext.equalsIgnoreCase("tcx"))
-            resultTrack = GPSController.extractTrackFromTcx(file.getAbsolutePath(), profileSetting);
+            resultTrack = GPSController.extractTrackFromTcx(file.getAbsolutePath());
         else {
             JOptionPane.showMessageDialog(currentFrame,
                     "Map not available",

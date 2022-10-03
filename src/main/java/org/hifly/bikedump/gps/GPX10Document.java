@@ -2,7 +2,6 @@ package org.hifly.bikedump.gps;
 
 import com.topografix.gpx.x1.x0.*;
 import org.hifly.bikedump.domain.Author;
-import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.utility.GPSUtility;
 import org.hifly.bikedump.utility.SlopeUtility;
@@ -16,8 +15,8 @@ import java.util.List;
 public class GPX10Document extends GPSDocument {
 
 
-    public GPX10Document(ProfileSetting profileSetting) {
-        super(profileSetting);
+    public GPX10Document() {
+        super();
     }
 
     @Override
@@ -97,7 +96,7 @@ public class GPX10Document extends GPSDocument {
                 author.setEmail(gpx.getEmail());
         resultTrack.setAuthor(author);
 
-        resultTrack.setSlopes(SlopeUtility.extractSlope(waypoints,profileSetting));
+        resultTrack.setSlopes(SlopeUtility.extractSlope(waypoints));
         resultTrack.setCoordinates(coordinates);
         GPSUtility.GpsStats stats = GPSUtility.extractInfoFromWaypoints(waypoints, totalDistance);
         resultTrack.setCoordinatesNewKm(stats.getWaypointsKm());

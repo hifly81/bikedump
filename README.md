@@ -5,9 +5,14 @@ Manage and extract stats from your bike gps gpx tcx activities.
 Generate graphs and history stats.
 
 
-## Screenshot
+## Screenshots
 
-see img folder
+<img src="img/img1.png" height="200" width="350">
+<img src="img/img2.png" height="200" width="350">
+<img src="img/img3.png" height="200" width="350">
+<img src="img/img4.png" height="200" width="350">
+<img src="img/img5.png" height="200" width="350">
+<img src="img/img6.png" height="200" width="350">
 
 ## Prerequisites
 

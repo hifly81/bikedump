@@ -388,7 +388,6 @@ public class DetailViewer extends JScrollPane {
     private String flushBuffer() {
         String text = text4HTML.toString();
         text4HTML = new StringBuffer();
-        text4HTML.append("");
         return text;
     }
 

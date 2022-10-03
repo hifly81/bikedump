@@ -19,13 +19,13 @@ import java.util.Date;
 
 import static org.hifly.bikedump.utility.Constants.HOME_FOLDER_NAME;
 
-public class GeoToolbar extends JToolBar {
+public class Toolbar extends JToolBar {
 
     private static final long serialVersionUID = 20L;
 
     private BikeDump currentFrame;
 
-    public GeoToolbar(BikeDump currentFrame) {
+    public Toolbar(BikeDump currentFrame) {
         super();
         this.currentFrame = currentFrame;
         addButtons();

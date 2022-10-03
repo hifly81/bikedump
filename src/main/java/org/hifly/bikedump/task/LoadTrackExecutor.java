@@ -1,6 +1,5 @@
 package org.hifly.bikedump.task;
 
-import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.TrackPref;
 import org.hifly.bikedump.domain.gps.Coordinate;
@@ -25,7 +24,6 @@ public class LoadTrackExecutor {
     public LoadTrackExecutor(
             boolean isNewTrackToLoad,
             Iterator iterator,
-            ProfileSetting profileSetting,
             StringBuffer sb, List<List<Coordinate>> coordinates,
             List<Map<String, WaypointSegment>> waypoint,
             List<Track> tracks) {
@@ -43,9 +41,9 @@ public class LoadTrackExecutor {
             }
 
             if(isNewTrackToLoad && (GeoMapStorage.tracksLibrary.get(file.getAbsolutePath()) == null))
-                todo.add(Executors.callable(new LoadTrack(file, profileSetting, sb, coordinates,waypoint, tracks)));
+                todo.add(Executors.callable(new LoadTrack(file, sb, coordinates,waypoint, tracks)));
             else
-                todo.add(Executors.callable(new LoadTrack(file, profileSetting, sb, coordinates,waypoint, tracks)));
+                todo.add(Executors.callable(new LoadTrack(file, sb, coordinates,waypoint, tracks)));
         }
 
     }

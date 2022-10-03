@@ -2,7 +2,6 @@ package org.hifly.bikedump.gps;
 
 import com.garmin.xmlschemas.trainingCenterDatabase.v2.*;
 import org.hifly.bikedump.domain.Author;
-import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.utility.GPSUtility;
 import org.hifly.bikedump.utility.SlopeUtility;
@@ -18,8 +17,8 @@ import java.util.List;
 public class TCX2Document extends GPSDocument {
     private Logger log = LoggerFactory.getLogger(TCX2Document.class);
 
-    public TCX2Document(ProfileSetting profileSetting) {
-        super(profileSetting);
+    public TCX2Document() {
+        super();
     }
 
     @Override
@@ -136,7 +135,7 @@ public class TCX2Document extends GPSDocument {
         resultTrack.setAuthor(author);
 
         resultTrack.setAltimetricProfile(SlopeUtility.totalAltimetricProfile(waypoints));
-        resultTrack.setSlopes(SlopeUtility.extractSlope(waypoints, profileSetting));
+        resultTrack.setSlopes(SlopeUtility.extractSlope(waypoints));
         resultTrack.setCoordinates(coordinates);
         GPSUtility.GpsStats stats = GPSUtility.extractInfoFromWaypoints(waypoints, totalDistance);
         resultTrack.setCoordinatesNewKm(stats.getWaypointsKm());

@@ -8,7 +8,7 @@
     <groupId>org.hifly.bikedump</groupId>
     <artifactId>bikedump</artifactId>
     <packaging>jar</packaging>
-    <version>0.2</version>
+    <version>${bikedump.version}</version>
 
     <name>Bike Dump</name>
     <url>https://github.com/hifly81</url>
@@ -16,6 +16,7 @@
     <properties>
         <slf4j.version>1.6.1</slf4j.version>
         <maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
+        <bikedump.version>0.2.1</bikedump.version>
     </properties>
 
     <repositories>
@@ -165,7 +166,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>bikedump-0.2-release</finalName>
+                            <finalName>bikedump-${bikedump.version}-release</finalName>
                             <archive>
                                 <manifest>
                                     <mainClass>

@@ -6,8 +6,6 @@ import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.gps.Coordinate;
 import org.hifly.bikedump.storage.GeoMapStorage;
 import org.hifly.bikedump.utility.GPSUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -17,7 +15,6 @@ import java.util.Map;
 
 public abstract class GPSDocument {
 
-    protected Logger log = LoggerFactory.getLogger(GPSDocument.class);
     protected List<Track> result = new ArrayList<>();
     protected List<Coordinate> coordinates = new ArrayList<>();
     protected List<Waypoint> waypoints = new ArrayList<>();
@@ -38,7 +35,7 @@ public abstract class GPSDocument {
     protected long totalTimeDiff = 0;
 
 
-    public GPSDocument(ProfileSetting profileSetting) {
+    public GPSDocument() {
         totalDistance = totalDistanceCalculated =
         totalSpeed = totalEffectiveSpeed =
         totalElevation = totalCalculatedElevation =
@@ -48,7 +45,6 @@ public abstract class GPSDocument {
         totalTime =
         totalHeart = 0;
         totalEffectiveSpeedPoints = totalCalculatedSpeedPoints = calories = heart = 0;
-        this.profileSetting = profileSetting;
     }
 
     protected void addSpeedElement(double distance, double timeDiffInHour) {

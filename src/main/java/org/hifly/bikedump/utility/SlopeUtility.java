@@ -47,14 +47,13 @@ public class SlopeUtility {
 
     //FIXME too intensive, similar to createSlopes
     public static SlopeSegment totalAltimetricProfile(List<Waypoint> waypoints) {
-
         SlopeSegment slopeSegment = new SlopeSegment();
         slopeSegment.setWaypoints(waypoints);
         return slopeSegment;
     }
 
     //TODO review slope ranges
-    public static List<SlopeSegment> extractSlope(List<Waypoint> waypoints, ProfileSetting profile) {
+    public static List<SlopeSegment> extractSlope(List<Waypoint> waypoints) {
         List<SlopeSegment> list = new ArrayList<>();
         double accumulatedDistance = 0;
         double descentDistance = 0;
@@ -66,9 +65,6 @@ public class SlopeUtility {
 
         int waypointStartIndex = 0;
         int waypointEndIndex = 0;
-
-        //get bikeWeight
-        double bikeWeight = 9;
 
         for (int i=0; i<waypoints.size(); i++) {
             Waypoint waypoint = waypoints.get(i);
@@ -154,7 +150,7 @@ public class SlopeUtility {
                         }
                     }
                     if(!combined)
-                        createSlope(list, accumulatedDistance, gradientUp, gradientFirst, gradientLast, waypoints, waypointStartIndex, waypointEndIndex, profile);
+                        createSlope(list, accumulatedDistance, gradientUp, gradientFirst, gradientLast, waypoints, waypointStartIndex, waypointEndIndex);
                     accumulatedDistance = 0;
                     descentDistance = 0;
                     gradientFirst = null;
@@ -205,7 +201,7 @@ public class SlopeUtility {
                 }
             }
             if(!combined)
-                createSlope(list, accumulatedDistance, gradientUp, gradientFirst, gradientLast, waypoints, waypointStartIndex, waypointEndIndex, profile);
+                createSlope(list, accumulatedDistance, gradientUp, gradientFirst, gradientLast, waypoints, waypointStartIndex, waypointEndIndex);
         }
 
         return list;
@@ -219,12 +215,7 @@ public class SlopeUtility {
             Waypoint gradientLast,
             List<Waypoint> waypoints,
             int waypointStartIndex,
-            int waypointEndIndex,
-            ProfileSetting profileSetting) {
-
-        //get bikeWeight
-        //TODO remove bike constants
-        double bikeWeight = 9;
+            int waypointEndIndex) {
 
         try {
             double gradient = ((gradientLast.getEle() - gradientFirst.getEle()) / (accDistance * 1000)) * 100;

@@ -1,12 +1,10 @@
 package org.hifly.bikedump.gui.dialog;
 
 import org.hifly.bikedump.domain.LibrarySetting;
-import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.storage.GeoMapStorage;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -16,25 +14,16 @@ public class SettingDialog extends JDialog {
  
     private static final long serialVersionUID = 14L;
 
-    private SettingDialog currentFrame = this;
-    private Frame externalFrame = null;
-    private JSpinner spinnerWeight, spinnerHeight, spinnerBikeWeight, spinnerHr = null;
-    private JComboBox bikeBrandsCombo, bikeTypesCombo = null;
-    private JTextField bikeNameField, bikeModelField = null;
+
     private JCheckBox scanFoldersCheck, elevationCorrection, showTipsAtStartup = null;
-    private ProfileSetting profileSetting;
 
-    public SettingDialog(Frame frame, final ProfileSetting profileSetting) {
+    public SettingDialog(Frame frame) {
         super(frame, true);
-
-        this.externalFrame = frame;
-        this.profileSetting = profileSetting;
 
         setTitle("BikeDump options");
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("General", null, createGeneralSettingPanel(), "General settings");
-        tabbedPane.addTab("Conversion", null, createConversionSettingPanel(), "Conversion settings");
         tabbedPane.addTab("Library", null, createLibrarySettingPanel(), "Library settings");
 
         setContentPane(tabbedPane);
@@ -84,53 +73,6 @@ public class SettingDialog extends JDialog {
         panel.add(panel1);
 
         return panel;
-    }
-
-
-
-    public JPanel createConversionSettingPanel() {
-        JPanel panel = new JPanel();
-
-        JPanel panel1 = new JPanel();
-        Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "Conversion properties");
-        panel1.setBorder(titleBorder);
-
-        RadioListener myListener = new RadioListener();
-
-        JRadioButton metricButton = new JRadioButton("Metric");
-        metricButton.setSelected(true);
-        metricButton.addActionListener(myListener);
-        JRadioButton imperialButton = new JRadioButton("Imperial");
-        imperialButton.addActionListener(myListener);
-
-        ButtonGroup group = new ButtonGroup();
-        group.add(metricButton);
-        group.add(imperialButton);
-
-        panel1.add(metricButton);
-        panel1.add(imperialButton);
-
-        panel.add(panel1);
-
-        return panel;
-    }
-
-    private JPanel createRootPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        return panel;
-    }
-
-    public ProfileSetting getProfileSetting() {
-        return profileSetting;
-    }
-
-    class RadioListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            profileSetting.setUnitSystem(e.getActionCommand());
-
-        }
     }
 
     class CheckListener implements ItemListener {

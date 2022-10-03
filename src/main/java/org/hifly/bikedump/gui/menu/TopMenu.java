@@ -3,6 +3,7 @@ package org.hifly.bikedump.gui.menu;
 import org.hifly.bikedump.domain.gps.SlopeSegment;
 import org.hifly.bikedump.graph.WaypointElevationGraph;
 import org.hifly.bikedump.graph.WaypointGraph;
+import org.hifly.bikedump.gui.dialog.About;
 import org.hifly.bikedump.gui.dialog.GraphViewer;
 import org.hifly.bikedump.gui.events.QuitHandler;
 import org.hifly.bikedump.storage.GeoMapStorage;
@@ -11,13 +12,14 @@ import org.hifly.bikedump.utility.SlopeUtility;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class GeoMapMenu extends JMenuBar {
+public class TopMenu extends JMenuBar {
 
     private static final long serialVersionUID = 19L;
 
@@ -27,7 +29,7 @@ public class GeoMapMenu extends JMenuBar {
     private JMenuItem trySample;
     private JFrame currentFrame;
 
-    public GeoMapMenu(JFrame currentFrame) {
+    public TopMenu(JFrame currentFrame) {
         super();
         this.currentFrame = currentFrame;
         this.add(createFileMenu());
@@ -176,6 +178,12 @@ public class GeoMapMenu extends JMenuBar {
         JMenuItem aboutMenuItem = new JMenuItem("About", null);
         aboutMenuItem.setMnemonic(KeyEvent.VK_P);
         aboutMenuItem.setToolTipText("About");
+        aboutMenuItem.addActionListener((new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                About about = new About();
+                about.setVisible(true);
+            }
+        } ));
 
         help.add(aboutMenuItem);
 

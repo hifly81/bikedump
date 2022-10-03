@@ -17,7 +17,7 @@ public class HTMLEditorPanel extends JTextPane {
         super();
         setContentType("text/html");
 
-        Font font = new Font("Arial", Font.PLAIN, 10) ;
+        Font font = new Font("Arial", Font.PLAIN, 12) ;
         String bodyRule = "body { font-family: " + font.getFamily() + "; " +
                 "font-size: " + font.getSize() + "pt; }";
         ((HTMLDocument)getDocument()).getStyleSheet().addRule(bodyRule);

@@ -4,11 +4,11 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class GeoFileChooser extends JFileChooser {
+public class FileChooser extends JFileChooser {
 
     private static final long serialVersionUID = 17L;
 
-    public GeoFileChooser() {
+    public FileChooser() {
         super();
         init();
     }

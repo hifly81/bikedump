@@ -19,15 +19,13 @@ import java.util.Map;
 public class LoadTrack implements Runnable {
 
     private File file;
-    private ProfileSetting profileSetting;
     private StringBuffer sb;
     private List<List<Coordinate>> coordinates;
     private List<Map<String, WaypointSegment>> waypoint;
     private List<Track> tracks;
 
-    public LoadTrack(File file, ProfileSetting profileSetting, StringBuffer sb, List<List<Coordinate>> coordinates, List<Map<String, WaypointSegment>> waypoint, List<Track> tracks) {
+    public LoadTrack(File file, StringBuffer sb, List<List<Coordinate>> coordinates, List<Map<String, WaypointSegment>> waypoint, List<Track> tracks) {
         this.file = file;
-        this.profileSetting = profileSetting;
         this.sb = sb;
         this.coordinates = coordinates;
         this.waypoint = waypoint;
@@ -47,9 +45,9 @@ public class LoadTrack implements Runnable {
             Map.Entry<Track, StringBuffer> resultTrack;
             //TODO check not based on extension
             if (ext.equalsIgnoreCase("gpx"))
-                resultTrack = GPSController.extractTrackFromGpx(file.getAbsolutePath(), profileSetting);
+                resultTrack = GPSController.extractTrackFromGpx(file.getAbsolutePath());
             else if (ext.equalsIgnoreCase("tcx"))
-                resultTrack = GPSController.extractTrackFromTcx(file.getAbsolutePath(), profileSetting);
+                resultTrack = GPSController.extractTrackFromTcx(file.getAbsolutePath());
             else
                 return;
 

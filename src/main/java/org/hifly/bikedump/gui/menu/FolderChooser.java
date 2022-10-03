@@ -2,11 +2,11 @@ package org.hifly.bikedump.gui.menu;
 
 import javax.swing.*;
 
-public class GeoFolderChooser extends JFileChooser {
+public class FolderChooser extends JFileChooser {
 
     private static final long serialVersionUID = 18L;
 
-    public GeoFolderChooser() {
+    public FolderChooser() {
         super();
         init();
     }
