@@ -1,6 +1,5 @@
 package org.hifly.bikedump.gps;
 
-import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.gps.Waypoint;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.gps.Coordinate;
@@ -20,7 +19,6 @@ public abstract class GPSDocument {
     protected List<Waypoint> waypoints = new ArrayList<>();
     protected Map<String, Double> elevationMap = GeoMapStorage.gpsElevationMap;
     protected Date startTime, endTime = null;
-    protected ProfileSetting profileSetting;
 
     protected double totalDistance,
            totalDistanceCalculated,

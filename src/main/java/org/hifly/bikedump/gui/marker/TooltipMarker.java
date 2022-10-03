@@ -7,7 +7,6 @@ import org.hifly.bikedump.utility.TimeUtility;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
 
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 
 public class TooltipMarker extends MapMarkerDot  {
     protected String text,text2,text3,text4,text5=null;

@@ -1,6 +1,5 @@
 package org.hifly.bikedump.controller;
 
-import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.gps.GPSDocument;
 import org.hifly.bikedump.gps.GPX10Document;

@@ -416,10 +416,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         showZoomControls.addActionListener(e -> mapViewer.setZoomContolsVisible(showZoomControls.isSelected()));
         panelBottom.add(showZoomControls);
 
-        final JCheckBox scrollWrapEnabled = new JCheckBox("Scrollwrap enabled");
-        scrollWrapEnabled.addActionListener(e -> mapViewer.setScrollWrapEnabled(scrollWrapEnabled.isSelected()));
-
-        panelBottom.add(scrollWrapEnabled);
         panelBottom.add(button);
         panelBottom.add(helpLabel);
 
