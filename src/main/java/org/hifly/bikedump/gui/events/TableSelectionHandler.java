@@ -2,7 +2,7 @@ package org.hifly.bikedump.gui.events;
 
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.TrackSelected;
-import org.hifly.bikedump.gui.BikeDump;
+import org.hifly.bikedump.gui.Bikedump;
 import org.hifly.bikedump.gui.panel.TrackTable;
 import org.hifly.bikedump.storage.DataHolder;
 
@@ -14,9 +14,9 @@ import java.util.HashSet;
 public class TableSelectionHandler implements ListSelectionListener {
 
     private TrackTable table;
-    private BikeDump bikeDump;
+    private Bikedump bikeDump;
 
-    public TableSelectionHandler(BikeDump bikeDump, TrackTable table, HashSet<TrackSelected> selectedTrackNames) {
+    public TableSelectionHandler(Bikedump bikeDump, TrackTable table, HashSet<TrackSelected> selectedTrackNames) {
           this.table = table;
           this.bikeDump = bikeDump;
           DataHolder.tracksSelected = selectedTrackNames;

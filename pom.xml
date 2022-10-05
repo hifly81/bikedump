@@ -170,7 +170,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        org.hifly.bikedump.gui.BikeDump
+                                        org.hifly.bikedump.gui.Bikedump
                                     </mainClass>
                                 </manifest>
                             </archive>

@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
+import static org.hifly.bikedump.utility.Constants.PROGRAM_NAME;
+
 public class TipOfTheDay extends JDialog {
     
     private static final long serialVersionUID = 16L;
@@ -20,7 +22,7 @@ public class TipOfTheDay extends JDialog {
 
         JPanel topPanel = new JPanel(new BorderLayout(0, 0));
         topPanel.setMaximumSize(new Dimension(450, 0));
-        JLabel hint = new JLabel("BikeDump Productivity Hints");
+        JLabel hint = new JLabel(PROGRAM_NAME + " Productivity Hints");
         hint.setBorder(BorderFactory.createEmptyBorder(0, 25, 0, 0));
         topPanel.add(hint);
 

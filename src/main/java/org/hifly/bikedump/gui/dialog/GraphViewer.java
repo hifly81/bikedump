@@ -57,8 +57,8 @@ public class GraphViewer extends JDialog {
         for(WaypointGraph graph:graphs) {
             JScrollPane scrollPanel =
                     new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-            JPanel panel = new JPanel();
             JFreeChart wpChart = graph.createGraph();
+            JPanel panel = new JPanel();
             ChartPanel wpGraph = new ChartPanel(wpChart);
             wpGraph.setMouseWheelEnabled(true);
             panel.add(wpGraph);

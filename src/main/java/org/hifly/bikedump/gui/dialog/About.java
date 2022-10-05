@@ -3,6 +3,8 @@ package org.hifly.bikedump.gui.dialog;
 import javax.swing.*;
 import java.awt.*;
 
+import static org.hifly.bikedump.utility.Constants.PROGRAM_NAME;
+
 public class About extends JDialog {
 
     private static final long serialVersionUID = 16L;
@@ -23,7 +25,7 @@ public class About extends JDialog {
 
         pane.setContentType("text/html");
         //TODO from external changes
-        String text = "<p><b>BikeDump v.0.2</b></p><p>- About panel</p><p>- increased font size for track information</p><p>- executable jar available</p>";
+        String text = "<p><b>Bikedump v.0.2</b></p><p>- About panel</p><p>- increased font size for track information</p><p>- executable jar available</p>";
         pane.setText(text);
         pane.setEditable(false);
         textPanel.add(pane);
@@ -31,7 +33,7 @@ public class About extends JDialog {
         basic.add(textPanel);
 
 
-        setTitle("BikeDump");
+        setTitle(PROGRAM_NAME);
         setSize(new Dimension(450, 350));
         setResizable(false);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
