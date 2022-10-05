@@ -2,7 +2,6 @@ package org.hifly.bikedump.task;
 
 import org.apache.commons.io.FilenameUtils;
 import org.hifly.bikedump.controller.GPSController;
-import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.TrackPref;
 import org.hifly.bikedump.domain.gps.Coordinate;

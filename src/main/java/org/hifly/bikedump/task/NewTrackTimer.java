@@ -3,7 +3,7 @@ package org.hifly.bikedump.task;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.gps.Coordinate;
 import org.hifly.bikedump.domain.gps.WaypointSegment;
-import org.hifly.bikedump.gui.BikeDump;
+import org.hifly.bikedump.gui.Bikedump;
 import org.hifly.bikedump.storage.DataHolder;
 import org.hifly.bikedump.utility.TimeUtility;
 
@@ -13,7 +13,7 @@ import java.util.*;
 
 public class NewTrackTimer {
 
-    private BikeDump bk;
+    private Bikedump bk;
 
     class FindNewTrack extends TimerTask {
 
@@ -55,7 +55,7 @@ public class NewTrackTimer {
         }
     }
 
-    public NewTrackTimer(BikeDump bk) {
+    public NewTrackTimer(Bikedump bk) {
         this.bk = bk;
         Timer timer = new Timer();
         //TODO schedule must be in settings

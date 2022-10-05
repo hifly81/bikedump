@@ -2,7 +2,6 @@ package org.hifly.bikedump.gps;
 
 import com.topografix.gpx.x1.x1.*;
 import org.hifly.bikedump.domain.Author;
-import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.utility.GPSUtility;
 import org.hifly.bikedump.utility.SlopeUtility;

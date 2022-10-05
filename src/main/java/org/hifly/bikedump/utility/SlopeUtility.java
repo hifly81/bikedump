@@ -1,6 +1,5 @@
 package org.hifly.bikedump.utility;
 
-import org.hifly.bikedump.domain.ProfileSetting;
 import org.hifly.bikedump.domain.gps.SlopeSegment;
 import org.hifly.bikedump.domain.gps.Waypoint;
 

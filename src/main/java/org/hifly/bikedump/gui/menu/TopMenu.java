@@ -170,6 +170,10 @@ public class TopMenu extends JMenuBar {
         return library;
     }
 
+    private String sizeClimbs(Map<String, List<SlopeSegment>> savedClimbs, String index) {
+        return savedClimbs.get(index)!=null?" ( " + savedClimbs.get(index).size() + " )":"";
+    }
+
     private JMenu createHelpMenu() {
         JMenu help = new JMenu("Help");
         help.setMnemonic(KeyEvent.VK_H);
@@ -195,8 +199,11 @@ public class TopMenu extends JMenuBar {
             List<SlopeSegment> slopes = savedClimbs.get(climbsItem.getText());
             if (slopes != null && !slopes.isEmpty()) {
                 for (final SlopeSegment slope : slopes) {
-                    JMenuItem temp = new JMenuItem(slope.getName());
-                    temp.setToolTipText(slope.getName());
+                    String climbName = "No name";
+                    if(slope.getName() != null && !slope.getName().equals(""))
+                        climbName = slope.getName();
+                    JMenuItem temp = new JMenuItem(climbName);
+                    temp.setToolTipText(climbName);
                     climbsItem.add(temp);
                     temp.addActionListener(event -> {
                         //open graph

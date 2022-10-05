@@ -10,7 +10,7 @@ public class SlopeRenderer extends XYAreaRenderer2 {
 
     private static final long serialVersionUID = 9L;
     
-    private boolean singleColor = false;
+    private boolean singleColor;
 
     public SlopeRenderer(XYSeriesCollection dataset,boolean singleColor) {
         this.dataset = dataset;

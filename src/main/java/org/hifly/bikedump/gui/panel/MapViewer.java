@@ -136,10 +136,10 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
                 }
 
                 for (int i = 0; i < listCoordinates.size(); i++) {
-                    String key = String.valueOf(listCoordinates.get(i).getLat())
+                    String key = listCoordinates.get(i).getLat()
                             + "-"
                             +
-                            String.valueOf(listCoordinates.get(i).getLon());
+                            listCoordinates.get(i).getLon();
                     if(tempMap !=null) {
                         WaypointSegment waypoint = tempMap.get(key);
                         if (waypoint != null) {

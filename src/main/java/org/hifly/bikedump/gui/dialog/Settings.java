@@ -10,17 +10,17 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 
-public class SettingDialog extends JDialog {
+public class Settings extends JDialog {
  
     private static final long serialVersionUID = 14L;
 
 
     private JCheckBox scanFoldersCheck, elevationCorrection, showTipsAtStartup = null;
 
-    public SettingDialog(Frame frame) {
+    public Settings(Frame frame) {
         super(frame, true);
 
-        setTitle("BikeDump options");
+        setTitle("Bikebump options");
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("General", null, createGeneralSettingPanel(), "General settings");

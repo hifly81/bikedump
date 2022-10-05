@@ -8,8 +8,8 @@ import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.TrackSelected;
 import org.hifly.bikedump.domain.gps.Coordinate;
 import org.hifly.bikedump.domain.gps.WaypointSegment;
-import org.hifly.bikedump.gui.dialog.ScrollableDialog;
-import org.hifly.bikedump.gui.dialog.SettingDialog;
+import org.hifly.bikedump.gui.dialog.Scrollable;
+import org.hifly.bikedump.gui.dialog.Settings;
 import org.hifly.bikedump.gui.dialog.TipOfTheDay;
 import org.hifly.bikedump.gui.events.QuitWindowHandler;
 import org.hifly.bikedump.gui.events.TableSelectionHandler;
@@ -50,23 +50,23 @@ import java.util.List;
 import java.util.Map;
 
 //TODO use resource bundles i18n
-public class BikeDump extends JFrame implements JMapViewerEventListener {
+public class Bikedump extends JFrame implements JMapViewerEventListener {
 
     private static final long serialVersionUID = 10L;
 
-    private Logger log = LoggerFactory.getLogger(BikeDump.class);
+    private Logger log = LoggerFactory.getLogger(Bikedump.class);
 
-    private SettingDialog settingDialog = null;
-    private BikeDump currentFrame = this;
+    private Settings settingDialog = null;
+    private Bikedump currentFrame = this;
     protected MapViewer mapViewer;
     private JSplitPane mainPanel = new JSplitPane();
     private Map.Entry<Integer, Integer> dimension;
     private JScrollPane folderMapScrollViewer, folderDetailViewer, folderTableViewer;
     public TrackTable trackTable = null;
     private String textForReport;
-    private static final String TITLE = "BikeDump v0.2";
+    private static final String TITLE = "Bikedump v0.2";
 
-    public BikeDump() {
+    public Bikedump() {
         super();
 
         //fix a user-agent
@@ -100,7 +100,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         //import file action
         JMenuItem itemImportFile = mainMenu.getItemImportFile();
         itemImportFile.addActionListener(event -> {
-            if (fileChooser.showOpenDialog(BikeDump.this) == JFileChooser.APPROVE_OPTION)
+            if (fileChooser.showOpenDialog(Bikedump.this) == JFileChooser.APPROVE_OPTION)
                 reloadTrackFromFile(fileChooser.getSelectedFile());
                 mapViewer.setDisplayToFitMapMarkers();
         });
@@ -108,7 +108,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         //import folder action
         JMenuItem itemImportFolder = mainMenu.getItemImportFolder();
         itemImportFolder.addActionListener(event -> {
-            if (folderChooser.showOpenDialog(BikeDump.this) == JFileChooser.APPROVE_OPTION) {
+            if (folderChooser.showOpenDialog(Bikedump.this) == JFileChooser.APPROVE_OPTION) {
                 File directory = folderChooser.getSelectedFile();
                 List<List<Coordinate>> coordinates = new ArrayList<>();
                 List<Map<String, WaypointSegment>> waypoint = new ArrayList<>();
@@ -131,7 +131,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
                 }
 
                 if (sb.length() > 0)
-                    new ScrollableDialog(null, sb.toString(), dimension.getKey() / 4, dimension.getValue() / 4).showMessage();
+                    new Scrollable(null, sb.toString(), dimension.getKey() / 4, dimension.getValue() / 4).showMessage();
 
                 //add dir to library
                 if (GeoMapStorage.librarySetting == null)
@@ -327,7 +327,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
         //List of loader results
         if (sb.length() > 0)
-            new ScrollableDialog(null, sb.toString(), dimension.getKey() / 2, dimension.getValue() / 2).showMessage();
+            new Scrollable(null, sb.toString(), dimension.getKey() / 2, dimension.getValue() / 2).showMessage();
     }
 
     @Override
@@ -342,7 +342,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
 
     private void initDialogs() {
         //define dialogs
-        settingDialog = new SettingDialog(currentFrame);
+        settingDialog = new Settings(currentFrame);
         settingDialog.pack();
 
     }
@@ -393,11 +393,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         button.addActionListener(e -> mapViewer.setDisplayToFitMapMarkers());
 
 
-        JComboBox tileSourceSelector = new JComboBox<>(new TileSource[]{new OsmTileSource.Mapnik()});
-        tileSourceSelector.addItemListener(e -> mapViewer.setTileSource((TileSource) e.getItem()));
-
-        panelTop.add(tileSourceSelector);
-
         final JCheckBox showMapMarker = new JCheckBox("Map markers visible");
         showMapMarker.setSelected(mapViewer.getMapMarkersVisible());
         showMapMarker.addActionListener(e -> mapViewer.setMapMarkerVisible(showMapMarker.isSelected()));
@@ -416,10 +411,6 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
         showZoomControls.addActionListener(e -> mapViewer.setZoomContolsVisible(showZoomControls.isSelected()));
         panelBottom.add(showZoomControls);
 
-        final JCheckBox scrollWrapEnabled = new JCheckBox("Scrollwrap enabled");
-        scrollWrapEnabled.addActionListener(e -> mapViewer.setScrollWrapEnabled(scrollWrapEnabled.isSelected()));
-
-        panelBottom.add(scrollWrapEnabled);
         panelBottom.add(button);
         panelBottom.add(helpLabel);
 
@@ -553,7 +544,7 @@ public class BikeDump extends JFrame implements JMapViewerEventListener {
     }
 
     public static void main(String[] args) throws Exception {
-        new BikeDump().setVisible(true);
+        new Bikedump().setVisible(true);
     }
 
 }

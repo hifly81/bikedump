@@ -4,7 +4,7 @@ import org.hifly.bikedump.graph.WaypointAvgSpeedGraph;
 import org.hifly.bikedump.graph.WaypointElevationGainedGraph;
 import org.hifly.bikedump.graph.WaypointElevationGraph;
 import org.hifly.bikedump.graph.WaypointTimeGraph;
-import org.hifly.bikedump.gui.BikeDump;
+import org.hifly.bikedump.gui.Bikedump;
 import org.hifly.bikedump.gui.dialog.GraphViewer;
 import org.hifly.bikedump.gui.panel.WorkoutCalendar;
 import org.hifly.bikedump.report.PdfReport;
@@ -23,9 +23,9 @@ public class Toolbar extends JToolBar {
 
     private static final long serialVersionUID = 20L;
 
-    private BikeDump currentFrame;
+    private Bikedump currentFrame;
 
-    public Toolbar(BikeDump currentFrame) {
+    public Toolbar(Bikedump currentFrame) {
         super();
         this.currentFrame = currentFrame;
         addButtons();
@@ -93,7 +93,7 @@ public class Toolbar extends JToolBar {
                     JOptionPane jop = new JOptionPane();
                     jop.setMessageType(JOptionPane.PLAIN_MESSAGE);
                     String reportName = currentFrame.getTextForReport().split("\\$\\$\\$")[0];
-                    jop.setMessage(reportName + "\nReport will be stored in:\n" + fileName);
+                    jop.setMessage(reportName + "\n\nReport will be stored in:\n" + fileName);
                     JDialog dialog = jop.createDialog(null, "Message");
                     new Thread(() -> {
                         try {
@@ -110,8 +110,16 @@ public class Toolbar extends JToolBar {
 
 
                 } catch (Exception ex) {
-                    //TODO define exception
+                    JOptionPane.showMessageDialog(currentFrame,
+                            "Report not available",
+                            "Report not available",
+                            JOptionPane.ERROR_MESSAGE);
                 }
+            } else {
+                JOptionPane.showMessageDialog(currentFrame,
+                        "No Track selected - Report not available",
+                        "No Track selected - Report not available",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 

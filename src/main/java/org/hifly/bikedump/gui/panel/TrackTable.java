@@ -88,7 +88,7 @@ public class TrackTable extends JTable {
         sorter.toggleSortOrder(0);
         setRowSelectionAllowed(true);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        setFont(new Font("Arial", Font.PLAIN, 10));
+        setFont(new Font("Arial", Font.PLAIN, 12));
         setIntercellSpacing(new Dimension(10,0));
         getColumnModel().setColumnMargin(10);
 

@@ -3,13 +3,13 @@ package org.hifly.bikedump.gui.dialog;
 import javax.swing.*;
 import java.awt.*;
 
-public class ScrollableDialog {
+public class Scrollable {
 
     JDialog dialog;
     JTextArea textArea;
     int dialogResult = JOptionPane.CANCEL_OPTION;
 
-    public ScrollableDialog(Frame owner, String text, int w,int h){
+    public Scrollable(Frame owner, String text, int w, int h){
         // create a modal dialog that will block until hidden
         dialog = new JDialog(owner, true);
         dialog.setLayout(new BorderLayout());

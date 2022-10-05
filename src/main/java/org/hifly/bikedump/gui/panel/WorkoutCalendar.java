@@ -3,7 +3,7 @@ package org.hifly.bikedump.gui.panel;
 import org.apache.commons.collections.CollectionUtils;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.TrackSelected;
-import org.hifly.bikedump.gui.BikeDump;
+import org.hifly.bikedump.gui.Bikedump;
 import org.hifly.bikedump.storage.DataHolder;
 
 import javax.swing.*;
@@ -18,7 +18,7 @@ public class WorkoutCalendar extends JFrame {
 
     private static final long serialVersionUID = 27L;
 
-    private BikeDump mapViewer;
+    private Bikedump mapViewer;
     private WorkoutCalendar currentFrame;
 
     static JLabel lblMonth;
@@ -31,7 +31,7 @@ public class WorkoutCalendar extends JFrame {
     static HashMap<String, List<Track>> tracksByMonth = DataHolder.getTracksByMonth();
 
     //TODO derive dimension from parent
-    public WorkoutCalendar(BikeDump mapViewer) {
+    public WorkoutCalendar(Bikedump mapViewer) {
         this.mapViewer = mapViewer;
         this.currentFrame = this;
 
