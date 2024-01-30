@@ -19,3 +19,5 @@ src/main/resources/hgt/
 .classpath
 .project
 .settings/
+
+.DS_Store

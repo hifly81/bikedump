@@ -44,7 +44,7 @@ mvn clean package
 ### Run Bikedump: ###
 
 ```
-java -jar target/bikedump-0.2-release.jar
+java -jar target/bikedump-0.2.2-release.jar
 ```
 
 ## External libraries: LICENSE
