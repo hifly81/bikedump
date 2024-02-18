@@ -1,11 +1,8 @@
 # Bikedump
 
-Bikedump is a Java GUI implementing GPX 1.0, GPX 1.1 and TCX 2 formats.
-
-It can be used to manage and extract stats from gps gpx tcx activities.
+Bikedump is a Java GUI that can be used to manage and extract stats from GPX 1.0, GPX 1.1 and TCX 2 activities from your cycling/mountain biking workouts.
 
 It also offers graphs and history stats.
-
 
 ## Screenshots
 
@@ -18,11 +15,17 @@ It also offers graphs and history stats.
 
 ## Prerequisites
 
-java >= 11
+java >= 11 (11, 17 and 21 tested)
 
-## Compile, Test, Run
+## How to use
 
-### Compile: ###
+Run Bikedump:
+
+```
+java -jar dist/bikedump-0.2.3-release.jar
+```
+
+## How to Compile
 
 Before compiling add the libraries to maven repo:
 
@@ -31,20 +34,22 @@ cd dist
 sh install-libs.sh
 ```
 
+Compile with Apache Maven:
+
 ```
 mvn clean compile
 ```
 
-### Executable jar: ###
+Create an executable jar with Apache Maven:
 
 ```
 mvn clean package
 ```
 
-### Run Bikedump: ###
+Run Bikedump: 
 
 ```
-java -jar target/bikedump-0.2.2-release.jar
+java -jar target/bikedump-0.2.3-release.jar
 ```
 
 ## External libraries: LICENSE
