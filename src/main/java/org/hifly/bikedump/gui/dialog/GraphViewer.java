@@ -79,7 +79,7 @@ public class GraphViewer extends JDialog {
         }
 
         //TODO 1 -2 - 4 -6 -8
-        if(graphs.size() <4) {
+        if(graphs.size() < 4) {
             splitPaneMain = new JSplitPane(JSplitPane.VERTICAL_SPLIT,listTempSplit.get(0),null);
             splitPaneMain.setOneTouchExpandable(true);
             //TODO divider dimension
@@ -91,7 +91,6 @@ public class GraphViewer extends JDialog {
             listTempSplit.get(1).setDividerLocation((dimension.getKey()-100)/2);
             splitPaneMain.setOneTouchExpandable(true);
             splitPaneMain.setDividerLocation(360);
-
         }
 
         return splitPaneMain;

@@ -20,7 +20,7 @@ public class Settings extends JDialog {
     public Settings(Frame frame) {
         super(frame, true);
 
-        setTitle("Bikebump options");
+        setTitle("Options");
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("General", null, createGeneralSettingPanel(), "General settings");

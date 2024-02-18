@@ -24,8 +24,12 @@ public class About extends JDialog {
         JTextPane pane = new JTextPane();
 
         pane.setContentType("text/html");
-        //TODO from external changes
-        String text = "<p><b>Bikedump v.0.2</b></p><p>- About panel</p><p>- increased font size for track information</p><p>- executable jar available</p>";
+        //TODO READ from CHANGES.md
+        String text = "<p><b>" +
+                "Bike Dump is a Java GUI that can be used to manage and extract stats from GPX 1.0, GPX 1.1 and TCX 2 activities from your cycling/mountain biking workouts.\n" +
+                "\n" +
+                "It also offers graphs and history stats." +
+                "</b></p>";
         pane.setText(text);
         pane.setEditable(false);
         textPanel.add(pane);

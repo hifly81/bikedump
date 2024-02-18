@@ -18,10 +18,10 @@ public class TooltipMarker extends MapMarkerDot  {
         super(lat,lon);
 
         text =  "Lap: "+waypoint.getUnit();
-        text2 = "timestamp:" + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", waypoint.getTimeSpent());
-        text3 = "time spent:" + TimeUtility.toStringFromTimeDiff(waypoint.getTimeIncrement());
-        text4 = "avg speed:" + GPSUtility.roundDoubleStat(waypoint.getAvgSpeed()) + " km/h";
-        text5 = "elevation gained:" + GPSUtility.roundDoubleStat(waypoint.getEleGained())+ " m";
+        text2 = "timestamp: " + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", waypoint.getTimeSpent());
+        text3 = "time spent: " + TimeUtility.toStringFromTimeDiff(waypoint.getTimeIncrement());
+        text4 = "avg speed: " + GPSUtility.roundDoubleStat(waypoint.getAvgSpeed()) + " km/h";
+        text5 = "elevation gained: " + GPSUtility.roundDoubleStat(waypoint.getEleGained())+ " m";
 
         this.waypoint = waypoint;
         this.mapViewer = viewer;

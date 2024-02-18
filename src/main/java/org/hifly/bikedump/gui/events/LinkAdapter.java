@@ -4,6 +4,7 @@ import org.hifly.bikedump.domain.gps.SlopeSegment;
 import org.hifly.bikedump.domain.gps.Waypoint;
 import org.hifly.bikedump.graph.WaypointElevationGraph;
 import org.hifly.bikedump.graph.WaypointGraph;
+import org.hifly.bikedump.gui.Bikedump;
 import org.hifly.bikedump.gui.dialog.GraphViewer;
 import org.hifly.bikedump.storage.ClimbStorage;
 
@@ -81,6 +82,10 @@ public class LinkAdapter extends MouseAdapter implements MouseMotionListener {
                                 //TODO verify climbname and verify if already exist
                                 slope.setName(climbName);
                                 ClimbStorage.saveClimb(slope, climbName);
+                                //TODO refresh menu not working
+                                Bikedump bikedump = (Bikedump)this.currentFrame;
+                                bikedump.topMenu.getClimbs().validate();
+                                bikedump.topMenu.getClimbs().repaint();
                             } else {
                                 //open graph
                                 WaypointGraph waypointElevationGraph =

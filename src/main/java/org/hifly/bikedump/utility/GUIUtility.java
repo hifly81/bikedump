@@ -9,6 +9,6 @@ public class GUIUtility {
     public static Map.Entry<Integer,Integer> getScreenDimension() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         return new AbstractMap.SimpleImmutableEntry<>(
-                (int)screenSize.getWidth(), (int)screenSize.getHeight());
+                (int)screenSize.getWidth()-100, (int)screenSize.getHeight()-100);
     }
 }

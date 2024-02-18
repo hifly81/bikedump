@@ -60,9 +60,12 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
     private JSplitPane mainPanel = new JSplitPane();
     private final Map.Entry<Integer, Integer> dimension;
     private JScrollPane folderMapScrollViewer, folderDetailViewer, folderTableViewer;
-    public TrackTable trackTable = null;
     private String textForReport;
-    private static final String TITLE = "Bikedump v0.2";
+    private static final String TITLE = "Bikedump";
+
+    public TrackTable trackTable = null;
+
+    public TopMenu topMenu = null;
 
     public Bikedump() {
         super();
@@ -91,12 +94,12 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
         add(toolBar, BorderLayout.PAGE_START);
 
         //create menu and its events
-        TopMenu mainMenu = new TopMenu(currentFrame);
+        topMenu = new TopMenu(currentFrame);
         final FileChooser fileChooser = new FileChooser();
         final FolderChooser folderChooser = new FolderChooser();
 
         //import file action
-        JMenuItem itemImportFile = mainMenu.getItemImportFile();
+        JMenuItem itemImportFile = topMenu.getItemImportFile();
         itemImportFile.addActionListener(event -> {
             if (fileChooser.showOpenDialog(Bikedump.this) == JFileChooser.APPROVE_OPTION)
                 reloadTrackFromFile(fileChooser.getSelectedFile());
@@ -104,7 +107,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
         });
 
         //import folder action
-        JMenuItem itemImportFolder = mainMenu.getItemImportFolder();
+        JMenuItem itemImportFolder = topMenu.getItemImportFolder();
         itemImportFolder.addActionListener(event -> {
             if (folderChooser.showOpenDialog(Bikedump.this) == JFileChooser.APPROVE_OPTION) {
                 File directory = folderChooser.getSelectedFile();
@@ -162,7 +165,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
 
 
         //try sample action
-        JMenuItem itemTrySample = mainMenu.getItemTrySample();
+        JMenuItem itemTrySample = topMenu.getItemTrySample();
         itemTrySample.addActionListener(event -> {
             URL res = getClass().getClassLoader().getResource("samples/vfassa.gpx");
             File file;
@@ -176,7 +179,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
         });
 
         //profile setting menu item
-        JMenuItem itemProfileSetting = mainMenu.getItemOptionsSetting();
+        JMenuItem itemProfileSetting = topMenu.getItemOptionsSetting();
         itemProfileSetting.addActionListener(event -> {
             settingDialog.setLocationRelativeTo(currentFrame);
             settingDialog.setVisible(true);
@@ -184,7 +187,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
         });
 
         //add menu
-        setJMenuBar(mainMenu);
+        setJMenuBar(topMenu);
 
         //loading GUI and track saved
         new SwingWorker<Void, String>() {

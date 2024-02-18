@@ -27,6 +27,7 @@ public class TopMenu extends JMenuBar {
     private JMenuItem itemImportFolder;
     private JMenuItem itemOptionsSetting;
     private JMenuItem trySample;
+    private JMenu climbs;
     private JFrame currentFrame;
 
     public TopMenu(JFrame currentFrame) {
@@ -128,7 +129,7 @@ public class TopMenu extends JMenuBar {
         JMenu library = new JMenu("Library");
         library.setMnemonic(KeyEvent.VK_L);
 
-        JMenu climbs = new JMenu("Climbs");
+        climbs = new JMenu("Climbs");
         URL mountainImageUrl = getClass().getResource("/img/mountain.png");
         ImageIcon mountainImageIcon = new ImageIcon(mountainImageUrl);
         Image img = mountainImageIcon.getImage();
@@ -230,6 +231,9 @@ public class TopMenu extends JMenuBar {
 
     public JMenuItem getItemTrySample() {
         return trySample;
+    }
+    public JMenu getClimbs() {
+        return climbs;
     }
 
 }

@@ -3,6 +3,7 @@ package org.hifly.bikedump.storage;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.hifly.bikedump.domain.gps.SlopeSegment;
+import org.hifly.bikedump.gui.Bikedump;
 
 import java.io.*;
 import java.nio.file.Files;
