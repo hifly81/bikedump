@@ -16,7 +16,7 @@
     <properties>
         <slf4j.version>1.6.1</slf4j.version>
         <maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
-        <bikedump.version>0.2.2</bikedump.version>
+        <bikedump.version>0.2.3</bikedump.version>
     </properties>
 
     <repositories>

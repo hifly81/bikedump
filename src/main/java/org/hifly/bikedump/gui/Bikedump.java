@@ -29,8 +29,6 @@ import org.hifly.bikedump.utility.GUIUtility;
 import org.openstreetmap.gui.jmapviewer.events.JMVCommandEvent;
 import org.openstreetmap.gui.jmapviewer.interfaces.ICoordinate;
 import org.openstreetmap.gui.jmapviewer.interfaces.JMapViewerEventListener;
-import org.openstreetmap.gui.jmapviewer.interfaces.TileSource;
-import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,13 +52,13 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
 
     private static final long serialVersionUID = 10L;
 
-    private Logger log = LoggerFactory.getLogger(Bikedump.class);
+    private final Logger log = LoggerFactory.getLogger(Bikedump.class);
 
     private Settings settingDialog = null;
-    private Bikedump currentFrame = this;
+    private final Bikedump currentFrame = this;
     protected MapViewer mapViewer;
     private JSplitPane mainPanel = new JSplitPane();
-    private Map.Entry<Integer, Integer> dimension;
+    private final Map.Entry<Integer, Integer> dimension;
     private JScrollPane folderMapScrollViewer, folderDetailViewer, folderTableViewer;
     public TrackTable trackTable = null;
     private String textForReport;
@@ -127,10 +125,10 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
                 try {
                     loadTrackExecutor.execute();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.warn("Can't import from directory", e);
                 }
 
-                if (sb.length() > 0)
+                if (!sb.isEmpty())
                     new Scrollable(null, sb.toString(), dimension.getKey() / 4, dimension.getValue() / 4).showMessage();
 
                 //add dir to library
@@ -173,7 +171,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
                 reloadTrackFromFile(file);
                 mapViewer.setDisplayToFitMapMarkers();
             } catch (URISyntaxException e) {
-                log.warn("Can't load sample gpx {}", e);
+                log.warn("Can't load sample gpx", e);
             }
         });
 
@@ -300,9 +298,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
                     table.clearSelection();
                     table.transferFocus();
                     DataHolder.tracksSelected.clear();
-
                 }
-
             }
         }
     }
@@ -326,7 +322,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
         }
 
         //List of loader results
-        if (sb.length() > 0)
+        if (!sb.isEmpty())
             new Scrollable(null, sb.toString(), dimension.getKey() / 2, dimension.getValue() / 2).showMessage();
     }
 
@@ -543,7 +539,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
         return textForReport;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         new Bikedump().setVisible(true);
     }
 
