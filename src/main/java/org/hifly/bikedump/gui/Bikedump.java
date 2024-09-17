@@ -39,9 +39,10 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -167,13 +168,20 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
         //try sample action
         JMenuItem itemTrySample = topMenu.getItemTrySample();
         itemTrySample.addActionListener(event -> {
-            URL res = getClass().getClassLoader().getResource("samples/vfassa.gpx");
             File file;
             try {
-                file = Paths.get(res.toURI()).toFile();
+                InputStream inputStream = Bikedump.class.getClassLoader().getResourceAsStream("samples/vfassa.gpx");
+
+                if (inputStream == null)
+                    log.warn("Can't load sample gpx");
+
+                Path tempFile = Files.createTempFile("vfassa", ".gpx");
+                assert inputStream != null;
+                Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+                file = tempFile.toFile();
                 reloadTrackFromFile(file);
                 mapViewer.setDisplayToFitMapMarkers();
-            } catch (URISyntaxException e) {
+            } catch (Exception e) {
                 log.warn("Can't load sample gpx", e);
             }
         });
@@ -274,7 +282,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
 
     public void loadSelectedTracks(TrackTable table) {
         if (!DataHolder.tracksSelected.isEmpty()) {
-            if (!DataHolder.tracksLoaded.isEmpty()) {
+            if (DataHolder.tracksLoaded != null && !DataHolder.tracksLoaded.isEmpty()) {
                 List<Track> selectedTracks = new ArrayList<>();
                 for (TrackSelected trackSelected : DataHolder.tracksSelected) {
                     int index = DataHolder.tracksLoaded.indexOf(new Track(trackSelected.getFilename()));
