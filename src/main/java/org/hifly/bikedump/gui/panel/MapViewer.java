@@ -5,6 +5,7 @@ import org.hifly.bikedump.gui.marker.CircleMarker;
 import org.hifly.bikedump.gui.marker.LineMarker;
 import org.hifly.bikedump.gui.marker.TooltipMarker;
 import org.hifly.bikedump.storage.GeoMapStorage;
+import org.hifly.bikedump.util.OfflineTileSource;
 import org.hifly.bikedump.utility.GPSUtility;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
@@ -42,11 +43,38 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
                 zoomLevel);
     }
 
+    /**
+     * Configure offline tiles if enabled and available
+     */
+    private void configureOfflineTiles() {
+        try {
+            if (GeoMapStorage.librarySetting != null && 
+                GeoMapStorage.librarySetting.isUseOfflineTiles() &&
+                GeoMapStorage.librarySetting.getOfflineTilesPath() != null) {
+                
+                String tilesPath = GeoMapStorage.librarySetting.getOfflineTilesPath();
+                OfflineTileSource offlineSource = new OfflineTileSource(tilesPath, "Offline Maps");
+                
+                if (offlineSource.isAvailable()) {
+                    setTileSource(offlineSource);
+                    log.info("Using offline tiles from: " + tilesPath);
+                } else {
+                    log.warn("Offline tiles path not available, using default online tiles: " + tilesPath);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error configuring offline tiles, falling back to online tiles", e);
+        }
+    }
+
     public MapViewer(
             List<List<ICoordinate>> coordinates,
             List<Map<String, WaypointSegment>> coordinatesNewKm,
             int zoomLevel) {
         super();
+
+        // Configure offline tiles if available
+        configureOfflineTiles();
 
         addMouseListener(this);
 
