@@ -4,6 +4,16 @@ Bike Dump is a Java GUI that can be used to manage and extract stats from GPX 1.
 
 It also offers graphs and history stats.
 
+## New Feature: Offline Map Tiles 🗺️
+
+Bike Dump now supports offline map tiles to avoid rate limiting and 403 errors from online OpenStreetMap servers. See [OFFLINE_TILES.md](OFFLINE_TILES.md) for detailed setup instructions.
+
+### Quick Setup:
+1. Download map tiles in TMS format (`{z}/{x}/{y}.png`)
+2. Go to **Options** → **Library** tab
+3. Check "Use offline map tiles" and select your tiles directory
+4. Enjoy unlimited map viewing without internet restrictions!
+
 ## Screenshots
 
 <img src="img/img1.png" height="200" width="350">
