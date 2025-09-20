@@ -2,7 +2,7 @@
 
 [![Java](https://img.shields.io/badge/Java-11%2B-orange.svg)](https://www.oracle.com/java/)
 [![License](https://img.shields.io/badge/License-Mixed-blue.svg)](LICENSE/)
-[![Version](https://img.shields.io/badge/Version-0.2.4-green.svg)](dist/)
+[![Version](https://img.shields.io/badge/Version-0.3.0-green.svg)](dist/)
 
 **Bike Dump** is a powerful Java GUI application designed to manage and extract comprehensive statistics from GPX 1.0, GPX 1.1, and TCX 2 activity files from your cycling and mountain biking workouts.
 
@@ -59,7 +59,7 @@ Bike Dump now supports offline map tiles to avoid rate limiting and 403 errors f
 Run Bike Dump with the pre-built jar:
 
 ```bash
-java -jar dist/bikedump-0.2.4-release.jar
+java -jar dist/bikedump-0.3.0-release.jar
 ```
 
 ## 🔨 How to Compile
@@ -90,7 +90,7 @@ mvn clean package
 Execute the newly built jar:
 
 ```bash
-java -jar target/bikedump-0.2.4-release.jar
+java -jar target/bikedump-0.3.0-release.jar
 ```
 
 ## 📜 External Libraries & Licenses
