@@ -44,10 +44,84 @@ public class SlopeUtility {
         }
     }
 
-    //FIXME too intensive, similar to createSlopes
     public static SlopeSegment totalAltimetricProfile(List<Waypoint> waypoints) {
         SlopeSegment slopeSegment = new SlopeSegment();
+        
+        if (waypoints == null || waypoints.isEmpty()) {
+            return slopeSegment;
+        }
+        
         slopeSegment.setWaypoints(waypoints);
+        
+        // Get first and last waypoints
+        Waypoint first = waypoints.get(0);
+        Waypoint last = waypoints.get(waypoints.size() - 1);
+        
+        // Calculate total elevation gain/loss
+        double totalElevationGain = 0;
+        double totalElevationLoss = 0;
+        Waypoint previous = null;
+        
+        for (Waypoint waypoint : waypoints) {
+            if (previous != null) {
+                double elevationDiff = waypoint.getEle() - previous.getEle();
+                if (elevationDiff > 0) {
+                    totalElevationGain += elevationDiff;
+                } else {
+                    totalElevationLoss += Math.abs(elevationDiff);
+                }
+            }
+            previous = waypoint;
+        }
+        
+        // Set basic properties
+        slopeSegment.setStartLatitude(first.getLat());
+        slopeSegment.setStartLongitude(first.getLon());
+        slopeSegment.setEndLatitude(last.getLat());
+        slopeSegment.setEndLongitude(last.getLon());
+        slopeSegment.setStartElevation(first.getEle());
+        slopeSegment.setEndElevation(last.getEle());
+        slopeSegment.setStartDistance(first.getDistanceFromStartingPoint());
+        slopeSegment.setEndDistance(last.getDistanceFromStartingPoint());
+        
+        // Calculate total distance
+        double totalDistance = last.getDistanceFromStartingPoint() - first.getDistanceFromStartingPoint();
+        slopeSegment.setDistance(totalDistance);
+        
+        // Set elevation (net elevation change)
+        double netElevation = last.getEle() - first.getEle();
+        slopeSegment.setElevation(netElevation);
+        
+        // Calculate average gradient
+        if (totalDistance > 0) {
+            double gradient = GPSUtility.gradientPercentage(netElevation, totalDistance);
+            slopeSegment.setGradient(gradient);
+        }
+        
+        // Set dates and calculate time-based statistics
+        slopeSegment.setStartDate(first.getDateRelevation());
+        slopeSegment.setEndDate(last.getDateRelevation());
+        
+        if (first.getDateRelevation() != null && last.getDateRelevation() != null) {
+            Calendar calFirst = Calendar.getInstance();
+            calFirst.setTime(first.getDateRelevation());
+            Calendar calLast = Calendar.getInstance();
+            calLast.setTime(last.getDateRelevation());
+            
+            double timeDiffInHour = TimeUtility.getTimeDiffHour(calLast, calFirst);
+            if (timeDiffInHour > 0) {
+                double avgSpeed = Math.abs(totalDistance / timeDiffInHour);
+                slopeSegment.setAvgSpeed(avgSpeed);
+                
+                // Calculate VAM (Vertical Ascent Meters per hour)
+                double timeDiffInSeconds = TimeUtility.getTimeDiffSecond(calLast, calFirst);
+                if (timeDiffInSeconds > 0) {
+                    double vam = (totalElevationGain / timeDiffInSeconds) * 3600;
+                    slopeSegment.setVam(vam);
+                }
+            }
+        }
+        
         return slopeSegment;
     }
 
