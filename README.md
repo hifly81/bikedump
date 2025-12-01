@@ -25,9 +25,9 @@
 - 🌐 **Offline Map Support**: Use offline map tiles to avoid rate limiting
 - 📱 **Multiple Format Support**: Compatible with GPX 1.0, GPX 1.1, and TCX 2 formats
 
-## 🗺️ New Feature: Offline Map Tiles
+## 🗺️ Offline Map Tiles
 
-Bike Dump now supports offline map tiles to avoid rate limiting and 403 errors from online OpenStreetMap servers. See [OFFLINE_TILES.md](OFFLINE_TILES.md) for detailed setup instructions.
+Bike Dump supports offline map tiles to avoid rate limiting and 403 errors from online OpenStreetMap servers. See [OFFLINE_TILES.md](OFFLINE_TILES.md) for detailed setup instructions.
 
 ### Quick Setup:
 1. 📥 Download map tiles in TMS format (`{z}/{x}/{y}.png`)
