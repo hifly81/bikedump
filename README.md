@@ -9,7 +9,7 @@
 ## 📚 Table of Contents
 
 - [✨ Features](#-features)
-- [🗺️ New Feature: Offline Map Tiles](#️-new-feature-offline-map-tiles)
+- [🗺️ Offline Map Tiles](#️-new-feature-offline-map-tiles)
 - [📸 Screenshots](#-screenshots)
 - [📋 Prerequisites](#-prerequisites)
 - [🚀 How to use](#-how-to-use)
