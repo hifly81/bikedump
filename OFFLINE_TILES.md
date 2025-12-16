@@ -1,6 +1,6 @@
 # Offline Map Tiles Support
 
-Bike Dump now supports offline map tiles to avoid rate limiting and 403 errors from online OpenStreetMap servers.
+Bike Dump supports offline map tiles to avoid rate limiting and 403 errors from online OpenStreetMap servers.
 
 ## How to Use Offline Tiles
 
