@@ -16,7 +16,8 @@
     <properties>
         <slf4j.version>1.6.1</slf4j.version>
         <maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
-        <bikedump.version>0.3.0</bikedump.version>
+        <bikedump.version>0.4.0</bikedump.version>
+        <flatlaf.version>3.5.4</flatlaf.version>
     </properties>
 
     <repositories>
@@ -28,6 +29,12 @@
     </repositories>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>${flatlaf.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.xmlbeans</groupId>

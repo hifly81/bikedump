@@ -2,37 +2,42 @@ package org.hifly.bikedump.gui.panel;
 
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.gps.SlopeSegment;
+import org.hifly.bikedump.domain.gps.Waypoint;
 import org.hifly.bikedump.domain.gps.WaypointSegment;
-import org.hifly.bikedump.gui.events.LinkAdapter;
+import org.hifly.bikedump.graph.WaypointElevationGraph;
+import org.hifly.bikedump.graph.WaypointGraph;
+import org.hifly.bikedump.gui.Bikedump;
+import org.hifly.bikedump.gui.dialog.GraphViewer;
+import org.hifly.bikedump.gui.panel.components.MetricCard;
+import org.hifly.bikedump.gui.panel.components.SectionPanel;
+import org.hifly.bikedump.gui.panel.components.UiSpacing;
+import org.hifly.bikedump.storage.ClimbStorage;
 import org.hifly.bikedump.utility.GPSUtility;
 import org.hifly.bikedump.utility.TimeUtility;
 
 import javax.swing.*;
 import java.awt.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-
-//TODO use a templating manager e.g freemarker
+// Component-based detail viewer (no HTML) with cards and collapsible sections.
+// Keeps the existing getText4Report() output format intact for PDF reporting.
 public class DetailViewer extends JScrollPane {
 
     private static final long serialVersionUID = 22L;
 
-    private Track track;
-    private JFrame currentFrame;
-    private StringBuffer text4HTML = new StringBuffer();
+    private final Track track;
+    private final JFrame currentFrame;
+
     private StringBuffer text4Report = new StringBuffer();
 
     private final String ELEMENT_SEPARATOR_REPORT = "$$$";
     private final String ELEMENT_SEPARATOR_SECTION_REPORT = "%%%";
 
-
     public DetailViewer(Track track, JFrame currentFrame) {
         super(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
         this.track = track;
         this.currentFrame = currentFrame;
 
@@ -40,127 +45,123 @@ public class DetailViewer extends JScrollPane {
     }
 
     private void createDetailViewer() {
-        HTMLEditorPanel textPane = new HTMLEditorPanel();
-        LinkAdapter handler = new LinkAdapter(currentFrame);
-        textPane.addMouseListener(handler);
+        JPanel root = new JPanel();
+        root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
+        root.setBorder(UiSpacing.pad(UiSpacing.GAP_MD));
+        root.setOpaque(true);
 
+        // --- Header ---
+        JLabel title = new JLabel(track.getName());
+        title.setFont(title.getFont().deriveFont(Font.BOLD, title.getFont().getSize2D() + 4f));
+        root.add(title);
 
-        String imgMountain = null;
-        String imgSave = null;
-        String imgSun = null;
-        String imgSunset = null;
-        try {
-            URL imgMountainUrl = getClass().getResource("/img/mountain.png");
-            imgMountain = imgMountainUrl.toExternalForm();
+        root.add(UiSpacing.vgap(6));
 
-            URL imgSaveUrl = getClass().getResource("/img/save.png");
-            imgSave = imgSaveUrl.toExternalForm();
-
-            URL imgSunUrl = getClass().getResource("/img/sun.png");
-            imgSun = imgSunUrl.toExternalForm();
-
-            URL imgSunsetUrl = getClass().getResource("/img/sunset.png");
-            imgSunset = imgSunsetUrl.toExternalForm();
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        appendTextToBuffer("<p><b>" + track.getName() + "</b><br>");
-        appendTextToReportBuffer(track.getName());
         String avgTemperatureSection = "Avg Temperature: " + track.getAvgTemperature();
-        appendTextToBuffer(avgTemperatureSection + "<br>");
+        JLabel tempLabel = new JLabel(avgTemperatureSection);
+        root.add(tempLabel);
+        appendTextToReportBuffer(track.getName());
         appendTextToReportBuffer(avgTemperatureSection);
-        String timeSection = TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getStartDate()) + "&nbsp; &nbsp;" + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getEndDate());
-        appendTextToBuffer(timeSection + "<br>");
+
+        String timeSection = TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getStartDate())
+                + "   " + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", track.getEndDate());
+        JLabel timeLabel = new JLabel(timeSection);
+        timeLabel.setForeground(UIManager.getColor("Label.disabledForeground"));
+        root.add(timeLabel);
         appendTextToReportBuffer(timeSection);
-        Map.Entry<String, String> sunTime = TimeUtility.getSunriseSunsetTime(
-                track.getCoordinates().get(0).getDecimalLatitude(),
-                track.getCoordinates().get(0).getDecimalLongitude(),
-                track.getStartDate());
-        if (sunTime != null) {
-            //write
-            textPane.append(null, flushBuffer());
-            textPane.addImg(imgSun, sunTime.getKey());
-            textPane.addImg(imgSunset, sunTime.getValue());
-        }
+
+        root.add(UiSpacing.vgap(UiSpacing.GAP_MD));
+
+        // --- Summary metrics grid ---
+        JPanel metrics = new JPanel(new GridLayout(0, 2, UiSpacing.GAP_SM, UiSpacing.GAP_SM));
+        metrics.setOpaque(false);
+
         String durationSection = "Duration: " + TimeUtility.toStringFromTimeDiff(track.getRealTime());
-        appendTextToBuffer(durationSection + "<br>");
-        appendTextToReportBuffer(durationSection);
         String effectiveDurationSection = "Effective duration: " + TimeUtility.toStringFromTimeDiff(track.getEffectiveTime());
-        appendTextToBuffer(effectiveDurationSection + "<br>");
-        appendTextToReportBuffer(effectiveDurationSection);
         String distanceSection = "Distance: " + GPSUtility.roundDoubleStat(track.getTotalDistance());
-        appendTextToBuffer(distanceSection + "<br>");
-        appendTextToReportBuffer(distanceSection);
         String calculatedSpeedSection = "Calculated Speed: " + GPSUtility.roundDoubleStat(track.getCalculatedAvgSpeed());
-        appendTextToBuffer(calculatedSpeedSection + "<br>");
-        appendTextToReportBuffer(calculatedSpeedSection);
         String effectiveSpeedSection = "Effective Speed: " + GPSUtility.roundDoubleStat(track.getEffectiveAvgSpeed());
-        appendTextToBuffer(effectiveSpeedSection + "<br>");
-        appendTextToReportBuffer(effectiveSpeedSection);
         String maxSpeedSection = "Max Speed: " + GPSUtility.roundDoubleStat(track.getMaxSpeed());
-        appendTextToBuffer("Max Speed: " + GPSUtility.roundDoubleStat(track.getMaxSpeed()) + "<br>");
-        appendTextToReportBuffer(maxSpeedSection);
         String caloriesSection = "Calories: " + track.getCalories();
-        appendTextToBuffer(caloriesSection + "<br>");
-        appendTextToReportBuffer(caloriesSection);
         String avgHeartSection = "Avg Heart: " + GPSUtility.roundDoubleStat(track.getHeartFrequency());
-        appendTextToBuffer("Avg Heart: " + GPSUtility.roundDoubleStat(track.getHeartFrequency()) + "<br>");
-        appendTextToReportBuffer(avgHeartSection);
         String maxHeartSection = "Max Heart: " + GPSUtility.roundDoubleStat(track.getHeartMax());
-        appendTextToBuffer("Max Heart: " + GPSUtility.roundDoubleStat(track.getHeartMax()) + "<br>");
+
+        metrics.add(new MetricCard("Duration", TimeUtility.toStringFromTimeDiff(track.getRealTime()), null));
+        metrics.add(new MetricCard("Effective duration", TimeUtility.toStringFromTimeDiff(track.getEffectiveTime()), null));
+        metrics.add(new MetricCard("Distance", GPSUtility.roundDoubleStat(track.getTotalDistance()), null));
+        metrics.add(new MetricCard("Calculated speed", GPSUtility.roundDoubleStat(track.getCalculatedAvgSpeed()), null));
+        metrics.add(new MetricCard("Effective speed", GPSUtility.roundDoubleStat(track.getEffectiveAvgSpeed()), null));
+        metrics.add(new MetricCard("Max speed", GPSUtility.roundDoubleStat(track.getMaxSpeed()), null));
+        metrics.add(new MetricCard("Calories", String.valueOf(track.getCalories()), null));
+        metrics.add(new MetricCard("Heart", GPSUtility.roundDoubleStat(track.getHeartFrequency()),
+                "Max: " + GPSUtility.roundDoubleStat(track.getHeartMax())));
+
+        root.add(metrics);
+
+        appendTextToReportBuffer(durationSection);
+        appendTextToReportBuffer(effectiveDurationSection);
+        appendTextToReportBuffer(distanceSection);
+        appendTextToReportBuffer(calculatedSpeedSection);
+        appendTextToReportBuffer(effectiveSpeedSection);
+        appendTextToReportBuffer(maxSpeedSection);
+        appendTextToReportBuffer(caloriesSection);
+        appendTextToReportBuffer(avgHeartSection);
         appendTextToReportBuffer(maxHeartSection);
 
+        root.add(UiSpacing.vgap(UiSpacing.GAP_LG));
 
-        appendTextToBuffer("<hr>");
+        // --- Altimetric profile section ---
+        JPanel altBody = new JPanel();
+        altBody.setOpaque(false);
+        altBody.setLayout(new BoxLayout(altBody, BoxLayout.Y_AXIS));
 
-        appendTextToBuffer("<p><b>Altimetic Profile</b></p>");
+        JPanel altMetrics = new JPanel(new GridLayout(0, 2, UiSpacing.GAP_SM, UiSpacing.GAP_SM));
+        altMetrics.setOpaque(false);
+
         String deviceElevationSection = "Device elevation: " + GPSUtility.roundDoubleStat(track.getCalculatedElevation());
-        appendTextToBuffer(deviceElevationSection + "<br>");
-        appendTextToReportBuffer(deviceElevationSection);
         String realElevationSection = "Real elevation: " + GPSUtility.roundDoubleStat(track.getRealElevation());
-        appendTextToBuffer(realElevationSection + "<br>");
-        appendTextToReportBuffer(realElevationSection);
         String deviceDescentSection = "Device descent: " + GPSUtility.roundDoubleStat(track.getCalculatedDescent());
-        appendTextToBuffer(deviceDescentSection + "<br>");
-        appendTextToReportBuffer(deviceDescentSection);
         String realDescentSection = "Real descent: " + GPSUtility.roundDoubleStat(track.getRealDescent());
-        appendTextToBuffer(realDescentSection + "<br>");
-        appendTextToReportBuffer(realDescentSection);
         String maxAltitudeSection = "Max altitude: " + GPSUtility.roundDoubleStat(track.getMaxAltitude());
-        appendTextToBuffer(maxAltitudeSection + "<br>");
-        appendTextToReportBuffer(maxAltitudeSection);
         String minAltitudeSection = "Min altitude: " + GPSUtility.roundDoubleStat(track.getMinAltitude());
-        appendTextToBuffer(minAltitudeSection + "<br>");
-        appendTextToReportBuffer(minAltitudeSection);
         String climbingDistanceSection = "Climbing distance: " + GPSUtility.roundDoubleStat(track.getClimbingDistance());
-        appendTextToBuffer(climbingDistanceSection + "<br>");
-        appendTextToReportBuffer(climbingDistanceSection);
         String climbingTimeSection = "Climbing time: " + TimeUtility.toStringFromTimeDiff(track.getClimbingTimeMillis());
-        appendTextToBuffer(climbingTimeSection + "<br>");
-        appendTextToReportBuffer(climbingTimeSection);
         String climbingSpeedSection = "Climbing speed: " + GPSUtility.roundDoubleStat(track.getClimbingSpeed());
-        appendTextToBuffer(climbingSpeedSection + "<br>");
+
+        altMetrics.add(new MetricCard("Device elevation", GPSUtility.roundDoubleStat(track.getCalculatedElevation()), null));
+        altMetrics.add(new MetricCard("Real elevation", GPSUtility.roundDoubleStat(track.getRealElevation()), null));
+        altMetrics.add(new MetricCard("Device descent", GPSUtility.roundDoubleStat(track.getCalculatedDescent()), null));
+        altMetrics.add(new MetricCard("Real descent", GPSUtility.roundDoubleStat(track.getRealDescent()), null));
+        altMetrics.add(new MetricCard("Max altitude", GPSUtility.roundDoubleStat(track.getMaxAltitude()), null));
+        altMetrics.add(new MetricCard("Min altitude", GPSUtility.roundDoubleStat(track.getMinAltitude()), null));
+        altMetrics.add(new MetricCard("Climbing distance", GPSUtility.roundDoubleStat(track.getClimbingDistance()), null));
+        altMetrics.add(new MetricCard("Climbing time", TimeUtility.toStringFromTimeDiff(track.getClimbingTimeMillis()), null));
+        altMetrics.add(new MetricCard("Climbing speed", GPSUtility.roundDoubleStat(track.getClimbingSpeed()), null));
+
+        altBody.add(altMetrics);
+
+        root.add(new SectionPanel("Altimetric Profile", altBody, true));
+
+        appendTextToReportBuffer(deviceElevationSection);
+        appendTextToReportBuffer(realElevationSection);
+        appendTextToReportBuffer(deviceDescentSection);
+        appendTextToReportBuffer(realDescentSection);
+        appendTextToReportBuffer(maxAltitudeSection);
+        appendTextToReportBuffer(minAltitudeSection);
+        appendTextToReportBuffer(climbingDistanceSection);
+        appendTextToReportBuffer(climbingTimeSection);
         appendTextToReportBuffer(climbingSpeedSection);
 
-        textPane.append(null, flushBuffer());
-        try {
-            textPane.addHyperlinkImg(
-                    new URL("http://bikedump.com?climbProfile=" + track.getFileName()), imgMountain, "View climb profile", Color.BLUE);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        handler.setAltimetricProfile(track.getAltimetricProfile());
+        root.add(UiSpacing.vgap(UiSpacing.GAP_LG));
 
+        // --- Climbs section ---
         String slopesSize = track.getSlopes() != null ? String.valueOf(track.getSlopes().size()) : "0";
         String climbsSection = "Climbs (" + slopesSize + " )";
-        appendTextToBuffer("<p><b>" + climbsSection + "</b><br><br>");
         appendTextToReportBuffer(climbsSection);
 
-        textPane.append(null, flushBuffer());
+        JPanel climbsBody = new JPanel();
+        climbsBody.setOpaque(false);
+        climbsBody.setLayout(new BoxLayout(climbsBody, BoxLayout.Y_AXIS));
 
         long totalSlopeDuration = 0;
         double totalSlopeElevation = 0;
@@ -172,63 +173,88 @@ public class DetailViewer extends JScrollPane {
 
         if (track.getSlopes() != null && !track.getSlopes().isEmpty()) {
             List<SlopeSegment> listSlopes = new ArrayList<>();
+
             for (int z = 0; z < track.getSlopes().size(); z++) {
                 SlopeSegment slope = track.getSlopes().get(z);
                 listSlopes.add(slope);
-                try {
-                    //TODO change URL format and include img;
-                    textPane.addHyperlinkImg(
-                            new URL("http://bikedump.com?slopeIndex=" + z), imgMountain, "View climb detail", Color.BLUE);
-                    textPane.addHyperlinkImg(
-                            new URL("http://bikedump.com/save/?slopeIndex=" + z), imgSave, "Save climb", Color.BLUE);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
+
+                JPanel climbRow = new JPanel(new BorderLayout());
+                climbRow.setOpaque(false);
+                climbRow.setBorder(UiSpacing.pad(0, 0, UiSpacing.GAP_SM, 0));
+
+                JLabel climbTitle = new JLabel("Climb " + (z + 1)
+                        + (slope.getName() != null && !slope.getName().isBlank() ? " - " + slope.getName() : ""));
+                climbTitle.setFont(climbTitle.getFont().deriveFont(Font.BOLD));
+                climbRow.add(climbTitle, BorderLayout.NORTH);
+
+                JPanel rowButtons = new JPanel(new FlowLayout(FlowLayout.LEADING, UiSpacing.GAP_SM, 0));
+                rowButtons.setOpaque(false);
+
+                final int slopeIndex = z;
+
+                JButton viewDetail = new JButton("View climb detail");
+                viewDetail.addActionListener(e -> viewClimbDetail(listSlopes, slopeIndex));
+
+                JButton saveClimb = new JButton("Save climb");
+                saveClimb.addActionListener(e -> saveClimb(listSlopes, slopeIndex));
+
+                rowButtons.add(viewDetail);
+                rowButtons.add(saveClimb);
+
+                climbRow.add(rowButtons, BorderLayout.CENTER);
+
+                JPanel climbMetrics = new JPanel(new GridLayout(0, 2, UiSpacing.GAP_SM, UiSpacing.GAP_SM));
+                climbMetrics.setOpaque(false);
+
                 String climbDistanceSection = "Distance: " + GPSUtility.roundDoubleStat(slope.getDistance());
-                appendTextToBuffer(climbDistanceSection + "<br>");
-                appendTextToReportBuffer(climbDistanceSection);
                 String climbStartDistanceSection = "Start km: " + GPSUtility.roundDoubleStat(slope.getStartDistance());
-                appendTextToBuffer(climbStartDistanceSection + "<br>");
-                appendTextToReportBuffer(climbStartDistanceSection);
                 String climbEndDistanceSection = "End km: " + GPSUtility.roundDoubleStat(slope.getEndDistance());
-                appendTextToBuffer(climbEndDistanceSection + "<br>");
-                appendTextToReportBuffer(climbEndDistanceSection);
+
+                String climbDurationSection;
                 if (slope.getEndDate() != null) {
-                    String climbDurationSection = "Duration: " + TimeUtility.toStringFromTimeDiff(slope.getEndDate().getTime() - slope.getStartDate().getTime());
-                    appendTextToBuffer(climbDurationSection + "<br>");
-                    appendTextToReportBuffer(climbDurationSection);
+                    climbDurationSection = "Duration: " + TimeUtility.toStringFromTimeDiff(slope.getEndDate().getTime() - slope.getStartDate().getTime());
                 } else {
-                    String climbDurationSection = "Duration: ";
-                    appendTextToBuffer(climbDurationSection + "<br>");
-                    appendTextToReportBuffer(climbDurationSection);
+                    climbDurationSection = "Duration: ";
                 }
 
                 String climbElevationSection = "Elevation: " + GPSUtility.roundDoubleStat(slope.getElevation());
-                appendTextToBuffer(climbElevationSection + "<br>");
-                appendTextToReportBuffer(climbElevationSection);
                 String climbGradientSection = "Gradient: " + GPSUtility.roundDoubleStat(slope.getGradient()) + " %";
-                appendTextToBuffer(climbGradientSection + "<br>");
-                appendTextToReportBuffer(climbGradientSection);
                 String climbStartElevationSection = "Start elevation: " + GPSUtility.roundDoubleStat(slope.getStartElevation());
-                appendTextToBuffer(climbStartElevationSection + "<br>");
-                appendTextToReportBuffer(climbStartElevationSection);
                 String climbEndElevationSection = "End elevation: " + GPSUtility.roundDoubleStat(slope.getEndElevation());
-                appendTextToBuffer(climbEndElevationSection + "<br>");
-                appendTextToReportBuffer(climbEndElevationSection);
                 String climbAvgSpeedSection = "Avg speed: " + GPSUtility.roundDoubleStat(slope.getAvgSpeed());
-                appendTextToBuffer(climbAvgSpeedSection + "<br>");
-                appendTextToReportBuffer(climbAvgSpeedSection);
                 String climbPowerSection = "Power: " + GPSUtility.roundDoubleStat(slope.getPower());
-                appendTextToBuffer(climbPowerSection + "<br>");
-                appendTextToReportBuffer(climbPowerSection);
                 String climbVamSection = "VAM: " + GPSUtility.roundDoubleStat(slope.getVam());
-                appendTextToBuffer(climbVamSection + "<br>");
-                appendTextToReportBuffer(climbVamSection);
-                appendTextToBuffer("<br>");
-                appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
 
-                //write
-                textPane.append(null, flushBuffer());
+                climbMetrics.add(new MetricCard("Distance", GPSUtility.roundDoubleStat(slope.getDistance()), null));
+                climbMetrics.add(new MetricCard("Gradient", GPSUtility.roundDoubleStat(slope.getGradient()) + " %", null));
+                climbMetrics.add(new MetricCard("Elevation", GPSUtility.roundDoubleStat(slope.getElevation()), null));
+                climbMetrics.add(new MetricCard("Avg speed", GPSUtility.roundDoubleStat(slope.getAvgSpeed()), null));
+                climbMetrics.add(new MetricCard("Power", GPSUtility.roundDoubleStat(slope.getPower()), null));
+                climbMetrics.add(new MetricCard("VAM", GPSUtility.roundDoubleStat(slope.getVam()), null));
+                climbMetrics.add(new MetricCard("Start km", GPSUtility.roundDoubleStat(slope.getStartDistance()), null));
+                climbMetrics.add(new MetricCard("End km", GPSUtility.roundDoubleStat(slope.getEndDistance()), null));
+                climbMetrics.add(new MetricCard("Start elevation", GPSUtility.roundDoubleStat(slope.getStartElevation()), null));
+                climbMetrics.add(new MetricCard("End elevation", GPSUtility.roundDoubleStat(slope.getEndElevation()), null));
+                climbMetrics.add(new MetricCard("Duration", slope.getEndDate() != null
+                        ? TimeUtility.toStringFromTimeDiff(slope.getEndDate().getTime() - slope.getStartDate().getTime())
+                        : "", null));
+
+                climbsBody.add(climbRow);
+                climbsBody.add(climbMetrics);
+                climbsBody.add(UiSpacing.vgap(UiSpacing.GAP_MD));
+
+                appendTextToReportBuffer(climbDistanceSection);
+                appendTextToReportBuffer(climbStartDistanceSection);
+                appendTextToReportBuffer(climbEndDistanceSection);
+                appendTextToReportBuffer(climbDurationSection);
+                appendTextToReportBuffer(climbElevationSection);
+                appendTextToReportBuffer(climbGradientSection);
+                appendTextToReportBuffer(climbStartElevationSection);
+                appendTextToReportBuffer(climbEndElevationSection);
+                appendTextToReportBuffer(climbAvgSpeedSection);
+                appendTextToReportBuffer(climbPowerSection);
+                appendTextToReportBuffer(climbVamSection);
+                appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
 
                 totalSlopeDistance += slope.getDistance();
                 totalSlopeElevation += slope.getElevation();
@@ -240,45 +266,60 @@ public class DetailViewer extends JScrollPane {
                     totalSlopeDuration += (slope.getEndDate().getTime() - slope.getStartDate().getTime());
                 }
             }
-            handler.setSlopes(listSlopes);
 
             if (track.getSlopes().size() > 0) {
+                JPanel totals = new JPanel(new GridLayout(0, 2, UiSpacing.GAP_SM, UiSpacing.GAP_SM));
+                totals.setOpaque(false);
+
+                totals.add(new MetricCard("Total distance", GPSUtility.roundDoubleStat(totalSlopeDistance), null));
+                totals.add(new MetricCard("Total elevation", GPSUtility.roundDoubleStat(totalSlopeElevation), null));
+                totals.add(new MetricCard("Total duration", TimeUtility.toStringFromTimeDiff(totalSlopeDuration), null));
+                totals.add(new MetricCard("Avg distance", GPSUtility.roundDoubleStat(totalSlopeDistance / track.getSlopes().size()), null));
+                totals.add(new MetricCard("Avg elevation", GPSUtility.roundDoubleStat(totalSlopeElevation / track.getSlopes().size()), null));
+                totals.add(new MetricCard("Avg gradient", GPSUtility.roundDoubleStat(totalSlopeGradient / track.getSlopes().size()), null));
+                totals.add(new MetricCard("Avg speed", GPSUtility.roundDoubleStat(totalAvgSpeed / track.getSlopes().size()), null));
+                totals.add(new MetricCard("Avg power", GPSUtility.roundDoubleStat(totalPower / track.getSlopes().size()), null));
+                totals.add(new MetricCard("Avg VAM", GPSUtility.roundDoubleStat(totalVam / track.getSlopes().size()), null));
+
+                climbsBody.add(new JLabel("Totals"));
+                climbsBody.add(UiSpacing.vgap(6));
+                climbsBody.add(totals);
+
+                // report text, same as legacy
                 String totalClimbDistanceSection = "Total distance: " + GPSUtility.roundDoubleStat(totalSlopeDistance);
-                appendTextToBuffer(totalClimbDistanceSection + "<br>");
-                appendTextToReportBuffer(totalClimbDistanceSection);
                 String totalClimbElevationSection = "Total elevation: " + GPSUtility.roundDoubleStat(totalSlopeElevation);
-                appendTextToBuffer(totalClimbElevationSection + "<br>");
-                appendTextToReportBuffer(totalClimbElevationSection);
                 String totalClimbDurationSection = "Total duration: " + TimeUtility.toStringFromTimeDiff(totalSlopeDuration);
-                appendTextToBuffer(totalClimbDurationSection + "<br>");
-                appendTextToReportBuffer(totalClimbDurationSection);
                 String totalClimbAvgSection = "Avg distance: " + GPSUtility.roundDoubleStat(totalSlopeDistance / track.getSlopes().size());
-                appendTextToBuffer(totalClimbAvgSection + "<br>");
-                appendTextToReportBuffer(totalClimbAvgSection);
                 String totalClimbAvgElevationSection = "Avg elevation: " + GPSUtility.roundDoubleStat(totalSlopeElevation / track.getSlopes().size());
-                appendTextToBuffer(totalClimbAvgElevationSection + "<br>");
-                appendTextToReportBuffer(totalClimbAvgElevationSection);
+                // Keep legacy behavior (original code used totalSlopeDuration / 2)
                 String totalClimbAvgDurationSection = "Avg duration: " + TimeUtility.toStringFromTimeDiff(totalSlopeDuration / 2);
-                appendTextToBuffer(totalClimbAvgDurationSection + "<br>");
-                appendTextToReportBuffer(totalClimbAvgDurationSection);
                 String totalClimbAvgGradient = "Avg gradient: " + GPSUtility.roundDoubleStat(totalSlopeGradient / track.getSlopes().size());
-                appendTextToBuffer(totalClimbAvgGradient + "<br>");
-                appendTextToReportBuffer(totalClimbAvgGradient);
                 String totalClimbAvgSpeedSection = "Avg speed: " + GPSUtility.roundDoubleStat(totalAvgSpeed / track.getSlopes().size());
-                appendTextToBuffer(totalClimbAvgSpeedSection + "<br>");
-                appendTextToReportBuffer(totalClimbAvgSpeedSection);
                 String totalClimbAvgPowerSection = "Avg power: " + GPSUtility.roundDoubleStat(totalPower / track.getSlopes().size());
-                appendTextToBuffer(totalClimbAvgPowerSection + "<br>");
-                appendTextToReportBuffer(totalClimbAvgPowerSection);
                 String totalClimbAvgVamSection = "Avg vam: " + GPSUtility.roundDoubleStat(totalVam / track.getSlopes().size());
-                appendTextToBuffer(totalClimbAvgVamSection + "<br>");
+
+                appendTextToReportBuffer(totalClimbDistanceSection);
+                appendTextToReportBuffer(totalClimbElevationSection);
+                appendTextToReportBuffer(totalClimbDurationSection);
+                appendTextToReportBuffer(totalClimbAvgSection);
+                appendTextToReportBuffer(totalClimbAvgElevationSection);
+                appendTextToReportBuffer(totalClimbAvgDurationSection);
+                appendTextToReportBuffer(totalClimbAvgGradient);
+                appendTextToReportBuffer(totalClimbAvgSpeedSection);
+                appendTextToReportBuffer(totalClimbAvgPowerSection);
                 appendTextToReportBuffer(totalClimbAvgVamSection);
             }
         }
 
-
-        appendTextToBuffer("</p></p><hr>");
         appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
+        root.add(new SectionPanel(climbsSection, climbsBody, false));
+
+        root.add(UiSpacing.vgap(UiSpacing.GAP_LG));
+
+        // --- Lap section ---
+        JPanel lapsBody = new JPanel();
+        lapsBody.setOpaque(false);
+        lapsBody.setLayout(new BoxLayout(lapsBody, BoxLayout.Y_AXIS));
 
         String lapsDetailSection = "Details for lap";
         WaypointSegment fastest = track.getStatsNewKm().get("Fastest");
@@ -287,109 +328,161 @@ public class DetailViewer extends JScrollPane {
         WaypointSegment longest = track.getStatsNewKm().get("Longest");
         WaypointSegment lessElevated = track.getStatsNewKm().get("Less Elevated");
         WaypointSegment mostElevated = track.getStatsNewKm().get("Most Elevated");
-        if (fastest != null) {
-            String fastestLapSection = "Fastest Lap: " + fastest.getUnit() + " - " + GPSUtility.roundDoubleStat(fastest.getAvgSpeed());
-            appendTextToBuffer(fastestLapSection + "<br>");
-            appendTextToReportBuffer(fastestLapSection);
-        } else {
-            String fastestLapSection = "Fastest Lap: ";
-            appendTextToBuffer(fastestLapSection + "<br>");
-            appendTextToReportBuffer(fastestLapSection);
-        }
-        if (slowest != null) {
-            String slowestLapSection = "Slowest Lap: " + slowest.getUnit() + " - " + GPSUtility.roundDoubleStat(slowest.getAvgSpeed());
-            appendTextToBuffer(slowestLapSection + "<br>");
-            appendTextToReportBuffer(slowestLapSection);
-        } else {
-            String slowestLapSection = "Slowest Lap: ";
-            appendTextToBuffer(slowestLapSection + "<br>");
-            appendTextToReportBuffer(slowestLapSection);
-        }
-        if (shortest != null) {
-            String shortestLapSection = "Shortest Lap: " + shortest.getUnit() + " - " + TimeUtility.toStringFromTimeDiff(shortest.getTimeIncrement());
-            appendTextToBuffer(shortestLapSection + "<br>");
-            appendTextToReportBuffer(shortestLapSection);
-        } else {
-            String shortestLapSection = "Shortest Lap: ";
-            appendTextToBuffer(shortestLapSection + "<br>");
-            appendTextToReportBuffer(shortestLapSection);
-        }
-        if (longest != null) {
-            String longestLapSection = "Longest Lap: " + longest.getUnit() + " - " + TimeUtility.toStringFromTimeDiff(longest.getTimeIncrement());
-            appendTextToBuffer(longestLapSection + "<br>");
-            appendTextToReportBuffer(longestLapSection);
-        } else {
-            String longestLapSection = "Longest Lap: ";
-            appendTextToBuffer(longestLapSection + "Longest Lap: <br>");
-            appendTextToReportBuffer(longestLapSection);
-        }
 
-        if(mostElevated != null) {
-            String mostElevatedLapSection = "Most elevated Lap: " + mostElevated.getUnit() + " - " + GPSUtility.roundDoubleStat(mostElevated.getEleGained());
-            appendTextToBuffer(mostElevatedLapSection + "<br>");
-            appendTextToReportBuffer(mostElevatedLapSection);
-            String lessElevatedLap = "Less elevated Lap: " + lessElevated.getUnit() + " - " + GPSUtility.roundDoubleStat(lessElevated.getEleGained());
-            appendTextToBuffer(lessElevatedLap + "<br>");
-            appendTextToReportBuffer(lessElevatedLap);
-            appendTextToBuffer("<br>");
-            appendTextToBuffer("<p><b>" + lapsDetailSection + "</b><br>");
+        addLapStatLine(lapsBody, "Fastest Lap: ", fastest != null ? fastest.getUnit() + " - " + GPSUtility.roundDoubleStat(fastest.getAvgSpeed()) : "");
+        addLapStatLine(lapsBody, "Slowest Lap: ", slowest != null ? slowest.getUnit() + " - " + GPSUtility.roundDoubleStat(slowest.getAvgSpeed()) : "");
+        addLapStatLine(lapsBody, "Shortest Lap: ", shortest != null ? shortest.getUnit() + " - " + TimeUtility.toStringFromTimeDiff(shortest.getTimeIncrement()) : "");
+        addLapStatLine(lapsBody, "Longest Lap: ", longest != null ? longest.getUnit() + " - " + TimeUtility.toStringFromTimeDiff(longest.getTimeIncrement()) : "");
+
+        if (mostElevated != null) {
+            addLapStatLine(lapsBody, "Most elevated Lap: ", mostElevated.getUnit() + " - " + GPSUtility.roundDoubleStat(mostElevated.getEleGained()));
+            addLapStatLine(lapsBody, "Less elevated Lap: ", lessElevated.getUnit() + " - " + GPSUtility.roundDoubleStat(lessElevated.getEleGained()));
+
+            JLabel detailLabel = new JLabel(lapsDetailSection);
+            detailLabel.setFont(detailLabel.getFont().deriveFont(Font.BOLD));
+            lapsBody.add(UiSpacing.vgap(UiSpacing.GAP_MD));
+            lapsBody.add(detailLabel);
+
             appendTextToReportBuffer(lapsDetailSection);
         }
 
         int km = 1;
         for (Map.Entry<String, WaypointSegment> entry : track.getCoordinatesNewKm().entrySet()) {
-            appendTextToBuffer(km + ")<br>");
+            WaypointSegment seg = entry.getValue();
+
+            JPanel lapCard = new JPanel(new GridLayout(0, 2, UiSpacing.GAP_SM, UiSpacing.GAP_SM));
+            lapCard.setOpaque(false);
+
+            JLabel lapTitle = new JLabel(km + ")");
+            lapTitle.setFont(lapTitle.getFont().deriveFont(Font.BOLD));
+            lapsBody.add(UiSpacing.vgap(UiSpacing.GAP_SM));
+            lapsBody.add(lapTitle);
+
+            String lapTimeRelevationSection = "Time relevation: " + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", seg.getTimeSpent());
+            String lapTimeSection = "Time lap: " + TimeUtility.toStringFromTimeDiff(seg.getTimeIncrement());
+            String lapAvgSpeedSection = "Avg speed: " + GPSUtility.roundDoubleStat(seg.getAvgSpeed());
+            String elevationLine = "Elevation gained: " + GPSUtility.roundDoubleStat(seg.getEleGained());
+            String heartSection = "Min heart: " + GPSUtility.roundDoubleStat(seg.getMinHeart()) + " - " + "Max heart:" + GPSUtility.roundDoubleStat(seg.getMaxHeart());
+
+            lapCard.add(new MetricCard("Time relevation", TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", seg.getTimeSpent()), null));
+            lapCard.add(new MetricCard("Time lap", TimeUtility.toStringFromTimeDiff(seg.getTimeIncrement()), null));
+            lapCard.add(new MetricCard("Avg speed", GPSUtility.roundDoubleStat(seg.getAvgSpeed()), null));
+            lapCard.add(new MetricCard("Elevation gained", GPSUtility.roundDoubleStat(seg.getEleGained()), "m"));
+            lapCard.add(new MetricCard("Heart", GPSUtility.roundDoubleStat(seg.getMinHeart()),
+                    "Max: " + GPSUtility.roundDoubleStat(seg.getMaxHeart())));
+
+            lapsBody.add(lapCard);
+
             appendTextToReportBuffer(km + ")");
-            String lapTimeRelevationSection = "Time relevation: " + TimeUtility.convertToString("dd/MM/yyyy HH:mm:ss", entry.getValue().getTimeSpent());
-            appendTextToBuffer(lapTimeRelevationSection + "<br>");
             appendTextToReportBuffer(lapTimeRelevationSection);
-            String lapTimeSection = "Time lap: " + TimeUtility.toStringFromTimeDiff(entry.getValue().getTimeIncrement());
-            appendTextToBuffer(lapTimeSection + "<br>");
             appendTextToReportBuffer(lapTimeSection);
-            String lapAvgSpeedSection = "Avg speed: " + GPSUtility.roundDoubleStat(entry.getValue().getAvgSpeed());
-            appendTextToBuffer(lapAvgSpeedSection + "<br>");
             appendTextToReportBuffer(lapAvgSpeedSection);
-            String fontElevation = "<font color=\"red\">";
-            String fontDescent = "<font color=\"green\">";
-            if (entry.getValue().getEleGained() > 0) {
-                appendTextToBuffer("Elevation gained: " + fontElevation + GPSUtility.roundDoubleStat(entry.getValue().getEleGained()) + " m</font><br>");
-            } else {
-                appendTextToBuffer("Elevation gained: " + fontDescent + GPSUtility.roundDoubleStat(entry.getValue().getEleGained()) + " m</font><br>");
-            }
-            appendTextToReportBuffer("Elevation gained: " + GPSUtility.roundDoubleStat(entry.getValue().getEleGained()));
-            String heartSection = "Min heart: " + GPSUtility.roundDoubleStat(entry.getValue().getMinHeart()) + " - " + "Max heart:" + GPSUtility.roundDoubleStat(entry.getValue().getMaxHeart());
-            appendTextToBuffer(heartSection + "<br><br>");
+            appendTextToReportBuffer(elevationLine);
             appendTextToReportBuffer(heartSection);
             appendTextToReportBuffer(ELEMENT_SEPARATOR_SECTION_REPORT);
+
             km++;
         }
-        appendTextToBuffer("</p></p>");
 
-        //write
-        textPane.append(null, flushBuffer());
+        root.add(new SectionPanel("Lap details", lapsBody, false));
 
-        this.getViewport().add(textPane);
-
+        setViewportView(root);
+        revalidate();
+        repaint();
     }
 
-    private void appendTextToBuffer(String text) {
-        text4HTML.append(text);
+    private void viewClimbDetail(List<SlopeSegment> slopes, int slopeIndex) {
+        if (slopes == null || slopeIndex < 0 || slopeIndex >= slopes.size()) {
+            JOptionPane.showMessageDialog(
+                    currentFrame,
+                    "Invalid climb index: " + slopeIndex,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        SlopeSegment slope = slopes.get(slopeIndex);
+        List<Waypoint> slopeWaypoints = slope.getWaypoints();
+
+        WaypointGraph waypointElevationGraph =
+                new WaypointElevationGraph(slopeWaypoints, true, false, true);
+        new GraphViewer(currentFrame, Arrays.asList(waypointElevationGraph));
+    }
+
+    private void saveClimb(List<SlopeSegment> slopes, int slopeIndex) {
+        if (slopes == null || slopeIndex < 0 || slopeIndex >= slopes.size()) {
+            JOptionPane.showMessageDialog(
+                    currentFrame,
+                    "Invalid climb index: " + slopeIndex,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        SlopeSegment slope = slopes.get(slopeIndex);
+
+        String climbName = (String) JOptionPane.showInputDialog(
+                currentFrame,
+                "Name for the climb",
+                "Save Climb",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                null,
+                slope.getName() != null ? slope.getName() : ""
+        );
+
+        if (climbName == null) {
+            // user cancelled
+            return;
+        }
+
+        climbName = climbName.trim();
+        if (climbName.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    currentFrame,
+                    "Climb name cannot be empty.",
+                    "Save Climb",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        // same behavior as LinkAdapter
+        slope.setName(climbName);
+        ClimbStorage.saveClimb(slope, climbName);
+
+        // refresh menu (same hack as LinkAdapter)
+        try {
+            if (currentFrame instanceof Bikedump bikedump && bikedump.topMenu != null) {
+                bikedump.topMenu.getClimbs().validate();
+                bikedump.topMenu.getClimbs().repaint();
+            }
+        } catch (Exception ignored) {
+        }
+
+        JOptionPane.showMessageDialog(
+                currentFrame,
+                "Saved climb: " + climbName,
+                "Save Climb",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    private void addLapStatLine(JPanel parent, String label, String value) {
+        String line = label + value;
+        JLabel l = new JLabel(line);
+        parent.add(l);
+        appendTextToReportBuffer(line);
     }
 
     private void appendTextToReportBuffer(String text) {
         text4Report.append(text);
-        //this is a separator for each line
         text4Report.append(ELEMENT_SEPARATOR_REPORT);
-    }
-
-    private String flushBuffer() {
-        String text = text4HTML.toString();
-        text4HTML = new StringBuffer();
-        return text;
     }
 
     public String getText4Report() {
         return text4Report.toString();
     }
-
 }
