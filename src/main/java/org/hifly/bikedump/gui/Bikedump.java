@@ -311,11 +311,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
         split2.setDividerSize(10);
         split3.setDividerSize(10);
 
-        // remove old panel only if it was previously added
-        try {
-            remove(mainPanel);
-        } catch (Exception ignored) {
-        }
+        remove(mainPanel);
 
         add(split3, BorderLayout.CENTER);
 
