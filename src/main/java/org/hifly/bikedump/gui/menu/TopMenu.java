@@ -29,9 +29,9 @@ public class TopMenu extends JMenuBar {
     private JMenuItem trySample;
 
     // NEW: view/theme actions
-    private JMenuItem themeSystem;
-    private JMenuItem themeLight;
-    private JMenuItem themeDark;
+    private JRadioButtonMenuItem themeSystem;
+    private JRadioButtonMenuItem themeLight;
+    private JRadioButtonMenuItem themeDark;
 
     private JMenu climbs;
     private JFrame currentFrame;
@@ -251,19 +251,15 @@ public class TopMenu extends JMenuBar {
     public JMenu getClimbs() { return climbs; }
 
     // NEW: theme items for wiring from Bikedump
-    public JMenuItem getThemeSystemItem() { return themeSystem; }
-    public JMenuItem getThemeLightItem() { return themeLight; }
-    public JMenuItem getThemeDarkItem() { return themeDark; }
+    public JRadioButtonMenuItem getThemeSystemItem() { return themeSystem; }
+    public JRadioButtonMenuItem getThemeLightItem() { return themeLight; }
+    public JRadioButtonMenuItem getThemeDarkItem() { return themeDark; }
 
     public void selectThemeRadio(ThemePreference pref) {
-        if (themeSystem instanceof JRadioButtonMenuItem sys &&
-            themeLight instanceof JRadioButtonMenuItem lig &&
-            themeDark instanceof JRadioButtonMenuItem dar) {
-            switch (pref) {
-                case SYSTEM -> sys.setSelected(true);
-                case LIGHT -> lig.setSelected(true);
-                case DARK -> dar.setSelected(true);
-            }
+        switch (pref) {
+            case SYSTEM -> themeSystem.setSelected(true);
+            case LIGHT -> themeLight.setSelected(true);
+            case DARK -> themeDark.setSelected(true);
         }
     }
 }

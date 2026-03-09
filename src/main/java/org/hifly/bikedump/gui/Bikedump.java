@@ -268,9 +268,9 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
     }
 
     private void wireThemeMenu() {
-        JMenuItem system = topMenu.getThemeSystemItem();
-        JMenuItem light = topMenu.getThemeLightItem();
-        JMenuItem dark = topMenu.getThemeDarkItem();
+        JRadioButtonMenuItem system = topMenu.getThemeSystemItem();
+        JRadioButtonMenuItem light = topMenu.getThemeLightItem();
+        JRadioButtonMenuItem dark = topMenu.getThemeDarkItem();
 
         if (system != null) {
             system.addActionListener(e -> setTheme(ThemePreference.SYSTEM));
