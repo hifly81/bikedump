@@ -27,7 +27,7 @@
 
 ## Offline Map Tiles
 
-Bike Dump supports offline map tiles to avoid rate limiting and 403 errors from online OpenStreetMap servers. See [OFFLINE_TILES.md](OFFLINE_TILES.md) for detailed setup instructions.
+Bike Dump supports offline map tiles to avoid rate limiting and 403 errors from online OpenStreetMap servers. See [OFFLINE_TILES.md](docs/OFFLINE_TILES.md) for detailed setup instructions.
 
 ### Quick Setup:
 1. Download map tiles in TMS format (`{z}/{x}/{y}.png`)
@@ -59,7 +59,7 @@ Bike Dump supports offline map tiles to avoid rate limiting and 403 errors from 
 Run Bike Dump with the pre-built jar:
 
 ```bash
-java -jar dist/bikedump-0.3.0-release.jar
+java -jar dist/bikedump-0.4.0-release.jar
 ```
 
 ## How to Compile
@@ -90,20 +90,21 @@ mvn clean package
 Execute the newly built jar:
 
 ```bash
-java -jar target/bikedump-0.3.0-release.jar
+java -jar target/bikedump-0.4.0-release.jar
 ```
 
 ## External Libraries & Licenses
 
 Bike Dump uses the following external libraries:
 
-| Library | Link | License |
-|---------|------|---------|
-| sunrisesunsetlib | [GitHub](https://github.com/mikereedell/sunrisesunsetlib-java) | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) |
-| jmapviewer | [OpenStreetMap Wiki](http://wiki.openstreetmap.org/wiki/JMapViewer) | [GPL](https://www.gnu.org/licenses/gpl-3.0.html) |
-| kryo | [GitHub](https://github.com/EsotericSoftware/kryo) | [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) |
-| ormlite-core | [GitHub](https://github.com/j256/ormlite-core) | [ISC](https://opensource.org/licenses/ISC) |
-| JFreeChart | [GitHub](https://github.com/jfree/jfreechart) | [LGPL-2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html) |
+| Library            | Link | License |
+|--------------------|------|---------|
+| sunrisesunsetlib   | [GitHub](https://github.com/mikereedell/sunrisesunsetlib-java) | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) |
+| jmapviewer         | [OpenStreetMap Wiki](http://wiki.openstreetmap.org/wiki/JMapViewer) | [GPL](https://www.gnu.org/licenses/gpl-3.0.html) |
+| kryo               | [GitHub](https://github.com/EsotericSoftware/kryo) | [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) |
+| ormlite-core       | [GitHub](https://github.com/j256/ormlite-core) | [ISC](https://opensource.org/licenses/ISC) |
+| JFreeChart         | [GitHub](https://github.com/jfree/jfreechart) | [LGPL-2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html) |
+| Flat Look and Feel | [GitHub](https://github.com/JFormDesigner/FlatLaf) | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)  |
 
 
 For additional details see: [NOTICE file](LICENSE/NOTICE.md)
