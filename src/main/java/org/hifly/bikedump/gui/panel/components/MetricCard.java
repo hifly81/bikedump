@@ -10,6 +10,11 @@ public class MetricCard extends JPanel {
     private final JLabel value = new JLabel();
     private final JLabel subtitle = new JLabel();
 
+    public MetricCard(String titleText, Double valueDouble, String subtitleText) {
+        this(titleText, String.valueOf(valueDouble), subtitleText);
+
+    }
+
     public MetricCard(String titleText, String valueText, String subtitleText) {
         super();
         setLayout(new BorderLayout(0, 2));
