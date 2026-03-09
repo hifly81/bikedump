@@ -2,7 +2,7 @@
 
 [![Java](https://img.shields.io/badge/Java-11%2B-orange.svg)](https://www.oracle.com/java/)
 [![License](https://img.shields.io/badge/License-Mixed-blue.svg)](LICENSE/)
-[![Version](https://img.shields.io/badge/Version-0.3.0-green.svg)](dist/)
+[![Version](https://img.shields.io/badge/Version-0.4.0-green.svg)](dist/)
 
 **Bike Dump** is a powerful Java GUI application designed to manage and extract comprehensive statistics from GPX 1.0, GPX 1.1, and TCX 2 activity files from your cycling and mountain biking workouts.
 
