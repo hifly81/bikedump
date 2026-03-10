@@ -17,13 +17,15 @@ import java.util.Map;
 
 import static org.hifly.bikedump.utility.Constants.HOME_FOLDER_NAME;
 
-public class GeoMapStorage {
+public class    GeoMapStorage {
 
     public static Map<String, Double> gpsElevationMap;
     public static Map<String, Double> gpsElevationMapFallback = new HashMap<>();
     public static List<SlopeSegment> savedClimbsList;
     public static Map<String,TrackPref> tracksLibrary;
     public static LibrarySetting librarySetting;
+
+    public static StravaPref stravaPref;
 
     static {
         FileInputStream streamIn = null;
@@ -45,22 +47,25 @@ public class GeoMapStorage {
             if(Files.notExists(pathD))
                 new File(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "preferences").mkdirs();
 
+            // NEW: strava export dir
+            Path pathE = Paths.get(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "strava" + File.separator + "exports");
+            if(Files.notExists(pathE))
+                new File(pathE.toString()).mkdirs();
+
             Path path = Paths.get(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "coordinates/storage_coordinates_kyro.db");
             if (Files.exists(path)) {
-                // file exist
                 streamIn = new FileInputStream(System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "coordinates/storage_coordinates_kyro.db");
                 input = new Input(streamIn);
                 Kryo kryo = new Kryo();
                 gpsElevationMap = (Map<String, Double>)kryo.readObject(input, HashMap.class);
             }
 
-
-            //load saved climbs
             savedClimbsList = ClimbStorage.readSavedClimbs();
-            //load opened tracks
             tracksLibrary = PrefStorage.readOpenedTracks();
-            //load saved library
             librarySetting = PrefStorage.readLibrarySetting();
+
+            stravaPref = PrefStorage.readStravaPref();
+            if (stravaPref == null) stravaPref = new StravaPref();
 
         }
         catch (Exception e) {
@@ -76,7 +81,6 @@ public class GeoMapStorage {
             catch (IOException e) {
             }
         }
-
     }
 
     public static void save() {
@@ -86,10 +90,12 @@ public class GeoMapStorage {
         if(GeoMapStorage.librarySetting != null) {
             PrefStorage.savePref(GeoMapStorage.librarySetting, "library");
         }
-        if(GeoMapStorage.savedClimbsList != null) {
-            for(SlopeSegment slope: GeoMapStorage.savedClimbsList) {
-                ClimbStorage.saveClimb(slope, slope.getName());
-            }
+        if (GeoMapStorage.stravaPref != null) {
+            PrefStorage.savePref(GeoMapStorage.stravaPref, "strava");
         }
+    }
+
+    public static String getStravaExportsDir() {
+        return Paths.get(System.getProperty("user.home"), HOME_FOLDER_NAME, "strava", "exports").toString();
     }
 }

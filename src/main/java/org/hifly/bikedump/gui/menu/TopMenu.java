@@ -13,6 +13,7 @@ import org.hifly.bikedump.utility.SlopeUtility;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.util.Arrays;
@@ -27,27 +28,28 @@ public class TopMenu extends JMenuBar {
     private JMenuItem itemImportFolder;
     private JMenuItem itemOptionsSetting;
     private JMenuItem trySample;
-
-    // NEW: view/theme actions
-    private JRadioButtonMenuItem themeSystem;
-    private JRadioButtonMenuItem themeLight;
-    private JRadioButtonMenuItem themeDark;
-
     private JMenu climbs;
     private JFrame currentFrame;
+
+    // NEW: Theme menu items
+    private JRadioButtonMenuItem themeSystemItem;
+    private JRadioButtonMenuItem themeLightItem;
+    private JRadioButtonMenuItem themeDarkItem;
 
     public TopMenu(JFrame currentFrame) {
         super();
         this.currentFrame = currentFrame;
+
         this.add(createFileMenu());
+        this.add(createViewMenu());     // NEW
         this.add(createSettingMenu());
-        this.add(createViewMenu());      // NEW
         this.add(createLibraryMenu());
         this.add(createHelpMenu());
+
         URL helpImageUrl = getClass().getResource("/img/help.png");
         ImageIcon helpImageIcon = new ImageIcon(helpImageUrl);
         Image img = helpImageIcon.getImage();
-        img = img.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        img = img.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
     }
 
     private JMenu createFileMenu() {
@@ -57,7 +59,7 @@ public class TopMenu extends JMenuBar {
         URL importImageUrl = getClass().getResource("/img/import.png");
         ImageIcon importImageIcon = new ImageIcon(importImageUrl);
         Image img = importImageIcon.getImage();
-        img = img.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        img = img.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
         importImageIcon = new ImageIcon(img);
         JMenu importMenu = new JMenu("Import");
         importMenu.setIcon(importImageIcon);
@@ -66,7 +68,7 @@ public class TopMenu extends JMenuBar {
         URL fileImageUrl = getClass().getResource("/img/file.png");
         ImageIcon fileImageIcon = new ImageIcon(fileImageUrl);
         img = fileImageIcon.getImage();
-        img = img.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        img = img.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
         fileImageIcon = new ImageIcon(img);
         JMenuItem importFile = new JMenuItem("Import from file...", fileImageIcon);
         importFile.setMnemonic(KeyEvent.VK_F);
@@ -75,12 +77,19 @@ public class TopMenu extends JMenuBar {
         URL folderImageUrl = getClass().getResource("/img/folder.png");
         ImageIcon folderImageIcon = new ImageIcon(folderImageUrl);
         img = folderImageIcon.getImage();
-        img = img.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        img = img.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
         folderImageIcon = new ImageIcon(img);
         JMenuItem importFolder = new JMenuItem("Import from folder...", folderImageIcon);
 
+        JMenuItem importStrava = new JMenuItem("Import from Strava...");
+        importStrava.addActionListener(e -> {
+            org.hifly.bikedump.gui.dialog.StravaDialog d = new org.hifly.bikedump.gui.dialog.StravaDialog(currentFrame);
+            d.setVisible(true);
+        });
+
         importMenu.add(importFile);
         importMenu.add(importFolder);
+        importMenu.add(importStrava);
 
         JMenuItem trySample = new JMenuItem("Try Sample", null);
         trySample.setMnemonic(KeyEvent.VK_S);
@@ -88,7 +97,7 @@ public class TopMenu extends JMenuBar {
         URL exitImageUrl = getClass().getResource("/img/quit.png");
         ImageIcon exitImageIcon = new ImageIcon(exitImageUrl);
         img = exitImageIcon.getImage();
-        img = img.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        img = img.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
         exitImageIcon = new ImageIcon(img);
         JMenuItem exit = new JMenuItem("Exit", exitImageIcon);
         exit.setMnemonic(KeyEvent.VK_C);
@@ -109,6 +118,30 @@ public class TopMenu extends JMenuBar {
         return file;
     }
 
+    // NEW: View menu with Theme submenu
+    private JMenu createViewMenu() {
+        JMenu view = new JMenu("View");
+        view.setMnemonic(KeyEvent.VK_V);
+
+        JMenu theme = new JMenu("Theme");
+
+        ButtonGroup group = new ButtonGroup();
+        themeSystemItem = new JRadioButtonMenuItem("System");
+        themeLightItem = new JRadioButtonMenuItem("Light");
+        themeDarkItem = new JRadioButtonMenuItem("Dark");
+
+        group.add(themeSystemItem);
+        group.add(themeLightItem);
+        group.add(themeDarkItem);
+
+        theme.add(themeSystemItem);
+        theme.add(themeLightItem);
+        theme.add(themeDarkItem);
+
+        view.add(theme);
+        return view;
+    }
+
     private JMenu createSettingMenu() {
         JMenu setting = new JMenu("Tool");
         setting.setMnemonic(KeyEvent.VK_S);
@@ -116,7 +149,7 @@ public class TopMenu extends JMenuBar {
         URL optionImageUrl = getClass().getResource("/img/option.png");
         ImageIcon optionImageIcon = new ImageIcon(optionImageUrl);
         Image img = optionImageIcon.getImage();
-        img = img.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        img = img.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
         optionImageIcon = new ImageIcon(img);
         JMenuItem optionsItem = new JMenuItem("Options", optionImageIcon);
         optionsItem.setMnemonic(KeyEvent.VK_P);
@@ -129,37 +162,7 @@ public class TopMenu extends JMenuBar {
         return setting;
     }
 
-    // NEW
-    private JMenu createViewMenu() {
-        JMenu view = new JMenu("View");
-        view.setMnemonic(KeyEvent.VK_V);
-
-        JMenu theme = new JMenu("Theme");
-
-        ButtonGroup group = new ButtonGroup();
-
-        JRadioButtonMenuItem system = new JRadioButtonMenuItem("System");
-        JRadioButtonMenuItem light = new JRadioButtonMenuItem("Light");
-        JRadioButtonMenuItem dark = new JRadioButtonMenuItem("Dark");
-
-        group.add(system);
-        group.add(light);
-        group.add(dark);
-
-        theme.add(system);
-        theme.add(light);
-        theme.add(dark);
-
-        this.themeSystem = system;
-        this.themeLight = light;
-        this.themeDark = dark;
-
-        view.add(theme);
-        return view;
-    }
-
     private JMenu createLibraryMenu() {
-        //list of saved climbs
         Map<String, List<SlopeSegment>> savedClimbs = SlopeUtility.organizeSlopesBySteepness(GeoMapStorage.savedClimbsList);
 
         JMenu library = new JMenu("Library");
@@ -169,7 +172,7 @@ public class TopMenu extends JMenuBar {
         URL mountainImageUrl = getClass().getResource("/img/mountain.png");
         ImageIcon mountainImageIcon = new ImageIcon(mountainImageUrl);
         Image img = mountainImageIcon.getImage();
-        img = img.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        img = img.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
         mountainImageIcon = new ImageIcon(img);
         climbs.setIcon(mountainImageIcon);
         climbs.setMnemonic(KeyEvent.VK_C);
@@ -213,10 +216,12 @@ public class TopMenu extends JMenuBar {
         JMenuItem aboutMenuItem = new JMenuItem("About", null);
         aboutMenuItem.setMnemonic(KeyEvent.VK_P);
         aboutMenuItem.setToolTipText("About");
-        aboutMenuItem.addActionListener(e -> {
-            About about = new About();
-            about.setVisible(true);
-        });
+        aboutMenuItem.addActionListener((new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                About about = new About();
+                about.setVisible(true);
+            }
+        }));
 
         help.add(aboutMenuItem);
 
@@ -250,16 +255,16 @@ public class TopMenu extends JMenuBar {
     public JMenuItem getItemTrySample() { return trySample; }
     public JMenu getClimbs() { return climbs; }
 
-    // NEW: theme items for wiring from Bikedump
-    public JRadioButtonMenuItem getThemeSystemItem() { return themeSystem; }
-    public JRadioButtonMenuItem getThemeLightItem() { return themeLight; }
-    public JRadioButtonMenuItem getThemeDarkItem() { return themeDark; }
+    public JRadioButtonMenuItem getThemeSystemItem() { return themeSystemItem; }
+    public JRadioButtonMenuItem getThemeLightItem() { return themeLightItem; }
+    public JRadioButtonMenuItem getThemeDarkItem() { return themeDarkItem; }
 
     public void selectThemeRadio(ThemePreference pref) {
+        if (pref == null) return;
         switch (pref) {
-            case SYSTEM -> themeSystem.setSelected(true);
-            case LIGHT -> themeLight.setSelected(true);
-            case DARK -> themeDark.setSelected(true);
+            case SYSTEM -> { if (themeSystemItem != null) themeSystemItem.setSelected(true); }
+            case LIGHT -> { if (themeLightItem != null) themeLightItem.setSelected(true); }
+            case DARK -> { if (themeDarkItem != null) themeDarkItem.setSelected(true); }
         }
     }
 }

@@ -23,17 +23,22 @@
 - 📅 **History Tracking**: Monitor your progress over time
 - 🗺️ **Map Integration**: View your routes with interactive maps
 - 🌐 **Offline Map Support**: Use offline map tiles to avoid rate limiting
+- **Strava integration**: Connect Bikedump to your Strava account and import your workouts
 - 📱 **Multiple Format Support**: Compatible with GPX 1.0, GPX 1.1, and TCX 2 formats
 
 ## Offline Map Tiles
 
-Bike Dump supports offline map tiles to avoid rate limiting and 403 errors from online OpenStreetMap servers. See [OFFLINE_TILES.md](docs/OFFLINE_TILES.md) for detailed setup instructions.
+Bike Dump supports offline map tiles to avoid rate limiting and 403 errors from online OpenStreetMap servers.
 
-### Quick Setup:
-1. Download map tiles in TMS format (`{z}/{x}/{y}.png`)
-2. Go to **Options** → **Library** tab
-3. Check "Use offline map tiles" and select your tiles directory
-4. Enjoy unlimited map viewing without internet restrictions!
+See dedicated instructions:
+
+- `docs/OFFLINE_TILES.md`
+
+## Strava integration
+
+See dedicated instructions:
+
+- `docs/STRAVA.md`
 
 ## Screenshots
 
@@ -59,7 +64,7 @@ Bike Dump supports offline map tiles to avoid rate limiting and 403 errors from 
 Run Bike Dump with the pre-built jar:
 
 ```bash
-java -jar dist/bikedump-0.4.0-release.jar
+java -jar dist/bikedump-0.5.0-release.jar
 ```
 
 ## How to Compile
@@ -90,7 +95,7 @@ mvn clean package
 Execute the newly built jar:
 
 ```bash
-java -jar target/bikedump-0.4.0-release.jar
+java -jar target/bikedump-0.5.0-release.jar
 ```
 
 ## External Libraries & Licenses

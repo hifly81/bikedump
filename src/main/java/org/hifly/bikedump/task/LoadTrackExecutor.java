@@ -8,6 +8,7 @@ import org.hifly.bikedump.storage.GeoMapStorage;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ public class LoadTrackExecutor {
     private ExecutorService es;
     private List<Callable<Object>> todo;
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public LoadTrackExecutor(
             boolean isNewTrackToLoad,
             Iterator iterator,
@@ -29,6 +31,10 @@ public class LoadTrackExecutor {
             List<Track> tracks) {
         es = Executors.newFixedThreadPool(5);
         todo = new ArrayList<>();
+
+        if (GeoMapStorage.tracksLibrary == null) {
+            GeoMapStorage.tracksLibrary = new HashMap<>();
+        }
 
         for (; iterator.hasNext(); ) {
             Object obj = iterator.next();
@@ -39,13 +45,18 @@ public class LoadTrackExecutor {
                 Map.Entry<String, TrackPref> entry = (Map.Entry<String, TrackPref>) obj;
                 file = new File(entry.getKey());
             }
+            if (file == null) continue;
 
-            if(isNewTrackToLoad && (GeoMapStorage.tracksLibrary.get(file.getAbsolutePath()) == null))
-                todo.add(Executors.callable(new LoadTrack(file, sb, coordinates,waypoint, tracks)));
-            else
-                todo.add(Executors.callable(new LoadTrack(file, sb, coordinates,waypoint, tracks)));
+            boolean already = GeoMapStorage.tracksLibrary.get(file.getAbsolutePath()) != null;
+
+            if (isNewTrackToLoad) {
+                if (!already) {
+                    todo.add(Executors.callable(new LoadTrack(file, sb, coordinates, waypoint, tracks)));
+                }
+            } else {
+                todo.add(Executors.callable(new LoadTrack(file, sb, coordinates, waypoint, tracks)));
+            }
         }
-
     }
 
     public List<Future<Object>> execute() throws Exception {

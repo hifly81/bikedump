@@ -2,6 +2,7 @@ package org.hifly.bikedump.storage;
 
 import org.hifly.bikedump.domain.LibrarySetting;
 import org.hifly.bikedump.domain.TrackPref;
+import org.hifly.bikedump.domain.StravaPref;
 
 import java.io.*;
 import java.util.Map;
@@ -28,6 +29,28 @@ public class PrefStorage {
             } catch (IOException e) {
             }
         }
+    }
+
+    public static StravaPref readStravaPref() {
+        File file = new File(PREF_DIR + "strava.pref");
+        FileInputStream streamIn = null;
+        ObjectInputStream objectinputstream = null;
+        StravaPref pref = null;
+
+        if (file != null && file.exists()) {
+            try {
+                streamIn = new FileInputStream(file);
+                objectinputstream = new ObjectInputStream(streamIn);
+                pref = (StravaPref) objectinputstream.readObject();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try { if (objectinputstream != null) objectinputstream.close(); } catch (Exception ignored) {}
+                try { if (streamIn != null) streamIn.close(); } catch (Exception ignored) {}
+            }
+        }
+
+        return pref;
     }
 
     public static Map<String, TrackPref> readOpenedTracks() {
