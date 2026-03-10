@@ -17,7 +17,7 @@ import java.util.Map;
 
 import static org.hifly.bikedump.utility.Constants.HOME_FOLDER_NAME;
 
-public class GeoMapStorage {
+public class    GeoMapStorage {
 
     public static Map<String, Double> gpsElevationMap;
     public static Map<String, Double> gpsElevationMapFallback = new HashMap<>();
@@ -96,6 +96,6 @@ public class GeoMapStorage {
     }
 
     public static String getStravaExportsDir() {
-        return System.getProperty("user.home") + File.separator + HOME_FOLDER_NAME + File.separator + "strava" + File.separator + "exports" + File.separator;
+        return Paths.get(System.getProperty("user.home"), HOME_FOLDER_NAME, "strava", "exports").toString();
     }
 }

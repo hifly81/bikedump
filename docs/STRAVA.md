@@ -105,10 +105,9 @@ What happens:
     - download **GPX** 
 5. Files are saved locally under:
     - `~/.bikedump/strava/exports/`
-    - e.g. `strava_<activityId>.tcx` or `strava_<activityId>.gpx`
+    - e.g. `strava_<activityId>.gpx`
 6. Bikedump loads the track using existing parsers
-7. Bikedump updates the **time marker** after a successful import:
-    - `lastSyncAfterEpochSeconds = now`
+7. Bikedump updates the **time marker** after a successful import
 
 This prevents importing the same activities repeatedly.
 

@@ -185,7 +185,9 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
                 Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
                 file = tempFile.toFile();
                 reloadTrackFromFile(file);
-                mapViewer.setDisplayToFitMapMarkers();
+                if (mapViewer != null) {
+                    mapViewer.setDisplayToFitMapMarkers();
+                }
             } catch (Exception e) {
                 log.warn("Can't load sample gpx", e);
             }
@@ -317,7 +319,9 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
                 if (!selectedTracks.isEmpty()) {
                     if (selectedTracks.size() == 1) {
                         reloadTrackFromFile(new File(selectedTracks.get(0).getFileName()));
-                        mapViewer.setDisplayToFitMapMarkers();
+                        if (mapViewer != null) {
+                            mapViewer.setDisplayToFitMapMarkers();
+                        }
                     } else {
                         List<Track> tracksToLoad = new ArrayList<>();
                         for (Track track : selectedTracks)

@@ -19,7 +19,7 @@ public class StravaDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
     private static final String OAUTH_HOST = "127.0.0.1";
-    private static final int OAUTH_PORT = 17899;
+    private static final int OAUTH_PORT = 8765;
     private static final long OAUTH_TIMEOUT_MILLIS = 2 * 60 * 1000L; // 2 min
 
     private final StravaPref pref;
@@ -225,7 +225,7 @@ public class StravaDialog extends JDialog {
 
         String state = Long.toHexString(System.nanoTime()) + Long.toHexString(Double.doubleToLongBits(Math.random()));
 
-        StravaOAuthLocalServer local = new StravaOAuthLocalServer(OAUTH_HOST, OAUTH_PORT);
+        StravaOAuthLocalServer local = new StravaOAuthLocalServer(pref.getRedirectHost(), pref.getCallbackPort());
         String redirectUri = local.getRedirectUri();
 
         String authUrl;

@@ -37,8 +37,20 @@ public class StravaSyncTimer {
                     List<Track> imported = res.tracks;
 
                     if (!imported.isEmpty()) {
+                        long maxStartEpochSeconds = 0L;
+                        for (Track track : imported) {
+                            Date startDate = track.getStartDate();
+                            if (startDate != null) {
+                                long startEpochSeconds = startDate.getTime() / 1000L;
+                                if (startEpochSeconds > maxStartEpochSeconds) {
+                                    maxStartEpochSeconds = startEpochSeconds;
+                                }
+                            }
+                        }
+                        if (maxStartEpochSeconds > 0L) {
+                            pref.setLastSyncAfterEpochSeconds(maxStartEpochSeconds);
+                        }
                         pref.setLastSuccessfulSyncAt(new Date());
-                        pref.setLastSyncAfterEpochSeconds(System.currentTimeMillis() / 1000L);
                         GeoMapStorage.save();
                         // TODO: hook into UI to show "imported N rides"
                     }
