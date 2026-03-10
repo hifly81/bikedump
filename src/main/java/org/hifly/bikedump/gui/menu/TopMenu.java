@@ -72,8 +72,15 @@ public class TopMenu extends JMenuBar {
         folderImageIcon = new ImageIcon(img);
         JMenuItem importFolder = new JMenuItem("Import from folder...", folderImageIcon);
 
+        JMenuItem importStrava = new JMenuItem("Import from Strava...");
+        importStrava.addActionListener(e -> {
+            org.hifly.bikedump.gui.dialog.StravaDialog d = new org.hifly.bikedump.gui.dialog.StravaDialog(currentFrame);
+            d.setVisible(true);
+        });
+
         importMenu.add(importFile);
         importMenu.add(importFolder);
+        importMenu.add(importStrava);
 
         JMenuItem trySample = new JMenuItem("Try Sample", null);
         trySample.setMnemonic(KeyEvent.VK_S);
