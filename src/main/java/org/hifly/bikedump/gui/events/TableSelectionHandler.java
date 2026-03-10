@@ -13,36 +13,41 @@ import java.util.HashSet;
 
 public class TableSelectionHandler implements ListSelectionListener {
 
-    private TrackTable table;
-    private Bikedump bikeDump;
+    private final TrackTable table;
+    private final Bikedump bikeDump;
 
     public TableSelectionHandler(Bikedump bikeDump, TrackTable table, HashSet<TrackSelected> selectedTrackNames) {
-          this.table = table;
-          this.bikeDump = bikeDump;
-          DataHolder.tracksSelected = selectedTrackNames;
+        this.table = table;
+        this.bikeDump = bikeDump;
+        DataHolder.tracksSelected = selectedTrackNames;
     }
 
+    @Override
     public void valueChanged(ListSelectionEvent e) {
+        if (e.getValueIsAdjusting()) return;
 
-        ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+        ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+        if (lsm.isSelectionEmpty()) {
+            DataHolder.tracksSelected.clear();
+            return;
+        }
 
-        if (!lsm.isSelectionEmpty()) {
-            int minIndex = lsm.getMinSelectionIndex();
-            int maxIndex = lsm.getMaxSelectionIndex();
-            for (int i = minIndex; i <= maxIndex; i++) {
-                if(minIndex == maxIndex && !DataHolder.tracksSelected.isEmpty())
-                    DataHolder.tracksSelected.clear();
-                if (lsm.isSelectedIndex(i)) {
-                    //this method finds the index inside the model regardless of sorting
-                    Track track = ((TrackTable.TrackTableModel)table.getModel()).getTrackAt(table.convertRowIndexToModel(i));
-                    if (track != null) {
-                        DataHolder.tracksSelected.add(new TrackSelected(track.getFileName()));
-                        bikeDump.loadSelectedTracks(table);
-                    }
-                }
+        // Rebuild selection buffer from the current JTable selection
+        DataHolder.tracksSelected.clear();
+
+        int[] selectedRows = table.getSelectedRows();
+        for (int viewRow : selectedRows) {
+            int modelRow = table.convertRowIndexToModel(viewRow);
+            Track track = ((TrackTable.TrackTableModel) table.getModel()).getTrackAt(modelRow);
+            if (track != null) {
+                DataHolder.tracksSelected.add(new TrackSelected(track.getFileName()));
             }
         }
 
+        // If single selection -> load immediately (current behavior)
+        // If multi selection -> DO NOT auto-load; user can press Enter to load aggregate
+        if (selectedRows.length == 1) {
+            bikeDump.loadSelectedTracks(table);
+        }
     }
-
 }

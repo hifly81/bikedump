@@ -1,5 +1,6 @@
 package org.hifly.bikedump.controller;
 
+import org.apache.commons.io.FilenameUtils;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.gps.GPSDocument;
 import org.hifly.bikedump.gps.GPX10Document;
@@ -74,6 +75,16 @@ public class GPSController {
             //TODO manage a list of tracks: a single file can contain multiple tracks
             if (tracks != null && !tracks.isEmpty())
                 track = tracks.get(0);
+
+            if (track != null) {
+                String name = track.getName();
+                if (name == null || name.trim().isEmpty() || "Strava Import".equalsIgnoreCase(name.trim())) {
+                    // fall back to filename base (e.g. strava_955022116)
+                    String base = FilenameUtils.getBaseName(filename);
+                    track.setName(base);
+                }
+            }
+
         } catch (SAXParseException sax) {
             log.error("file is not GPX [" + sax.getMessage() + "]:" + filename);
         } catch (Exception ex) {

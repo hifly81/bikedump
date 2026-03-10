@@ -7,6 +7,7 @@ import org.hifly.bikedump.gui.Bikedump;
 import org.hifly.bikedump.storage.DataHolder;
 import org.hifly.bikedump.utility.TimeUtility;
 
+import javax.xml.crypto.Data;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -49,7 +50,9 @@ public class NewTrackTimer {
                 }
 
                 //add founded tracks
-                DataHolder.tracksLoaded.addAll(tracks);
+                if(DataHolder.tracksLoaded != null) {
+                    DataHolder.tracksLoaded.addAll(tracks);
+                }
             }
 
         }

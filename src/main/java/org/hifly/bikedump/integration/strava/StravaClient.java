@@ -1,18 +1,32 @@
 package org.hifly.bikedump.integration.strava;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hifly.bikedump.domain.StravaPref;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
+/**
+ * Strava HTTP client using HttpURLConnection + Jackson for JSON parsing.
+ *
+ * Supports:
+ * - list activities with optional after/before
+ * - streams for latlng/altitude/time (to generate GPX)
+ */
 public class StravaClient {
 
-    // TODO:
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     private final String clientId;
     private final String clientSecret;
 
@@ -21,15 +35,16 @@ public class StravaClient {
         this.clientSecret = Objects.requireNonNull(clientSecret, "clientSecret");
     }
 
+    // ---------------- OAuth ----------------
+
     public String buildAuthorizeUrl(String redirectUri, String state) throws Exception {
-        // scope: read + activity:read_all
         return "https://www.strava.com/oauth/authorize"
-                + "?client_id=" + URLEncoder.encode(clientId, "UTF-8")
-                + "&redirect_uri=" + URLEncoder.encode(redirectUri, "UTF-8")
+                + "?client_id=" + enc(clientId)
+                + "&redirect_uri=" + enc(redirectUri)
                 + "&response_type=code"
                 + "&approval_prompt=auto"
-                + "&scope=" + URLEncoder.encode("read,activity:read_all", "UTF-8")
-                + "&state=" + URLEncoder.encode(state, "UTF-8");
+                + "&scope=" + enc("read,activity:read_all")
+                + "&state=" + enc(state);
     }
 
     public void exchangeCodeForToken(StravaPref pref, String code) throws Exception {
@@ -43,7 +58,7 @@ public class StravaClient {
     }
 
     public void refreshIfNeeded(StravaPref pref) throws Exception {
-        if (!pref.isConnected()) return;
+        if (pref == null || !pref.isConnected()) return;
         if (!pref.isAccessTokenExpired()) return;
 
         String body = "client_id=" + enc(clientId)
@@ -55,48 +70,71 @@ public class StravaClient {
         applyTokenJson(pref, json);
     }
 
-    public List<StravaActivity> listRideActivities(StravaPref pref, int perPage, int page) throws Exception {
-        // filtering: we will filter by type == "Ride" client-side
-        String url = "https://www.strava.com/api/v3/athlete/activities?per_page=" + perPage + "&page=" + page;
-        String json = getJson(url, pref.getAccessToken());
-        return parseActivities(json);
-    }
+    // ---------------- Activities ----------------
 
-    public List<StravaActivity> listActivities(StravaPref pref, int perPage, int page, long afterEpochSeconds) throws Exception {
+    /**
+     * List activities with optional after/before (epoch seconds).
+     */
+    public List<StravaActivity> listActivities(StravaPref pref, int perPage, int page, Long afterEpochSeconds, Long beforeEpochSeconds) throws Exception {
         String url = "https://www.strava.com/api/v3/athlete/activities"
                 + "?per_page=" + perPage
                 + "&page=" + page;
 
-        if (afterEpochSeconds > 0) {
+        if (afterEpochSeconds != null && afterEpochSeconds > 0) {
             url += "&after=" + afterEpochSeconds;
+        }
+        if (beforeEpochSeconds != null && beforeEpochSeconds > 0) {
+            url += "&before=" + beforeEpochSeconds;
         }
 
         String json = getJson(url, pref.getAccessToken());
         return parseActivities(json);
     }
 
-    public File downloadActivityExport(StravaPref pref, long activityId, String format, File outFile) throws Exception {
-        // format: "gpx" or "tcx"
-        String url = "https://www.strava.com/api/v3/activities/" + activityId + "/export_" + format;
-        downloadBinary(url, pref.getAccessToken(), outFile);
-        return outFile;
+    // Backward compatible overload
+    public List<StravaActivity> listActivities(StravaPref pref, int perPage, int page, long afterEpochSeconds) throws Exception {
+        return listActivities(pref, perPage, page, afterEpochSeconds > 0 ? afterEpochSeconds : null, null);
     }
 
+    /**
+     * Fetch activity streams. key_by_type=true returns object with keys: latlng, altitude, time.
+     */
+    public Streams getActivityStreams(StravaPref pref, long activityId) throws Exception {
+        String url = "https://www.strava.com/api/v3/activities/" + activityId
+                + "/streams?keys=latlng,altitude,time&key_by_type=true";
 
-    private static String enc(String s) throws Exception {
-        return URLEncoder.encode(s, "UTF-8");
+        String json = getJson(url, pref.getAccessToken());
+        return parseStreams(json);
+    }
+
+    // ---------------- HTTP helpers ----------------
+
+    private static HttpURLConnection open(String url, String method, String accessToken) throws Exception {
+        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        conn.setRequestMethod(method);
+        conn.setInstanceFollowRedirects(true);
+
+        conn.setConnectTimeout(15000);
+        conn.setReadTimeout(30000);
+
+        conn.setRequestProperty("Accept", "application/json");
+        conn.setRequestProperty("User-Agent", "Bikedump");
+        if (accessToken != null && !accessToken.isEmpty()) {
+            conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+        }
+        return conn;
     }
 
     private static String postForm(String url, String body) throws Exception {
-        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-        conn.setRequestMethod("POST");
-        conn.setConnectTimeout(15000);
-        conn.setReadTimeout(60000);
+        HttpURLConnection conn = open(url, "POST", null);
         conn.setDoOutput(true);
-        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(body.getBytes("UTF-8"));
-        }
+        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+
+        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+        conn.setFixedLengthStreamingMode(bytes.length);
+        conn.getOutputStream().write(bytes);
+        conn.getOutputStream().close();
+
         int code = conn.getResponseCode();
         String resp = readAll(code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream());
         if (code < 200 || code >= 300) {
@@ -106,11 +144,8 @@ public class StravaClient {
     }
 
     private static String getJson(String url, String accessToken) throws Exception {
-        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-        conn.setRequestMethod("GET");
-        conn.setConnectTimeout(15000);
-        conn.setReadTimeout(60000);
-        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+        HttpURLConnection conn = open(url, "GET", accessToken);
+
         int code = conn.getResponseCode();
         String resp = readAll(code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream());
         if (code < 200 || code >= 300) {
@@ -119,100 +154,97 @@ public class StravaClient {
         return resp;
     }
 
-    private static void downloadBinary(String url, String accessToken, File outFile) throws Exception {
-        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-        conn.setRequestMethod("GET");
-        conn.setConnectTimeout(15000);
-        conn.setReadTimeout(60000);
-        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
-
-        int code = conn.getResponseCode();
-        if (code < 200 || code >= 300) {
-            String resp = readAll(conn.getErrorStream());
-            throw new IOException("Strava export error HTTP " + code + ": " + resp);
-        }
-
-        try (InputStream is = conn.getInputStream();
-             OutputStream os = new FileOutputStream(outFile)) {
-            byte[] buf = new byte[8192];
-            int r;
-            while ((r = is.read(buf)) != -1) {
-                os.write(buf, 0, r);
-            }
-        }
-    }
-
     private static String readAll(InputStream is) throws Exception {
         if (is == null) return "";
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             StringBuilder sb = new StringBuilder();
             String line;
-            while((line = br.readLine()) != null) sb.append(line);
+            while ((line = br.readLine()) != null) sb.append(line);
             return sb.toString();
         }
     }
 
-    private static void applyTokenJson(StravaPref pref, String json) {
-        // minimal JSON extraction without adding deps
-        // expects fields: access_token, refresh_token, expires_at
-        pref.setAccessToken(extractJsonString(json, "access_token"));
-        pref.setRefreshToken(extractJsonString(json, "refresh_token"));
-        String expiresAt = extractJsonNumber(json, "expires_at");
-        if (expiresAt != null && !expiresAt.isEmpty()) {
-            pref.setExpiresAtEpochSeconds(Long.parseLong(expiresAt));
-        }
+    private static String enc(String s) throws Exception {
+        return URLEncoder.encode(s, "UTF-8");
     }
 
-    private static String extractJsonString(String json, String key) {
-        Pattern p = Pattern.compile("\"" + Pattern.quote(key) + "\"\\s*:\\s*\"([^\"]*)\"");
-        Matcher m = p.matcher(json);
-        return m.find() ? m.group(1) : null;
+    // ---------------- JSON parsing ----------------
+
+    private static void applyTokenJson(StravaPref pref, String json) throws Exception {
+        JsonNode root = MAPPER.readTree(json);
+
+        String accessToken = root.path("access_token").asText(null);
+        String refreshToken = root.path("refresh_token").asText(null);
+        long expiresAt = root.path("expires_at").asLong(0L);
+
+        pref.setAccessToken(accessToken);
+        pref.setRefreshToken(refreshToken);
+        if (expiresAt > 0) pref.setExpiresAtEpochSeconds(expiresAt);
     }
 
-    private static String extractJsonNumber(String json, String key) {
-        Pattern p = Pattern.compile("\"" + Pattern.quote(key) + "\"\\s*:\\s*(\\d+)");
-        Matcher m = p.matcher(json);
-        return m.find() ? m.group(1) : null;
-    }
-
-    private static List<StravaActivity> parseActivities(String json) {
-        // Very small parser: find objects in an array by regex.
-        // We only need: id, type, name, start_date (optional).
+    private static List<StravaActivity> parseActivities(String json) throws Exception {
         List<StravaActivity> out = new ArrayList<>();
+        if (json == null || json.trim().isEmpty()) return out;
 
-        // naive split on "},{" boundaries (ok for Strava activities array)
-        String trimmed = json.trim();
-        if (!trimmed.startsWith("[")) return out;
-        if (trimmed.equals("[]")) return out;
+        JsonNode root = MAPPER.readTree(json);
+        if (!root.isArray()) return out;
 
-        // remove [ and ]
-        String body = trimmed.substring(1, trimmed.length() - 1);
-        String[] chunks = body.split("\\},\\s*\\{");
-
-        for (String chunk : chunks) {
-            String obj = chunk;
-            if (!obj.startsWith("{")) obj = "{" + obj;
-            if (!obj.endsWith("}")) obj = obj + "}";
-
-            String idStr = extractJsonNumber(obj, "id");
-            String type = extractJsonString(obj, "type");
-            String name = extractJsonString(obj, "name");
-
-            if (idStr == null) continue;
+        for (JsonNode n : root) {
+            long id = n.path("id").asLong(0L);
+            if (id <= 0) continue;
 
             StravaActivity a = new StravaActivity();
-            a.id = Long.parseLong(idStr);
-            a.type = type;
-            a.name = name;
+            a.id = id;
+            a.type = n.path("type").asText(null);
+            a.name = n.path("name").asText(null);
+            a.startDate = n.path("start_date").asText(null);
+
             out.add(a);
         }
-
         return out;
+    }
+
+    private static Streams parseStreams(String json) throws Exception {
+        Streams s = new Streams();
+        if (json == null || json.trim().isEmpty()) return s;
+
+        JsonNode root = MAPPER.readTree(json);
+
+        JsonNode latlng = root.path("latlng").path("data");
+        if (latlng.isArray()) {
+            s.latlng = new ArrayList<>();
+            for (JsonNode p : latlng) {
+                if (p.isArray() && p.size() >= 2) {
+                    s.latlng.add(new double[]{p.get(0).asDouble(), p.get(1).asDouble()});
+                }
+            }
+        }
+
+        JsonNode alt = root.path("altitude").path("data");
+        if (alt.isArray()) {
+            s.altitude = new ArrayList<>();
+            for (JsonNode a : alt) s.altitude.add(a.asDouble());
+        }
+
+        JsonNode time = root.path("time").path("data");
+        if (time.isArray()) {
+            s.time = new ArrayList<>();
+            for (JsonNode t : time) s.time.add(t.asInt());
+        }
+
+        return s;
     }
 
     public static class StravaActivity {
         public long id;
-        public String type; // "Ride"
+        public String type;
         public String name;
+        public String startDate; // ISO8601 UTC
+    }
+
+    public static class Streams {
+        public List<double[]> latlng;
+        public List<Double> altitude;
+        public List<Integer> time;
     }
 }

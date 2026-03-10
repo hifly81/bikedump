@@ -17,10 +17,34 @@ public class HTMLEditorPanel extends JTextPane {
         super();
         setContentType("text/html");
 
-        Font font = new Font("Arial", Font.PLAIN, 12) ;
-        String bodyRule = "body { font-family: " + font.getFamily() + "; " +
-                "font-size: " + font.getSize() + "pt; }";
-        ((HTMLDocument)getDocument()).getStyleSheet().addRule(bodyRule);
+        // Use Look&Feel defaults instead of hardcoding Arial 12
+        Font font = UIManager.getFont("Label.font");
+        if (font == null) font = getFont();
+
+        Color fg = UIManager.getColor("Label.foreground");
+        if (fg == null) fg = getForeground();
+
+        Color bg = UIManager.getColor("Panel.background");
+        if (bg == null) bg = getBackground();
+
+        setFont(font);
+        setForeground(fg);
+        setBackground(bg);
+        setOpaque(true);
+
+        // Apply CSS that follows current LAF colors + font
+        String bodyRule = "body {"
+                + " font-family: " + font.getFamily() + ";"
+                + " font-size: " + font.getSize() + "pt;"
+                + " color: " + toCss(fg) + ";"
+                + " background-color: " + toCss(bg) + ";"
+                + " }"
+                + " a { color: " + toCss(UIManager.getColor("Component.linkColor") != null ? UIManager.getColor("Component.linkColor") : fg) + "; }";
+
+        ((HTMLDocument) getDocument()).getStyleSheet().addRule(bodyRule);
+
+        // Optional: remove default margin that sometimes looks "old"
+        ((HTMLDocument) getDocument()).getStyleSheet().addRule("body { margin: 6px; }");
     }
 
     public void append(Color c, String text) {
@@ -29,8 +53,7 @@ public class HTMLEditorPanel extends JTextPane {
         EditorKit kit = getEditorKit();
         try {
             kit.read(r, doc, doc.getLength());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -51,17 +74,21 @@ public class HTMLEditorPanel extends JTextPane {
         }
     }
 
-    public void addImg(String text,String imgText) {
+    public void addImg(String text, String imgText) {
         try {
             Document doc = this.getDocument();
             SimpleAttributeSet attrs = new SimpleAttributeSet();
             attrs.addAttribute(StyleConstants.NameAttribute, HTML.Tag.IMG);
             attrs.addAttribute(HTML.Attribute.SRC, text);
             doc.insertString(doc.getLength(), " ", attrs);
-            doc.insertString(doc.getLength(), " "+imgText, null);
+            doc.insertString(doc.getLength(), " " + imgText, null);
         } catch (BadLocationException e) {
             e.printStackTrace(System.err);
         }
     }
 
+    private static String toCss(Color c) {
+        if (c == null) return "#000000";
+        return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
+    }
 }

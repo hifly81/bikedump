@@ -7,6 +7,7 @@ import org.hifly.bikedump.utility.GPSUtility;
 import org.hifly.bikedump.utility.TimeUtility;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +16,8 @@ public class AggregateDetailViewer extends JScrollPane {
 
     private static final long serialVersionUID = 21L;
 
-    private List<Track> tracks;
-    private JFrame currentFrame;
+    private final List<Track> tracks;
+    private final JFrame currentFrame;
 
     public AggregateDetailViewer(List<Track> tracks, JFrame currentFrame) {
         super(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -25,12 +26,33 @@ public class AggregateDetailViewer extends JScrollPane {
         this.currentFrame = currentFrame;
 
         createDetailsViewer();
+
+        // Ensure current LAF applies to everything inside this scrollpane
+        SwingUtilities.updateComponentTreeUI(this);
+        revalidate();
+        repaint();
     }
 
     private void createDetailsViewer() {
         HTMLEditorPanel textPane = new HTMLEditorPanel();
+
+        textPane.setOpaque(true);
+        Color bg = UIManager.getColor("Panel.background");
+        Color fg = UIManager.getColor("Label.foreground");
+        Font font = UIManager.getFont("Label.font");
+        if (bg != null) textPane.setBackground(bg);
+        if (fg != null) textPane.setForeground(fg);
+        if (font != null) textPane.setFont(font);
+
         LinkAdapter handler = new LinkAdapter(currentFrame);
         textPane.addMouseListener(handler);
+
+        if (tracks == null || tracks.isEmpty()) {
+            textPane.append(null, "<p>No tracks loaded.</p>");
+            setViewportView(textPane);
+            return;
+        }
+
 
         double totalDistance = 0;
         double totalCalories = 0;
@@ -96,16 +118,17 @@ public class AggregateDetailViewer extends JScrollPane {
             totalClimbingSpeed += track.getClimbingSpeed();
             totalClimbingTime += track.getClimbingTimeMillis();
 
-            if(track.getStatsNewKm() !=null) {
-                fastests.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Fastest"));
-                slowests.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Slowest"));
-                shortests.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Shortest"));
-                longests.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Longest"));
-                lessElevateds.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Less Elevated"));
-                mostElevateds.put(track.getName() == null ? track.getFileName() : track.getName(), track.getStatsNewKm().get("Most Elevated"));
+            if (track.getStatsNewKm() != null) {
+                String key = track.getName() == null ? track.getFileName() : track.getName();
+                fastests.put(key, track.getStatsNewKm().get("Fastest"));
+                slowests.put(key, track.getStatsNewKm().get("Slowest"));
+                shortests.put(key, track.getStatsNewKm().get("Shortest"));
+                longests.put(key, track.getStatsNewKm().get("Longest"));
+                lessElevateds.put(key, track.getStatsNewKm().get("Less Elevated"));
+                mostElevateds.put(key, track.getStatsNewKm().get("Most Elevated"));
             }
-
         }
+
         text += "Total distance:" + GPSUtility.roundDoubleStat(totalDistance) + "<br>";
         text += "Avg distance:" + GPSUtility.roundDoubleStat(totalDistance / tracks.size()) + "<br>";
         text += "Total calories:" + totalCalories + "<br>";
@@ -140,13 +163,9 @@ public class AggregateDetailViewer extends JScrollPane {
             if (fastest == null) {
                 fastest = entry.getValue();
                 fastestString = entry.getKey();
-            } else {
-                if (entry.getValue() != null) {
-                    if (entry.getValue().getAvgSpeed() > fastest.getAvgSpeed()) {
-                        fastest = entry.getValue();
-                        fastestString = entry.getKey();
-                    }
-                }
+            } else if (entry.getValue() != null && entry.getValue().getAvgSpeed() > fastest.getAvgSpeed()) {
+                fastest = entry.getValue();
+                fastestString = entry.getKey();
             }
         }
 
@@ -154,13 +173,9 @@ public class AggregateDetailViewer extends JScrollPane {
             if (slowest == null) {
                 slowest = entry.getValue();
                 slowestString = entry.getKey();
-            } else {
-                if (entry.getValue() != null) {
-                    if (entry.getValue().getAvgSpeed() < slowest.getAvgSpeed()) {
-                        slowest = entry.getValue();
-                        slowestString = entry.getKey();
-                    }
-                }
+            } else if (entry.getValue() != null && entry.getValue().getAvgSpeed() < slowest.getAvgSpeed()) {
+                slowest = entry.getValue();
+                slowestString = entry.getKey();
             }
         }
 
@@ -168,13 +183,9 @@ public class AggregateDetailViewer extends JScrollPane {
             if (shortest == null) {
                 shortest = entry.getValue();
                 shortestString = entry.getKey();
-            } else {
-                if (entry.getValue() != null) {
-                    if (entry.getValue().getTimeIncrement() < shortest.getTimeIncrement()) {
-                        shortest = entry.getValue();
-                        shortestString = entry.getKey();
-                    }
-                }
+            } else if (entry.getValue() != null && entry.getValue().getTimeIncrement() < shortest.getTimeIncrement()) {
+                shortest = entry.getValue();
+                shortestString = entry.getKey();
             }
         }
 
@@ -182,13 +193,9 @@ public class AggregateDetailViewer extends JScrollPane {
             if (longest == null) {
                 longest = entry.getValue();
                 longestString = entry.getKey();
-            } else {
-                if (entry.getValue() != null) {
-                    if (entry.getValue().getTimeIncrement() > longest.getTimeIncrement()) {
-                        longest = entry.getValue();
-                        longestString = entry.getKey();
-                    }
-                }
+            } else if (entry.getValue() != null && entry.getValue().getTimeIncrement() > longest.getTimeIncrement()) {
+                longest = entry.getValue();
+                longestString = entry.getKey();
             }
         }
 
@@ -196,13 +203,9 @@ public class AggregateDetailViewer extends JScrollPane {
             if (mostElevated == null) {
                 mostElevated = entry.getValue();
                 mostElevatedString = entry.getKey();
-            } else {
-                if (entry.getValue() != null) {
-                    if (entry.getValue().getEleGained() > mostElevated.getEleGained()) {
-                        mostElevated = entry.getValue();
-                        mostElevatedString = entry.getKey();
-                    }
-                }
+            } else if (entry.getValue() != null && entry.getValue().getEleGained() > mostElevated.getEleGained()) {
+                mostElevated = entry.getValue();
+                mostElevatedString = entry.getKey();
             }
         }
 
@@ -210,13 +213,9 @@ public class AggregateDetailViewer extends JScrollPane {
             if (lessElevated == null) {
                 lessElevated = entry.getValue();
                 lessElevatedString = entry.getKey();
-            } else {
-                if (entry.getValue() != null) {
-                    if (entry.getValue().getEleGained() < lessElevated.getEleGained()) {
-                        lessElevated = entry.getValue();
-                        lessElevatedString = entry.getKey();
-                    }
-                }
+            } else if (entry.getValue() != null && entry.getValue().getEleGained() < lessElevated.getEleGained()) {
+                lessElevated = entry.getValue();
+                lessElevatedString = entry.getKey();
             }
         }
 
@@ -241,16 +240,14 @@ public class AggregateDetailViewer extends JScrollPane {
         else
             text += "Most elevated Lap:<br>";
 
-        if (lessElevated !=null)
+        if (lessElevated != null)
             text += "Less elevated Lap:" + lessElevated.getUnit() + " - " + GPSUtility.roundDoubleStat(lessElevated.getEleGained()) + "in track:" + lessElevatedString + "<br>";
         else
             text += "Less elevated Lap:<br>";
 
-        //write
+        // write
         textPane.append(null, text);
 
-        this.getViewport().add(textPane);
-
+        setViewportView(textPane);
     }
-
 }

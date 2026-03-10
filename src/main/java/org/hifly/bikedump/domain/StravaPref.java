@@ -1,32 +1,60 @@
 package org.hifly.bikedump.domain;
 
+import org.hifly.bikedump.utility.Constants;
+import org.hifly.bikedump.utility.ObfuscationUtility;
+
 import java.io.Serializable;
 import java.util.Date;
 
 public class StravaPref implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    // OAuth
     private String accessToken;
     private String refreshToken;
     private long expiresAtEpochSeconds;
 
-    // OAuth callback config
     private int callbackPort = 8765;
     private String redirectHost = "127.0.0.1";
 
-    // Sync
     private boolean autoSyncEnabled;
-    private long autoSyncIntervalMillis = 6 * 60 * 60 * 1000L; // default 6h
+    private long autoSyncIntervalMillis = 6 * 60 * 60 * 1000L;
     private Date lastSuccessfulSyncAt;
-
-    // NEW: time marker for Strava "after" filter
-    // Strava expects seconds since epoch
     private long lastSyncAfterEpochSeconds = 0;
 
-    public boolean isConnected() {
-        return accessToken != null && !accessToken.isEmpty();
+    // Credentials
+    private String clientId;
+    // store obfuscated, not plain
+    private String clientSecretObf;
+
+    public String getClientId() { return clientId; }
+    public void setClientId(String clientId) { this.clientId = clientId; }
+
+    /**
+     * Returns de-obfuscated secret.
+     * NOTE: this is only obfuscation, not encryption.
+     */
+    public String getClientSecret() {
+        if (clientSecretObf == null) return null;
+        return ObfuscationUtility.deobfuscate(clientSecretObf, getLocalKeyMaterial());
     }
+
+    /**
+     * Accepts plain secret and stores it obfuscated.
+     */
+    public void setClientSecret(String clientSecretPlain) {
+        if (clientSecretPlain == null) {
+            this.clientSecretObf = null;
+        } else {
+            this.clientSecretObf = ObfuscationUtility.obfuscate(clientSecretPlain, getLocalKeyMaterial());
+        }
+    }
+
+    private String getLocalKeyMaterial() {
+        // deterministic per-user-machine-ish string; NOT a password.
+        return System.getProperty("user.home") + "|" + Constants.PROGRAM_NAME;
+    }
+
+    public boolean isConnected() { return accessToken != null && !accessToken.isEmpty(); }
 
     public boolean isAccessTokenExpired() {
         long now = System.currentTimeMillis() / 1000L;
@@ -64,7 +92,6 @@ public class StravaPref implements Serializable {
         accessToken = null;
         refreshToken = null;
         expiresAtEpochSeconds = 0;
-
         lastSuccessfulSyncAt = null;
         lastSyncAfterEpochSeconds = 0;
     }

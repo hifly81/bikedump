@@ -31,14 +31,18 @@ public class StravaSyncTimer {
             @Override
             public void run() {
                 try {
-                    List<Track> imported = importer.importNewRides(pref, 10);
+                    Long after = pref.getLastSyncAfterEpochSeconds() > 0 ? pref.getLastSyncAfterEpochSeconds() : null;
+
+                    StravaImporter.ImportResult res = importer.importRidesBetweenWithLog(pref, 10, after, null);
+                    List<Track> imported = res.tracks;
+
                     if (!imported.isEmpty()) {
                         pref.setLastSuccessfulSyncAt(new Date());
+                        pref.setLastSyncAfterEpochSeconds(System.currentTimeMillis() / 1000L);
                         GeoMapStorage.save();
                         // TODO: hook into UI to show "imported N rides"
                     }
                 } catch (Exception e) {
-                    // TODO: log
                     e.printStackTrace();
                 }
             }
