@@ -17,10 +17,8 @@ import org.hifly.bikedump.gui.menu.FileChooser;
 import org.hifly.bikedump.gui.menu.FolderChooser;
 import org.hifly.bikedump.gui.menu.TopMenu;
 import org.hifly.bikedump.gui.menu.Toolbar;
-import org.hifly.bikedump.gui.panel.AggregateDetailViewer;
-import org.hifly.bikedump.gui.panel.DetailViewer;
-import org.hifly.bikedump.gui.panel.MapViewer;
-import org.hifly.bikedump.gui.panel.TrackTable;
+import org.hifly.bikedump.gui.panel.*;
+import org.hifly.bikedump.gui.table.TrackColorRowRenderer;
 import org.hifly.bikedump.gui.theme.ThemeManager;
 import org.hifly.bikedump.gui.theme.ThemePreference;
 import org.hifly.bikedump.storage.DataHolder;
@@ -35,6 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -45,10 +45,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 //TODO use resource bundles i18n
 public class Bikedump extends JFrame implements JMapViewerEventListener {
@@ -60,9 +58,8 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
     private Settings settingDialog = null;
     private final Bikedump currentFrame = this;
     protected MapViewer mapViewer;
-
-    // UPDATED: mainPanel now holds the new 2-column layout split pane (left column | map)
     private JSplitPane mainPanel = new JSplitPane();
+    private JScrollPane homeAggregateDetailViewer;
 
     private final Map.Entry<Integer, Integer> dimension;
     private JScrollPane folderMapScrollViewer, folderDetailViewer, folderTableViewer;
@@ -81,6 +78,8 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
         //panel dimension
         dimension = GUIUtility.getScreenDimension();
         setSize(dimension.getKey(), dimension.getValue());
+        setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        setLocationRelativeTo(null);
         setTitle(TITLE);
         setName(TITLE);
         //layout
@@ -158,6 +157,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
 
                 JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint, true);
                 JScrollPane detailViewer = new AggregateDetailViewer(tracks, currentFrame);
+                homeAggregateDetailViewer = detailViewer;
                 JScrollPane tableViewer = createTableTracksViewer(tracks);
 
                 repaintPanels(tableViewer, mapScrollViewer, detailViewer);
@@ -238,6 +238,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
 
                 JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoint, true);
                 JScrollPane detailViewer = new AggregateDetailViewer(tracks, currentFrame);
+                homeAggregateDetailViewer = detailViewer;
                 JScrollPane tableViewer = createTableTracksViewer(tracks);
 
                 repaintPanels(tableViewer, mapScrollViewer, detailViewer);
@@ -298,9 +299,15 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
                 splitMain.setDividerLocation(0.30);
                 // 60% table, 40% detail (tweak as you like)
                 leftSplit.setDividerLocation(0.60);
+
+                if (currentFrame.trackTable != null) {
+                    currentFrame.trackTable.clearSelection();
+                    currentFrame.trackTable.requestFocusInWindow();
+                }
             } catch (Exception ignored) {
             }
         });
+
     }
 
     public void loadSelectedTracks(TrackTable table) {
@@ -319,22 +326,45 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
                 if (!selectedTracks.isEmpty()) {
                     if (selectedTracks.size() == 1) {
                         reloadTrackFromFile(new File(selectedTracks.get(0).getFileName()));
+                        clearTrackRowColors(trackTable);
                         if (mapViewer != null) {
                             mapViewer.setDisplayToFitMapMarkers();
                         }
                     } else {
-                        List<Track> tracksToLoad = new ArrayList<>();
-                        for (Track track : selectedTracks)
-                            tracksToLoad.add(track);
+                        List<Track> tracksToLoad = new ArrayList<>(selectedTracks);
 
+                        // details (already correct)
                         JScrollPane detailViewer = new AggregateDetailViewer(tracksToLoad, currentFrame);
-                        JScrollPane tableViewer = createTableTracksViewer(tracksToLoad);
+                        homeAggregateDetailViewer = detailViewer;
 
-                        // keep map at right
-                        repaintPanels(tableViewer, folderMapScrollViewer, detailViewer);
+                        // table (already correct)
+                        JScrollPane tableViewer = createTableTracksViewer(tracksToLoad);
+                        // apply row colors ONLY for multi-track view
+                        applyMultiTrackRowColors(trackTable, tracksToLoad);
+
+                        // rebuild map for selected tracks
+                        List<List<Coordinate>> coordinates = new ArrayList<>();
+                        List<Map<String, WaypointSegment>> waypoints = new ArrayList<>();
+
+                        for (Track t : tracksToLoad) {
+                            if (t != null && t.getCoordinates() != null) coordinates.add(t.getCoordinates());
+                            if (t != null && t.getCoordinatesNewKm() != null) waypoints.add(t.getCoordinatesNewKm());
+                        }
+
+                        JScrollPane mapScrollViewer = createMapViewer(coordinates, waypoints, true);
+                        folderMapScrollViewer = mapScrollViewer;
+
+                        // repaint UI
+                        repaintPanels(tableViewer, mapScrollViewer, detailViewer);
+
+
                     }
 
-                    table.transferFocus();
+                    SwingUtilities.invokeLater(() -> {
+                        try {
+                            table.requestFocusInWindow();
+                        } catch (Exception ignored) {}
+                    });
                     DataHolder.tracksSelected.clear();
                 }
             }
@@ -363,6 +393,10 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
             new Scrollable(null, sb.toString(), dimension.getKey() / 2, dimension.getValue() / 2).showMessage();
     }
 
+    public JScrollPane getHomeAggregateDetailViewer() {
+        return homeAggregateDetailViewer;
+    }
+
     @Override
     public void processCommand(JMVCommandEvent command) {
         if (command.getCommand().equals(JMVCommandEvent.COMMAND.ZOOM) ||
@@ -388,27 +422,48 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
 
         List<List<ICoordinate>> resultList = new ArrayList<>();
         if (coordinates != null && !coordinates.isEmpty()) {
-            List<ICoordinate> list = new ArrayList<>();
             for (List<Coordinate> listCoordinates : coordinates) {
-                for (Coordinate coordinate : listCoordinates) {
-                    org.openstreetmap.gui.jmapviewer.Coordinate temp =
-                            new org.openstreetmap.gui.jmapviewer.Coordinate(
-                                    coordinate.getDecimalLatitude(),
-                                    coordinate.getDecimalLongitude());
-                    list.add(temp);
+                List<ICoordinate> list = new ArrayList<>(); // IMPORTANT: new list per track
+                if (listCoordinates != null) {
+                    for (Coordinate coordinate : listCoordinates) {
+                        org.openstreetmap.gui.jmapviewer.Coordinate temp =
+                                new org.openstreetmap.gui.jmapviewer.Coordinate(
+                                        coordinate.getDecimalLatitude(),
+                                        coordinate.getDecimalLongitude());
+                        list.add(temp);
+                    }
                 }
-                resultList.add(list);
+                if (!list.isEmpty()) {
+                    resultList.add(list);
+                }
             }
         }
 
         JScrollPane pane = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         if (multiple) {
-            if (resultList.size() > 2)
-                mapViewer = new MapViewer(null, null, 10, resultList.get(0).get(0).getLat(), resultList.get(0).get(0).getLon());
-            else
-                mapViewer = new MapViewer(resultList, waypoints, 20);
-        } else
-            mapViewer = new MapViewer(resultList, waypoints, 20);
+            List<RouteOverlay> routes = toRoutes(resultList, waypoints);
+            mapViewer = new MapViewer(routes, 20);
+
+            // Center map on the densest cluster of points (dominant area)
+            try {
+                Map.Entry<Double, Double> center = computeDominantCenter(resultList);
+                if (center != null) {
+                    mapViewer.setDisplayPositionByLatLon(center.getKey(), center.getValue(), 7);
+                }
+            } catch (Exception ignored) {
+            }
+
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    mapViewer.setDisplayToFitMapMarkers();
+                } catch (Exception ignored) {
+                }
+            });
+
+        } else {
+            List<RouteOverlay> routes = toRoutes(resultList, waypoints);
+            mapViewer = new MapViewer(routes, 20);
+        }
         pane.getViewport().add(mapViewer);
         mapViewer.addJMVListener(this);
 
@@ -476,6 +531,60 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
         return scrollPanel;
     }
 
+    private static class BucketAgg {
+        int count = 0;
+        double sumLat = 0;
+        double sumLon = 0;
+
+        void add(double lat, double lon) {
+            count++;
+            sumLat += lat;
+            sumLon += lon;
+        }
+
+        Map.Entry<Double, Double> center() {
+            return new java.util.AbstractMap.SimpleEntry<>(sumLat / count, sumLon / count);
+        }
+    }
+
+    private Map.Entry<Double, Double> computeDominantCenter(List<List<ICoordinate>> resultList) {
+        if (resultList == null || resultList.isEmpty()) return null;
+
+        final double cell = 1.0; // degrees
+
+        java.util.Map<String, BucketAgg> buckets = new java.util.HashMap<>();
+
+        for (List<ICoordinate> trackPts : resultList) {
+            if (trackPts == null || trackPts.isEmpty()) continue;
+
+            ICoordinate first = trackPts.get(0);
+            ICoordinate last = trackPts.get(trackPts.size() - 1);
+
+            addBucketPoint(buckets, first.getLat(), first.getLon(), cell);
+            addBucketPoint(buckets, last.getLat(), last.getLon(), cell);
+        }
+
+        BucketAgg best = null;
+        for (BucketAgg agg : buckets.values()) {
+            if (best == null || agg.count > best.count) best = agg;
+        }
+
+        return (best != null && best.count > 0) ? best.center() : null;
+    }
+
+    private void addBucketPoint(java.util.Map<String, BucketAgg> buckets, double lat, double lon, double cell) {
+        int latKey = (int) Math.floor(lat / cell);
+        int lonKey = (int) Math.floor(lon / cell);
+        String key = latKey + ":" + lonKey;
+
+        BucketAgg agg = buckets.get(key);
+        if (agg == null) {
+            agg = new BucketAgg();
+            buckets.put(key, agg);
+        }
+        agg.add(lat, lon);
+    }
+
     private void reloadTrackFromFile(File file) {
         String ext = FilenameUtils.getExtension(file.getAbsolutePath());
         Map.Entry<Track, StringBuffer> resultTrack;
@@ -534,24 +643,53 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
     }
 
     private JScrollPane createTableTracksViewer(List<Track> tracks) {
-        JScrollPane panel = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        JScrollPane panel = new JScrollPane(
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS
+        );
+
         final TrackTable table = new TrackTable(tracks);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table.getSelectionModel().addListSelectionListener(
-                new TableSelectionHandler(currentFrame, table, new HashSet<>()));
+
+        // IMPORTANT: do NOT apply row colors here.
+        // Colors are only applied in multi-track selection view.
+        clearTrackRowColors(table);
+
+        // --- SHIFT-driven multi select state ---
+        TableSelectionHandler selectionHandler = new TableSelectionHandler(currentFrame, table, new HashSet<>());
+        table.getSelectionModel().addListSelectionListener(selectionHandler);
+
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
+            if (!table.isFocusOwner()) return false;
+
+            if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+                if (e.getID() == KeyEvent.KEY_PRESSED) {
+                    selectionHandler.setShiftDown(true);
+                } else if (e.getID() == KeyEvent.KEY_RELEASED) {
+                    selectionHandler.setShiftDown(false);
+
+                    selectionHandler.rebuildSelectedTracksFromTable();
+                    if (!DataHolder.tracksSelected.isEmpty()) {
+                        loadSelectedTracks(table);
+                    }
+                }
+            }
+            return false;
+        });
 
         table.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER)
-                    loadSelectedTracks(table);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    selectionHandler.setShiftDown(false);
+                    selectionHandler.rebuildSelectedTracksFromTable();
+                    if (!DataHolder.tracksSelected.isEmpty()) {
+                        loadSelectedTracks(table);
+                    }
+                }
             }
-
-            @Override
-            public void keyTyped(KeyEvent e) {}
-
-            @Override
-            public void keyReleased(KeyEvent e) {}
+            @Override public void keyTyped(KeyEvent e) {}
+            @Override public void keyReleased(KeyEvent e) {}
         });
 
         trackTable = table;
@@ -620,6 +758,7 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
                         try {
                             JScrollPane mapScrollViewer = createMapViewer(rr.coordinates, rr.waypoint, true);
                             JScrollPane detailViewer = new AggregateDetailViewer(rr.tracks, currentFrame);
+                            homeAggregateDetailViewer = detailViewer;
                             JScrollPane tableViewer = createTableTracksViewer(rr.tracks);
 
                             repaintPanels(tableViewer, mapScrollViewer, detailViewer);
@@ -669,6 +808,63 @@ public class Bikedump extends JFrame implements JMapViewerEventListener {
         if (topMenu != null) {
             topMenu.selectThemeRadio(pref);
         }
+    }
+
+    private static List<RouteOverlay> toRoutes(
+            List<List<ICoordinate>> coordinates,
+            List<Map<String, WaypointSegment>> waypoints) {
+
+        List<RouteOverlay> routes = new ArrayList<>();
+        if (coordinates == null) return routes;
+
+        for (int i = 0; i < coordinates.size(); i++) {
+            List<ICoordinate> coords = coordinates.get(i);
+            Map<String, WaypointSegment> wp = (waypoints != null && i < waypoints.size()) ? waypoints.get(i) : null;
+
+            if (coords == null || coords.isEmpty()) continue;
+
+            routes.add(new RouteOverlay(
+                    "Track " + (i + 1),
+                    coords,
+                    wp,
+                    RouteColors.baseColorForRoute(i)
+            ));
+        }
+        return routes;
+    }
+
+    private void applyMultiTrackRowColors(JTable table, List<Track> tracksToLoad) {
+        if (table == null || tracksToLoad == null || tracksToLoad.size() <= 1) {
+            clearTrackRowColors(table);
+            return;
+        }
+
+        // key = Name column (index 1)
+        Map<String, Color> colorByName = new HashMap<>();
+        for (int i = 0; i < tracksToLoad.size(); i++) {
+            Track t = tracksToLoad.get(i);
+            String name = (t.getName() != null && !t.getName().isBlank()) ? t.getName() : t.getFileName();
+            colorByName.put(name, RouteColors.baseColorForRoute(i));
+        }
+
+        TableCellRenderer base = table.getDefaultRenderer(Object.class);
+        table.putClientProperty("bikedump.baseObjectRenderer", base); // keep for restore
+        table.setDefaultRenderer(Object.class, new org.hifly.bikedump.gui.table.TrackColorRowRenderer(base, colorByName, 1));
+        table.repaint();
+    }
+
+    private void clearTrackRowColors(JTable table) {
+        if (table == null) return;
+
+        Object saved = table.getClientProperty("bikedump.baseObjectRenderer");
+        if (saved instanceof TableCellRenderer) {
+            table.setDefaultRenderer(Object.class, (TableCellRenderer) saved);
+            table.putClientProperty("bikedump.baseObjectRenderer", null);
+        } else {
+            // fallback: reset to Swing default
+            table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer());
+        }
+        table.repaint();
     }
 
     public static void main(String[] args) {

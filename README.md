@@ -64,7 +64,7 @@ See dedicated instructions:
 Run Bike Dump with the pre-built jar:
 
 ```bash
-java -jar dist/bikedump-0.5.0-release.jar
+java -jar dist/bikedump-0.6.0-release.jar
 ```
 
 ## How to Compile
@@ -95,7 +95,7 @@ mvn clean package
 Execute the newly built jar:
 
 ```bash
-java -jar target/bikedump-0.5.0-release.jar
+java -jar target/bikedump-0.6.0-release.jar
 ```
 
 ## External Libraries & Licenses

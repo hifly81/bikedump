@@ -9,6 +9,11 @@ import org.hifly.bikedump.gui.dialog.GraphViewer;
 import org.hifly.bikedump.gui.panel.WorkoutCalendar;
 import org.hifly.bikedump.report.PdfReport;
 import org.hifly.bikedump.storage.DataHolder;
+import org.hifly.bikedump.domain.Track;
+import org.hifly.bikedump.domain.gps.WaypointSegment;
+import org.hifly.bikedump.gui.panel.TrackTable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,28 +66,109 @@ public class Toolbar extends JToolBar {
         img = webImageIcon.getImage();
         img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
 
-
         add(backButton);
         backButton.addActionListener(event -> {
-            if (currentFrame.getFolderDetailViewer() != null && currentFrame.getFolderMapScrollViewer() != null && currentFrame.getFolderTableViewer() != null)
-                currentFrame.repaintPanels(currentFrame.getFolderTableViewer(), currentFrame.getFolderMapScrollViewer(), currentFrame.getFolderDetailViewer());
+            if (currentFrame.getFolderMapScrollViewer() != null
+                    && currentFrame.getFolderTableViewer() != null
+                    && currentFrame.getHomeAggregateDetailViewer() != null) {
+
+                if (currentFrame.trackTable != null) {
+                    currentFrame.trackTable.clearSelection();
+                }
+                DataHolder.tracksSelected.clear();
+
+                currentFrame.repaintPanels(
+                        currentFrame.getFolderTableViewer(),
+                        currentFrame.getFolderMapScrollViewer(),
+                        currentFrame.getHomeAggregateDetailViewer()
+                );
+            }
         });
 
         add(graphButton);
         graphButton.addActionListener(event -> {
-            if(DataHolder.listsWaypointSegment == null) {
+            if (currentFrame.trackTable == null) {
                 JOptionPane.showMessageDialog(currentFrame,
-                        "Graphs not available",
+                        "No track table available",
                         "Graphs not available",
                         JOptionPane.ERROR_MESSAGE);
-            } else {
-                WaypointElevationGraph waypointElevationGraph = new WaypointElevationGraph(DataHolder.listsWaypointSegment);
-                WaypointAvgSpeedGraph waypointAvgSpeedGraph = new WaypointAvgSpeedGraph(DataHolder.listsWaypointSegment);
-                WaypointTimeGraph waypointTimeGraph = new WaypointTimeGraph(DataHolder.listsWaypointSegment);
-                WaypointElevationGainedGraph waypointElevationGainedGraph = new WaypointElevationGainedGraph(DataHolder.listsWaypointSegment);
-                new GraphViewer(currentFrame,
-                        Arrays.asList(waypointElevationGraph, waypointAvgSpeedGraph, waypointTimeGraph, waypointElevationGainedGraph));
+                return;
             }
+
+            int[] selectedRows = currentFrame.trackTable.getSelectedRows();
+            if (selectedRows == null || selectedRows.length == 0) {
+                // fallback: treat all visible rows as selected
+                int rc = currentFrame.trackTable.getRowCount();
+                if (rc > 0) {
+                    selectedRows = new int[rc];
+                    for (int i = 0; i < rc; i++) selectedRows[i] = i;
+                }
+            }
+
+            if (selectedRows == null || selectedRows.length == 0) {
+                JOptionPane.showMessageDialog(currentFrame,
+                        "Select one track to show graphs.",
+                        "Graphs",
+                        JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            if (selectedRows.length > 1) {
+                JOptionPane.showMessageDialog(currentFrame,
+                        "Select only one track to show graphs.",
+                        "Graphs",
+                        JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            int viewRow = selectedRows[0];
+            int modelRow = currentFrame.trackTable.convertRowIndexToModel(viewRow);
+
+            Track selectedTrack = ((TrackTable.TrackTableModel) currentFrame.trackTable.getModel()).getTrackAt(modelRow);
+
+            if (selectedTrack == null) {
+                JOptionPane.showMessageDialog(currentFrame,
+                        "Can't determine selected track.",
+                        "Graphs",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+
+            if (DataHolder.tracksLoaded == null || DataHolder.tracksLoaded.isEmpty()) {
+                JOptionPane.showMessageDialog(currentFrame,
+                        "No tracks loaded",
+                        "Graphs not available",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Build waypoint segments ONLY for selected tracks
+            List<List<WaypointSegment>> selectedLists = new ArrayList<>();
+
+            for (int viewRow2: selectedRows) {
+                int modelRow2 = currentFrame.trackTable.convertRowIndexToModel(viewRow2);
+                Track track = ((TrackTable.TrackTableModel) currentFrame.trackTable.getModel()).getTrackAt(modelRow2);
+                if (track != null && track.getCoordinatesNewKm() != null && !track.getCoordinatesNewKm().isEmpty()) {
+                    selectedLists.add(new ArrayList<>(track.getCoordinatesNewKm().values()));
+                }
+            }
+
+            if (selectedLists.isEmpty()) {
+                JOptionPane.showMessageDialog(currentFrame,
+                        "Graphs not available for selected track(s)",
+                        "Graphs not available",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Use the same graph logic, but based on selection
+            WaypointElevationGraph waypointElevationGraph = new WaypointElevationGraph(selectedLists);
+            WaypointAvgSpeedGraph waypointAvgSpeedGraph = new WaypointAvgSpeedGraph(selectedLists);
+            WaypointTimeGraph waypointTimeGraph = new WaypointTimeGraph(selectedLists);
+            WaypointElevationGainedGraph waypointElevationGainedGraph = new WaypointElevationGainedGraph(selectedLists);
+
+            new GraphViewer(currentFrame,
+                    Arrays.asList(waypointElevationGraph, waypointAvgSpeedGraph, waypointTimeGraph, waypointElevationGainedGraph));
         });
 
         add(reportButton);

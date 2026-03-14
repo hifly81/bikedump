@@ -7,9 +7,12 @@ import org.hifly.bikedump.gui.Bikedump;
 import org.hifly.bikedump.storage.DataHolder;
 
 import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
@@ -30,42 +33,43 @@ public class WorkoutCalendar extends JFrame {
     static Map<Integer, List<Track>> mapTrackByDay = new HashMap<>();
     static HashMap<String, List<Track>> tracksByMonth = DataHolder.getTracksByMonth();
 
-    //TODO derive dimension from parent
+    private JPanel pnlCalendar;
+    private JLabel lblYear;
+    private JScrollPane stblCalendar;
+
     public WorkoutCalendar(Bikedump mapViewer) {
         this.mapViewer = mapViewer;
         this.currentFrame = this;
 
         setTitle("Workout Calendar");
-        setSize(330, 375);
+
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        int w = Math.max(330, (int) (screen.width * 0.25));
+        int h = Math.max(375, (int) (screen.height * 0.25));
+        setSize(w, h);
+
         getContentPane().setLayout(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        //Create controls
         lblMonth = new JLabel("January");
-        JLabel lblYear = new JLabel("Change year:");
+        lblYear = new JLabel("Change year:");
         cmbYear = new JComboBox();
-        btnPrev = new JButton("&lt;&lt;");
-        btnNext = new JButton("&gt;&gt;");
+        btnPrev = new JButton("<<");
+        btnNext = new JButton(">>");
         tableModelCalendar = new DefaultTableModel() {
             private static final long serialVersionUID = 28L;
-
-            public boolean isCellEditable(int rowIndex, int mColIndex) {
-                return false;
-            }
+            public boolean isCellEditable(int rowIndex, int mColIndex) { return false; }
         };
         tableCalendar = new JTable(tableModelCalendar);
-        JScrollPane stblCalendar = new JScrollPane(tableCalendar);
-        JPanel pnlCalendar = new JPanel(null);
+        stblCalendar = new JScrollPane(tableCalendar);
+        pnlCalendar = new JPanel(null);
 
-        //Set border
         pnlCalendar.setBorder(BorderFactory.createTitledBorder("Calendar"));
 
-        //Register action listeners
         btnPrev.addActionListener(new btnPrev_Action());
         btnNext.addActionListener(new btnNext_Action());
         cmbYear.addActionListener(new cmbYear_Action());
 
-        //Add controls to pane
         getContentPane().add(pnlCalendar);
         pnlCalendar.add(lblMonth);
         pnlCalendar.add(lblYear);
@@ -74,39 +78,33 @@ public class WorkoutCalendar extends JFrame {
         pnlCalendar.add(btnNext);
         pnlCalendar.add(stblCalendar);
 
-        //Set bounds
-        pnlCalendar.setBounds(0, 0, 320, 335);
-        lblMonth.setBounds(160 - lblMonth.getPreferredSize().width / 2, 25, 100, 25);
-        lblYear.setBounds(10, 305, 80, 20);
-        cmbYear.setBounds(230, 305, 80, 20);
-        btnPrev.setBounds(10, 25, 50, 25);
-        btnNext.setBounds(260, 25, 50, 25);
-        stblCalendar.setBounds(10, 50, 300, 250);
+        doLayoutBounds();
+        addComponentListener(new ComponentAdapter() {
+            @Override public void componentResized(ComponentEvent e) {
+                doLayoutBounds();
+            }
+        });
 
-        //Make frame visible
-        setResizable(false);
+        setResizable(true);
+        setLocationRelativeTo(mapViewer);
         setVisible(true);
 
-        //Get real month/year
-        GregorianCalendar cal = new GregorianCalendar(); //Create calendar
-        realDay = cal.get(GregorianCalendar.DAY_OF_MONTH); //Get day
-        realMonth = cal.get(GregorianCalendar.MONTH); //Get month
-        realYear = cal.get(GregorianCalendar.YEAR); //Get year
-        currentMonth = realMonth; //Match month and year
+        GregorianCalendar cal = new GregorianCalendar();
+        realDay = cal.get(GregorianCalendar.DAY_OF_MONTH);
+        realMonth = cal.get(GregorianCalendar.MONTH);
+        realYear = cal.get(GregorianCalendar.YEAR);
+        currentMonth = realMonth;
         currentYear = realYear;
 
-        //Add headers
-        String[] headers = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}; //All headers
+        String[] headers = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
         for (int i = 0; i < 7; i++)
             tableModelCalendar.addColumn(headers[i]);
 
-        tableCalendar.getParent().setBackground(tableCalendar.getBackground()); //Set background
+        tableCalendar.getParent().setBackground(tableCalendar.getBackground());
 
-        //No resize/reorder
         tableCalendar.getTableHeader().setResizingAllowed(false);
         tableCalendar.getTableHeader().setReorderingAllowed(false);
 
-        //Single cell selection
         tableCalendar.setColumnSelectionAllowed(true);
         tableCalendar.setRowSelectionAllowed(true);
         tableCalendar.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -120,14 +118,15 @@ public class WorkoutCalendar extends JFrame {
                 if (!CollectionUtils.isEmpty(monthlyTracks)) {
                     Calendar cal = Calendar.getInstance();
                     Date startDate;
-                    //clear data holder
+
                     DataHolder.tracksSelected.clear();
                     for (Track track : monthlyTracks) {
                         startDate = track.getStartDate();
                         if (startDate != null) {
                             cal.setTime(startDate);
                             int day = cal.get(Calendar.DAY_OF_MONTH);
-                            if (day == (Integer) tableCalendar.getValueAt(row, col)) {
+                            Object cell = tableCalendar.getValueAt(row, col);
+                            if (cell instanceof Integer && day == (Integer) cell) {
                                 DataHolder.tracksSelected.add(new TrackSelected(track.getFileName(), track.getName()));
                             }
                         }
@@ -137,65 +136,95 @@ public class WorkoutCalendar extends JFrame {
                         currentFrame.mapViewer.loadSelectedTracks(currentFrame.mapViewer.trackTable);
                 }
             }
-
         });
 
-        //Set row/column count
-        tableCalendar.setRowHeight(38);
+        tableCalendar.setRowHeight(Math.max(38, (getHeight() - 120) / 6));
         tableModelCalendar.setColumnCount(7);
         tableModelCalendar.setRowCount(6);
 
-        //Populate table
         for (int i = realYear - 100; i <= realYear + 100; i++)
             cmbYear.addItem(String.valueOf(i));
 
-        //Refresh calendar
-        refreshCalendar(realMonth, realYear); //Refresh calendar
+        refreshCalendar(realMonth, realYear);
+    }
+
+    private void doLayoutBounds() {
+        int frameW = getContentPane().getWidth();
+        int frameH = getContentPane().getHeight();
+
+        int pad = 10;
+
+        // panel inside frame
+        pnlCalendar.setBounds(0, 0, frameW, frameH);
+
+        // top controls area
+        int topY = 25;
+        int btnW = 50;
+        int btnH = 25;
+
+        btnPrev.setBounds(pad, topY, btnW, btnH);
+        btnNext.setBounds(frameW - pad - btnW, topY, btnW, btnH);
+
+        lblMonth.setBounds(frameW / 2 - 90, topY, 180, 25);
+
+        // calendar table area
+        int tableTop = 50;
+        int bottomAreaH = 45;
+        int tableW = frameW - (pad * 2);
+        int tableH = frameH - tableTop - bottomAreaH - pad;
+
+        stblCalendar.setBounds(pad, tableTop, tableW, Math.max(150, tableH));
+
+        // bottom controls
+        int bottomY = frameH - bottomAreaH;
+        lblYear.setBounds(pad, bottomY + 10, 90, 20);
+        cmbYear.setBounds(frameW - pad - 80, bottomY + 10, 80, 20);
+
+        // adjust row height when resizing
+        if (tableCalendar != null) {
+            tableCalendar.setRowHeight(Math.max(38, stblCalendar.getHeight() / 6));
+        }
+
+        pnlCalendar.revalidate();
+        pnlCalendar.repaint();
     }
 
     public static void refreshCalendar(int month, int year) {
-        //Variables
         String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-        int nod, som; //Number Of Days, Start Of Month
+        int nod, som;
 
-        //Allow/disallow buttons
         btnPrev.setEnabled(true);
         btnNext.setEnabled(true);
         if (month == 0 && year <= realYear - 10) {
             btnPrev.setEnabled(false);
-        } //Too early
+        }
         if (month == 11 && year >= realYear + 100) {
             btnNext.setEnabled(false);
-        } //Too late
-        lblMonth.setText(months[month]); //Refresh the month label (at the top)
-        lblMonth.setBounds(160 - lblMonth.getPreferredSize().width / 2, 25, 180, 25); //Re-align label with calendar
-        cmbYear.setSelectedItem(String.valueOf(year)); //Select the correct year in the combo box
+        }
+        lblMonth.setText(months[month]);
+        lblMonth.setBounds(160 - lblMonth.getPreferredSize().width / 2, 25, 180, 25);
+        cmbYear.setSelectedItem(String.valueOf(year));
 
-        //Clear table
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 7; j++) {
                 tableModelCalendar.setValueAt(null, i, j);
             }
         }
 
-        //Get first day of month and number of days
         GregorianCalendar cal = new GregorianCalendar(year, month, 1);
         nod = cal.getActualMaximum(GregorianCalendar.DAY_OF_MONTH);
         som = cal.get(GregorianCalendar.DAY_OF_WEEK);
 
-        //Draw calendar
         for (int i = 1; i <= nod; i++) {
             int row = (i + som - 2) / 7;
             int column = (i + som - 2) % 7;
             tableModelCalendar.setValueAt(i, row, column);
         }
 
-        //Apply renderers
         tableCalendar.setDefaultRenderer(tableCalendar.getColumnClass(0), new CellCalendarRenderer());
     }
 
     private static void getMonthlyTracks() {
-        //get tracks by month
         if (!mapTrackByDay.isEmpty()) {
             mapTrackByDay.clear();
         }
@@ -222,7 +251,7 @@ public class WorkoutCalendar extends JFrame {
     }
 
     static class CellCalendarRenderer extends DefaultTableCellRenderer {
-        
+
         private static final long serialVersionUID = 29L;
 
         static ImageIcon imgBikeIcon;
@@ -234,14 +263,13 @@ public class WorkoutCalendar extends JFrame {
             imgBike = imgBike.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
             imgBikeIcon = new ImageIcon(imgBike);
             getMonthlyTracks();
-
         }
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focused, int row, int column) {
             super.getTableCellRendererComponent(table, value, selected, focused, row, column);
-            if (column == 0 || column == 6) { //Week-end
+            if (column == 0 || column == 6) {
                 setBackground(new Color(255, 220, 220));
-            } else { //Week
+            } else {
                 setBackground(new Color(255, 255, 255));
             }
             if (value != null) {
@@ -254,10 +282,9 @@ public class WorkoutCalendar extends JFrame {
                     setText(value.toString());
                     setIcon(null);
                 }
-                if (intValue == realDay && currentMonth == realMonth && currentYear == realYear) { //Today
+                if (intValue == realDay && currentMonth == realMonth && currentYear == realYear) {
                     setBackground(new Color(220, 220, 255));
                 }
-
             }
             setBorder(null);
             setForeground(Color.black);
@@ -267,11 +294,11 @@ public class WorkoutCalendar extends JFrame {
     }
 
     static class btnPrev_Action implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            if (currentMonth == 0) { //Back one year
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+            if (currentMonth == 0) {
                 currentMonth = 11;
                 currentYear -= 1;
-            } else { //Back one month
+            } else {
                 currentMonth -= 1;
             }
             getMonthlyTracks();
@@ -280,11 +307,11 @@ public class WorkoutCalendar extends JFrame {
     }
 
     static class btnNext_Action implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            if (currentMonth == 11) { //Foward one year
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+            if (currentMonth == 11) {
                 currentMonth = 0;
                 currentYear += 1;
-            } else { //Foward one month
+            } else {
                 currentMonth += 1;
             }
             getMonthlyTracks();
@@ -293,7 +320,7 @@ public class WorkoutCalendar extends JFrame {
     }
 
     static class cmbYear_Action implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(java.awt.event.ActionEvent e) {
             if (cmbYear.getSelectedItem() != null) {
                 String b = cmbYear.getSelectedItem().toString();
                 currentYear = Integer.parseInt(b);
