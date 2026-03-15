@@ -96,14 +96,6 @@ public class Toolbar extends JToolBar {
             }
 
             int[] selectedRows = currentFrame.trackTable.getSelectedRows();
-            if (selectedRows == null || selectedRows.length == 0) {
-                // fallback: treat all visible rows as selected
-                int rc = currentFrame.trackTable.getRowCount();
-                if (rc > 0) {
-                    selectedRows = new int[rc];
-                    for (int i = 0; i < rc; i++) selectedRows[i] = i;
-                }
-            }
 
             if (selectedRows == null || selectedRows.length == 0) {
                 JOptionPane.showMessageDialog(currentFrame,
