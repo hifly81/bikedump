@@ -18,18 +18,12 @@ public class StravaDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String OAUTH_HOST = "127.0.0.1";
-    private static final int OAUTH_PORT = 8765;
     private static final long OAUTH_TIMEOUT_MILLIS = 2 * 60 * 1000L; // 2 min
 
     private final StravaPref pref;
 
     // Status
     private final JLabel statusLabel = new JLabel();
-
-    // Test API
-    private final JTextField testAfterField = new JTextField("", 12);   // epoch seconds or empty
-    private final JTextField testBeforeField = new JTextField("", 12);  // epoch seconds or empty
 
     // Import (range)
     private final JTextField maxField = new JTextField("20", 6);
@@ -56,18 +50,27 @@ public class StravaDialog extends JDialog {
         setLocationRelativeTo(owner);
     }
 
+    private static <T extends Component> T left(T c) {
+        if (c instanceof JComponent jc) {
+            jc.setAlignmentX(Component.LEFT_ALIGNMENT);
+        }
+        return c;
+    }
+
     private JPanel buildPanel() {
         JPanel root = new JPanel();
         root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
         root.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        root.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        root.add(sectionTitle("Connection"));
-        root.add(buildConnectionPanel());
-        root.add(Box.createVerticalStrut(10));
+        root.add(left(sectionTitle("Connection")));
+        root.add(left(buildConnectionPanel()));
+        root.add(left(Box.createVerticalStrut(10)));
 
-        root.add(sectionTitle("Import rides"));
-        root.add(buildImportPanel());
+        root.add(left(sectionTitle("Import rides")));
+        root.add(left(buildImportPanel()));
 
+        root.add(left(Box.createVerticalGlue()));
         return root;
     }
 
@@ -79,17 +82,27 @@ public class StravaDialog extends JDialog {
 
     private JPanel buildConnectionPanel() {
         JPanel p = new JPanel(new GridBagLayout());
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(2, 2, 2, 2);
         c.anchor = GridBagConstraints.WEST;
 
-        c.gridx = 0; c.gridy = 0;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.NONE;
         p.add(new JLabel("Status:"), c);
 
         c.gridx = 1;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
         p.add(statusLabel, c);
 
-        c.gridx = 0; c.gridy = 1;
+        c.gridx = 0;
+        c.gridy = 1;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.NONE;
         JButton connect = new JButton("Connect");
         connect.addActionListener(e -> onConnect());
         p.add(connect, c);
@@ -99,10 +112,13 @@ public class StravaDialog extends JDialog {
         disconnect.addActionListener(e -> onDisconnect());
         p.add(disconnect, c);
 
-        JLabel hint = new JLabel("<html><small>Connect opens the browser and waits for the callback on "
-                + OAUTH_HOST + ":" + OAUTH_PORT + ".</small></html>");
-        hint.setForeground(Color.GRAY);
-        c.gridx = 0; c.gridy = 2; c.gridwidth = 2;
+        JLabel hint = new JLabel("<html><small>Connect opens the browser and waits for the callback on the configured host/port.</small></html>");
+        hint.setForeground(UIManager.getColor("Label.disabledForeground"));
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 2;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
         p.add(hint, c);
 
         return p;
@@ -111,34 +127,61 @@ public class StravaDialog extends JDialog {
     private JPanel buildImportPanel() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel hint = new JLabel("<html><small>Imports Ride activities as GPX using Strava Streams. Dates are UTC (YYYY-MM-DD).</small></html>");
-        hint.setForeground(Color.GRAY);
-        p.add(hint);
+        hint.setForeground(UIManager.getColor("Label.disabledForeground"));
+        p.add(left(hint));
+        p.add(left(Box.createVerticalStrut(6)));
 
         JPanel form = new JPanel(new GridBagLayout());
+        form.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(2, 2, 2, 2);
         c.anchor = GridBagConstraints.WEST;
 
-        c.gridx = 0; c.gridy = 0;
+        // row 0
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.NONE;
         form.add(new JLabel("Max rides:"), c);
+
         c.gridx = 1;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.NONE; // keep compact, left aligned
         form.add(maxField, c);
 
-        c.gridx = 0; c.gridy = 1;
+        // row 1
+        c.gridx = 0;
+        c.gridy = 1;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.NONE;
         form.add(new JLabel("From (YYYY-MM-DD):"), c);
+
         c.gridx = 1;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.NONE;
         form.add(fromField, c);
 
-        c.gridx = 0; c.gridy = 2;
+        // row 2
+        c.gridx = 0;
+        c.gridy = 2;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.NONE;
         form.add(new JLabel("To (YYYY-MM-DD):"), c);
+
         c.gridx = 1;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.NONE;
         form.add(toField, c);
 
-        p.add(form);
+        p.add(left(form));
+        p.add(left(Box.createVerticalStrut(6)));
 
         JButton importBtn = new JButton("Import");
+        importBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
         importBtn.addActionListener(e -> onImportWithRange());
         p.add(importBtn);
 
