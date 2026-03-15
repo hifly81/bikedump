@@ -22,8 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-// Component-based detail viewer (no HTML) with cards and collapsible sections.
-// Keeps the existing getText4Report() output format intact for PDF reporting.
+
 public class DetailViewer extends JScrollPane {
 
     private static final long serialVersionUID = 22L;
@@ -384,7 +383,8 @@ public class DetailViewer extends JScrollPane {
             km++;
         }
 
-        root.add(new SectionPanel("Lap details", lapsBody, false));
+        int lapsCount = (track.getCoordinatesNewKm() != null) ? track.getCoordinatesNewKm().size() : 0;
+        root.add(new SectionPanel("Lap details (" + lapsCount + ")", lapsBody, false));
 
         setViewportView(root);
         revalidate();

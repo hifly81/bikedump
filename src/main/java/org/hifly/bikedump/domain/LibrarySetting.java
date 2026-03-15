@@ -11,6 +11,7 @@ public class LibrarySetting implements Serializable {
     private boolean scanFolder;
     private String offlineTilesPath;
     private boolean useOfflineTiles;
+    private String osmApiKey;
 
     public boolean isScanFolder() {
         return scanFolder;
@@ -43,4 +44,8 @@ public class LibrarySetting implements Serializable {
     public void setUseOfflineTiles(boolean useOfflineTiles) {
         this.useOfflineTiles = useOfflineTiles;
     }
+
+    public String getOsmApiKey() { return osmApiKey; }
+
+    public void setOsmApiKey(String osmApiKey) { this.osmApiKey = osmApiKey; }
 }

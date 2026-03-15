@@ -5,9 +5,6 @@ import org.hifly.bikedump.domain.StravaPref;
 import org.hifly.bikedump.storage.GeoMapStorage;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -19,7 +16,6 @@ public class Settings extends JDialog {
     private JTextField offlineTilesPathField = null;
     private JButton browseOfflineTilesButton = null;
 
-    // --- Strava UI ---
     private JTextField stravaClientIdField = null;
     private JPasswordField stravaClientSecretField = null;
     private JButton stravaSaveCredentialsButton = null;
@@ -31,6 +27,8 @@ public class Settings extends JDialog {
     private JCheckBox stravaAutoSyncEnabled = null;
     private JComboBox<String> stravaAutoSyncInterval = null;
 
+    private JTextField osmApiKeyField = null;
+
     public Settings(Frame frame) {
         super(frame, true);
 
@@ -38,7 +36,7 @@ public class Settings extends JDialog {
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("General", null, createGeneralSettingPanel(), "General settings");
-        tabbedPane.addTab("Library", null, createLibrarySettingPanel(), "Library settings");
+        tabbedPane.addTab("Maps", null, createMapsSettingPanel(), "Map settings");
         tabbedPane.addTab("Strava", null, createStravaSettingPanel(), "Strava settings");
 
         setContentPane(tabbedPane);
@@ -47,188 +45,309 @@ public class Settings extends JDialog {
     }
 
     public JPanel createGeneralSettingPanel() {
-        JPanel panel = new JPanel();
+        JPanel root = new JPanel(new GridBagLayout());
+        root.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JPanel panel1 = new JPanel();
-        Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "General");
-        panel1.setBorder(titleBorder);
-
-        elevationCorrection = new JCheckBox("Elevation Correction");
-        elevationCorrection.addItemListener(new CheckListener());
-        //TODO implement save/restore from pref
-        elevationCorrection.setSelected(true);
-
-        showTipsAtStartup = new JCheckBox("Show Tips at Startup");
-        //TODO implement save/restore from pref
-        showTipsAtStartup.setSelected(true);
-
-        panel1.add(elevationCorrection);
-        panel1.add(showTipsAtStartup);
-
-        panel.add(panel1);
-
-        return panel;
-    }
-
-    public JPanel createLibrarySettingPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        // Library settings panel
-        JPanel panel1 = new JPanel();
-        Border titleBorder = new TitledBorder(new LineBorder(Color.RED), "Library");
-        panel1.setBorder(titleBorder);
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(4, 4, 4, 4);
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
 
         scanFoldersCheck = new JCheckBox("Scan imported folders");
         scanFoldersCheck.addItemListener(new CheckListener());
-        scanFoldersCheck.setSelected(GeoMapStorage.librarySetting == null ? false : GeoMapStorage.librarySetting.isScanFolder());
+        scanFoldersCheck.setSelected(GeoMapStorage.librarySetting != null && GeoMapStorage.librarySetting.isScanFolder());
+        root.add(scanFoldersCheck, c);
 
-        panel1.add(scanFoldersCheck);
+        c.gridy++;
 
-        // Offline tiles settings panel
-        JPanel panel2 = new JPanel();
-        panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
-        Border tilesBorder = new TitledBorder(new LineBorder(Color.BLUE), "Offline Map Tiles");
-        panel2.setBorder(tilesBorder);
+        elevationCorrection = new JCheckBox("Elevation Correction");
+        elevationCorrection.addItemListener(new CheckListener());
+        elevationCorrection.setSelected(true); // TODO: persist if you want
+        root.add(elevationCorrection, c);
+
+        c.gridy++;
+
+        showTipsAtStartup = new JCheckBox("Show Tips at Startup");
+        showTipsAtStartup.setSelected(true); // TODO: persist if you want
+        root.add(showTipsAtStartup, c);
+
+        // push everything up
+        c.gridy++;
+        c.weighty = 1.0;
+        root.add(Box.createVerticalGlue(), c);
+
+        return root;
+    }
+
+    public JPanel createMapsSettingPanel() {
+        JPanel root = new JPanel(new GridBagLayout());
+        root.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(4, 4, 4, 4);
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+        c.gridy = 0;
 
         useOfflineTiles = new JCheckBox("Use offline map tiles");
         useOfflineTiles.addItemListener(new CheckListener());
-        useOfflineTiles.setSelected(GeoMapStorage.librarySetting == null ? false : GeoMapStorage.librarySetting.isUseOfflineTiles());
+        useOfflineTiles.setSelected(GeoMapStorage.librarySetting != null && GeoMapStorage.librarySetting.isUseOfflineTiles());
 
-        JPanel pathPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        pathPanel.add(new JLabel("Tiles directory:"));
-        offlineTilesPathField = new JTextField(30);
+        c.gridwidth = 3;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1.0;
+        root.add(useOfflineTiles, c);
+
+        c.gridy++;
+        c.gridwidth = 1;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.NONE;
+        root.add(new JLabel("Tiles directory:"), c);
+
+        offlineTilesPathField = new JTextField(28);
         String currentPath = GeoMapStorage.librarySetting != null ? GeoMapStorage.librarySetting.getOfflineTilesPath() : "";
         offlineTilesPathField.setText(currentPath != null ? currentPath : "");
         offlineTilesPathField.addFocusListener(new PathFieldListener());
 
+        c.gridx = 1;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        root.add(offlineTilesPathField, c);
+
         browseOfflineTilesButton = new JButton("Browse...");
         browseOfflineTilesButton.addActionListener(new BrowseActionListener());
 
-        pathPanel.add(offlineTilesPathField);
-        pathPanel.add(browseOfflineTilesButton);
+        c.gridx = 2;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.NONE;
+        root.add(browseOfflineTilesButton, c);
 
-        panel2.add(useOfflineTiles);
-        panel2.add(pathPanel);
+        c.gridx = 0;
+        c.gridy++;
+        root.add(new JLabel("OSM API key:"), c);
 
-        JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel infoLabel = new JLabel("<html><small>Directory should contain tiles in format: {z}/{x}/{y}.png</small></html>");
-        infoLabel.setForeground(Color.GRAY);
-        infoPanel.add(infoLabel);
-        panel2.add(infoPanel);
+        osmApiKeyField = new JTextField(28);
+        String k = GeoMapStorage.librarySetting != null ? GeoMapStorage.librarySetting.getOsmApiKey() : "";
+        osmApiKeyField.setText(k != null ? k : "");
 
-        panel.add(panel1);
-        panel.add(panel2);
+        // save on focus lost (simple)
+        osmApiKeyField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                ensureLibrarySetting();
+                GeoMapStorage.librarySetting.setOsmApiKey(osmApiKeyField.getText());
+                GeoMapStorage.save();
+            }
+        });
 
-        return panel;
+        c.gridx = 1;
+        c.gridwidth = 2;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        root.add(osmApiKeyField, c);
+
+        // push up
+        c.gridx = 0;
+        c.gridy++;
+        c.gridwidth = 3;
+        c.weighty = 1.0;
+        root.add(Box.createVerticalGlue(), c);
+
+        return root;
     }
 
+    private void ensureLibrarySetting() {
+        if (GeoMapStorage.librarySetting == null) {
+            GeoMapStorage.librarySetting = new LibrarySetting();
+        }
+    }
     public JPanel createStravaSettingPanel() {
         if (GeoMapStorage.stravaPref == null) {
             GeoMapStorage.stravaPref = new StravaPref();
         }
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JPanel root = new JPanel();
+        root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
+        root.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // -------------------- Credentials --------------------
-        JPanel credPanel = new JPanel();
-        credPanel.setLayout(new BoxLayout(credPanel, BoxLayout.Y_AXIS));
-        credPanel.setBorder(new TitledBorder(new LineBorder(Color.RED), "Strava App Credentials"));
+        root.add(sectionTitle("Strava App Credentials"));
+        root.add(buildStravaCredentialsPanel());
+        root.add(Box.createVerticalStrut(10));
 
-        JPanel idPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        idPanel.add(new JLabel("Client ID:"));
-        stravaClientIdField = new JTextField(20);
+        root.add(sectionTitle("OAuth Callback (Local)"));
+        root.add(buildStravaCallbackPanel());
+        root.add(Box.createVerticalStrut(10));
+
+        root.add(sectionTitle("Auto Sync"));
+        root.add(buildStravaAutoSyncPanel());
+
+        root.add(Box.createVerticalGlue());
+
+        return root;
+    }
+
+    private JComponent sectionTitle(String title) {
+        JLabel l = new JLabel(title);
+        l.setFont(l.getFont().deriveFont(Font.BOLD));
+        l.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return l;
+    }
+
+    private JPanel buildStravaCredentialsPanel() {
+        JPanel p = new JPanel(new GridBagLayout());
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(4, 4, 4, 4);
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+        c.gridy = 0;
+
+        p.add(new JLabel("Client ID:"), c);
+
+        stravaClientIdField = new JTextField(22);
         stravaClientIdField.setText(GeoMapStorage.stravaPref.getClientId() == null ? "" : GeoMapStorage.stravaPref.getClientId());
-        idPanel.add(stravaClientIdField);
 
-        JPanel secretPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        secretPanel.add(new JLabel("Client Secret:"));
-        stravaClientSecretField = new JPasswordField(20);
+        c.gridx = 1;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        p.add(stravaClientIdField, c);
 
-        // IMPORTANT: for minimum exposure, do not re-display the real secret
-        // If you prefer to show it, replace with: GeoMapStorage.stravaPref.getClientSecret()
+        // Client Secret
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.NONE;
+        p.add(new JLabel("Client Secret:"), c);
+
+        stravaClientSecretField = new JPasswordField(22);
+
         String existingSecret = GeoMapStorage.stravaPref.getClientSecret();
         if (existingSecret != null && !existingSecret.isEmpty()) {
             stravaClientSecretField.setText("********");
         } else {
             stravaClientSecretField.setText("");
         }
-        secretPanel.add(stravaClientSecretField);
 
-        JPanel credButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        c.gridx = 1;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        p.add(stravaClientSecretField, c);
+
+        // Buttons row
+        c.gridx = 0;
+        c.gridy++;
+        c.gridwidth = 2;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.NONE;
+
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        buttons.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         stravaSaveCredentialsButton = new JButton("Save");
         stravaSaveCredentialsButton.addActionListener(new StravaSaveCredentialsListener());
+
         stravaClearCredentialsButton = new JButton("Clear");
         stravaClearCredentialsButton.addActionListener(new StravaClearCredentialsListener());
-        credButtons.add(stravaSaveCredentialsButton);
-        credButtons.add(stravaClearCredentialsButton);
 
-        JPanel credInfoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel credInfo = new JLabel("<html><small>Saved locally in ~/.bikedump/preferences/strava.pref (secret is obfuscated, not encrypted).</small></html>");
-        credInfo.setForeground(Color.GRAY);
-        credInfoPanel.add(credInfo);
+        buttons.add(stravaSaveCredentialsButton);
+        buttons.add(stravaClearCredentialsButton);
+        p.add(buttons, c);
 
-        credPanel.add(idPanel);
-        credPanel.add(secretPanel);
-        credPanel.add(credButtons);
-        credPanel.add(credInfoPanel);
+        // Info row
+        c.gridy++;
+        JLabel info = new JLabel("<html><small>Saved locally in ~/.bikedump/preferences/strava.pref (secret is obfuscated, not encrypted).</small></html>");
+        info.setForeground(Color.GRAY);
+        p.add(info, c);
 
-        // -------------------- OAuth callback --------------------
-        JPanel callbackPanel = new JPanel();
-        callbackPanel.setLayout(new BoxLayout(callbackPanel, BoxLayout.Y_AXIS));
-        callbackPanel.setBorder(new TitledBorder(new LineBorder(Color.BLUE), "OAuth Callback (Local)"));
+        return p;
+    }
 
-        JPanel hostPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        hostPanel.add(new JLabel("Redirect host:"));
-        stravaHostField = new JTextField(20);
+    private JPanel buildStravaCallbackPanel() {
+        JPanel p = new JPanel(new GridBagLayout());
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(4, 4, 4, 4);
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+        c.gridy = 0;
+
+        p.add(new JLabel("Redirect host:"), c);
+
+        stravaHostField = new JTextField(22);
         String host = GeoMapStorage.stravaPref.getRedirectHost();
         stravaHostField.setText(host == null || host.isEmpty() ? "127.0.0.1" : host);
         stravaHostField.addFocusListener(new StravaHostFieldListener());
-        hostPanel.add(stravaHostField);
 
-        JPanel portPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        portPanel.add(new JLabel("Callback port:"));
+        c.gridx = 1;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        p.add(stravaHostField, c);
+
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.NONE;
+        p.add(new JLabel("Callback port:"), c);
+
         stravaPortField = new JTextField(8);
         int port = GeoMapStorage.stravaPref.getCallbackPort();
         stravaPortField.setText(String.valueOf(port <= 0 ? 8765 : port));
         stravaPortField.addFocusListener(new StravaPortFieldListener());
-        portPanel.add(stravaPortField);
 
-        JPanel uriPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        c.gridx = 1;
+        c.fill = GridBagConstraints.NONE;
+        p.add(stravaPortField, c);
+
+        c.gridx = 0;
+        c.gridy++;
+        c.gridwidth = 2;
+
         JLabel uriLabel = new JLabel();
         uriLabel.setForeground(Color.GRAY);
         uriLabel.setText(buildRedirectUriText());
-        uriPanel.add(uriLabel);
 
         stravaHostField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                uriLabel.setText(buildRedirectUriText());
-            }
+            @Override public void keyReleased(KeyEvent e) { uriLabel.setText(buildRedirectUriText()); }
         });
         stravaPortField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                uriLabel.setText(buildRedirectUriText());
-            }
+            @Override public void keyReleased(KeyEvent e) { uriLabel.setText(buildRedirectUriText()); }
         });
 
-        callbackPanel.add(hostPanel);
-        callbackPanel.add(portPanel);
-        callbackPanel.add(uriPanel);
+        p.add(uriLabel, c);
 
-        // -------------------- Auto Sync --------------------
-        JPanel syncPanel = new JPanel();
-        syncPanel.setLayout(new BoxLayout(syncPanel, BoxLayout.Y_AXIS));
-        syncPanel.setBorder(new TitledBorder(new LineBorder(Color.DARK_GRAY), "Auto Sync"));
+        return p;
+    }
+
+    private JPanel buildStravaAutoSyncPanel() {
+        JPanel p = new JPanel(new GridBagLayout());
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(4, 4, 4, 4);
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+        c.gridy = 0;
 
         stravaAutoSyncEnabled = new JCheckBox("Enable auto-sync");
         stravaAutoSyncEnabled.setSelected(GeoMapStorage.stravaPref.isAutoSyncEnabled());
         stravaAutoSyncEnabled.addItemListener(new StravaSyncCheckListener());
 
-        JPanel intervalPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        intervalPanel.add(new JLabel("Interval:"));
+        c.gridwidth = 2;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        p.add(stravaAutoSyncEnabled, c);
+
+        c.gridy++;
+        c.gridwidth = 1;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.NONE;
+        p.add(new JLabel("Interval:"), c);
+
         stravaAutoSyncInterval = new JComboBox<>(new String[]{
                 "30 minutes",
                 "1 hour",
@@ -237,25 +356,24 @@ public class Settings extends JDialog {
         });
         stravaAutoSyncInterval.setSelectedItem(millisToIntervalLabel(GeoMapStorage.stravaPref.getAutoSyncIntervalMillis()));
         stravaAutoSyncInterval.addActionListener(new StravaIntervalActionListener());
-        intervalPanel.add(stravaAutoSyncInterval);
 
-        JPanel syncInfoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel syncInfo = new JLabel("<html><small>Auto-sync runs only while the app is open.</small></html>");
-        syncInfo.setForeground(Color.GRAY);
-        syncInfoPanel.add(syncInfo);
+        c.gridx = 1;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.NONE;
+        p.add(stravaAutoSyncInterval, c);
 
-        syncPanel.add(stravaAutoSyncEnabled);
-        syncPanel.add(intervalPanel);
-        syncPanel.add(syncInfoPanel);
+        c.gridx = 0;
+        c.gridy++;
+        c.gridwidth = 2;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
 
-        // Compose tab
-        panel.add(credPanel);
-        panel.add(callbackPanel);
-        panel.add(syncPanel);
+        JLabel info = new JLabel("<html><small>Auto-sync runs only while the app is open.</small></html>");
+        info.setForeground(Color.GRAY);
+        p.add(info, c);
 
-        return panel;
+        return p;
     }
-
     private String buildRedirectUriText() {
         String host = (stravaHostField != null ? stravaHostField.getText() : null);
         if (host == null || host.trim().isEmpty()) host = "127.0.0.1";
@@ -339,8 +457,6 @@ public class Settings extends JDialog {
             }
         }
     }
-
-    // -------------------- Strava listeners --------------------
 
     class StravaSaveCredentialsListener implements ActionListener {
         @Override
