@@ -1,5 +1,7 @@
 package org.hifly.bikedump.util;
 
+import org.hifly.bikedump.utility.OfflineTileSource;
+
 import java.io.File;
 
 /**

@@ -1,4 +1,4 @@
-package org.hifly.bikedump.util;
+package org.hifly.bikedump.utility;
 
 import org.openstreetmap.gui.jmapviewer.tilesources.AbstractTileSource;
 

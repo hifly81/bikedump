@@ -1,7 +1,6 @@
-package org.hifly.bikedump.graph;
+package org.hifly.bikedump.gui.graph;
 
 import org.hifly.bikedump.domain.gps.WaypointSegment;
-import org.hifly.bikedump.utility.GPSUtility;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
@@ -13,9 +12,9 @@ import org.jfree.data.xy.XYSeriesCollection;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WaypointElevationGainedGraph extends WaypointGraph {
+public class WaypointTimeGraph extends WaypointGraph {
 
-    public WaypointElevationGainedGraph(List<List<WaypointSegment>> waypoints) {
+    public WaypointTimeGraph(List<List<WaypointSegment>> waypoints) {
         super(waypoints);
     }
 
@@ -25,10 +24,10 @@ public class WaypointElevationGainedGraph extends WaypointGraph {
         IntervalXYDataset dataset = createDataset();
 
         final JFreeChart chart = ChartFactory.createXYBarChart(
-                "elevation gained/distance",
+                "time/distance",
                 "distance (Km.)",
                 false,
-                "elevation gained (m.)",
+                "time (min.)",
                 dataset,
                 PlotOrientation.VERTICAL,
                 true,
@@ -36,7 +35,7 @@ public class WaypointElevationGainedGraph extends WaypointGraph {
                 false
         );
 
-        TextTitle subtitle1 = new TextTitle("This plot shows the elevation gained (+ or -) for every lap");
+        TextTitle subtitle1 = new TextTitle("This plot shows the time duration of each lap");
         chart.addSubtitle(subtitle1);
 
         //remove old legends
@@ -53,14 +52,14 @@ public class WaypointElevationGainedGraph extends WaypointGraph {
         for(List<WaypointSegment> waypoint:waypoints) {
             XYSeries series1 = new XYSeries(index);
             for(WaypointSegment km:waypoint)
-                series1.add(km.getUnit(), GPSUtility.roundDoubleStat(km.getEleGained()));
+                series1.add(km.getUnit(),((km.getTimeIncrement()/1000))/60);
             series.add(series1);
             index++;
         }
 
         XYSeriesCollection dataset = new XYSeriesCollection();
-        series.forEach(dataset::addSeries);
+        for(XYSeries serie:series)
+            dataset.addSeries(serie);
         return dataset;
     }
-
 }

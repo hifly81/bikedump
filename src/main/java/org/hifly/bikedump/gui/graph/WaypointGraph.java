@@ -1,4 +1,4 @@
-package org.hifly.bikedump.graph;
+package org.hifly.bikedump.gui.graph;
 
 import org.hifly.bikedump.domain.gps.Waypoint;
 import org.hifly.bikedump.domain.gps.WaypointSegment;

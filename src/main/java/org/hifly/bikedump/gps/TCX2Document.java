@@ -6,8 +6,6 @@ import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.utility.GPSUtility;
 import org.hifly.bikedump.utility.SlopeUtility;
 import org.hifly.bikedump.utility.TimeUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -15,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 
 public class TCX2Document extends GPSDocument {
-    private Logger log = LoggerFactory.getLogger(TCX2Document.class);
 
     public TCX2Document() {
         super();
@@ -28,7 +25,7 @@ public class TCX2Document extends GPSDocument {
 
         TrainingCenterDatabaseDocument doc = TrainingCenterDatabaseDocument.Factory.parse(new File(gpsFile));
         TrainingCenterDatabaseT tcx = doc.getTrainingCenterDatabase();
-        TrackT[] tracks = null;
+        TrackT[] tracks;
         //tcx can contain courses or activities
         if(tcx.getActivities()== null) {
             CourseT[] courses = tcx.getCourses().getCourseArray();
@@ -47,7 +44,6 @@ public class TCX2Document extends GPSDocument {
             totalTime = lap.getTotalTimeSeconds();
             calories = lap.getCalories();
         }
-
 
         for (TrackT track : tracks) {
             if(track.getTrackpointArray(track.getTrackpointArray().length - 1).getTime() != null)
@@ -150,5 +146,4 @@ public class TCX2Document extends GPSDocument {
 
         return resultTrack;
     }
-
 }

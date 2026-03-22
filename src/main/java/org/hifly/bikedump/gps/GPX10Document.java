@@ -109,5 +109,4 @@ public class GPX10Document extends GPSDocument {
             resultTrack.setStatsNewKm(GPSUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
         return resultTrack;
     }
-
 }

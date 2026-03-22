@@ -7,24 +7,23 @@ import org.hifly.bikedump.storage.GeoMapStorage;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.Serial;
 
 public class Settings extends JDialog {
 
+    @Serial
     private static final long serialVersionUID = 14L;
 
-    private JCheckBox scanFoldersCheck, elevationCorrection, showTipsAtStartup, useOfflineTiles = null;
+    private JCheckBox scanFoldersCheck;
+    private JCheckBox useOfflineTiles = null;
     private JTextField offlineTilesPathField = null;
-    private JButton browseOfflineTilesButton = null;
 
     private JTextField stravaClientIdField = null;
     private JPasswordField stravaClientSecretField = null;
-    private JButton stravaSaveCredentialsButton = null;
-    private JButton stravaClearCredentialsButton = null;
 
     private JTextField stravaHostField = null;
     private JTextField stravaPortField = null;
 
-    private JCheckBox stravaAutoSyncEnabled = null;
     private JComboBox<String> stravaAutoSyncInterval = null;
 
     private JTextField osmApiKeyField = null;
@@ -63,14 +62,14 @@ public class Settings extends JDialog {
 
         c.gridy++;
 
-        elevationCorrection = new JCheckBox("Elevation Correction");
+        JCheckBox elevationCorrection = new JCheckBox("Elevation Correction");
         elevationCorrection.addItemListener(new CheckListener());
         elevationCorrection.setSelected(true); // TODO: persist if you want
         root.add(elevationCorrection, c);
 
         c.gridy++;
 
-        showTipsAtStartup = new JCheckBox("Show Tips at Startup");
+        JCheckBox showTipsAtStartup = new JCheckBox("Show Tips at Startup");
         showTipsAtStartup.setSelected(true); // TODO: persist if you want
         root.add(showTipsAtStartup, c);
 
@@ -117,7 +116,7 @@ public class Settings extends JDialog {
         c.fill = GridBagConstraints.HORIZONTAL;
         root.add(offlineTilesPathField, c);
 
-        browseOfflineTilesButton = new JButton("Browse...");
+        JButton browseOfflineTilesButton = new JButton("Browse...");
         browseOfflineTilesButton.addActionListener(new BrowseActionListener());
 
         c.gridx = 2;
@@ -247,10 +246,10 @@ public class Settings extends JDialog {
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         buttons.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        stravaSaveCredentialsButton = new JButton("Save");
+        JButton stravaSaveCredentialsButton = new JButton("Save");
         stravaSaveCredentialsButton.addActionListener(new StravaSaveCredentialsListener());
 
-        stravaClearCredentialsButton = new JButton("Clear");
+        JButton stravaClearCredentialsButton = new JButton("Clear");
         stravaClearCredentialsButton.addActionListener(new StravaClearCredentialsListener());
 
         buttons.add(stravaSaveCredentialsButton);
@@ -333,7 +332,7 @@ public class Settings extends JDialog {
         c.gridx = 0;
         c.gridy = 0;
 
-        stravaAutoSyncEnabled = new JCheckBox("Enable auto-sync");
+        JCheckBox stravaAutoSyncEnabled = new JCheckBox("Enable auto-sync");
         stravaAutoSyncEnabled.setSelected(GeoMapStorage.stravaPref.isAutoSyncEnabled());
         stravaAutoSyncEnabled.addItemListener(new StravaSyncCheckListener());
 

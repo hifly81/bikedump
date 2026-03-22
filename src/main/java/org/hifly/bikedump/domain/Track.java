@@ -271,10 +271,6 @@ public class Track {
         this.climbingDistance = climbingDistance;
     }
 
-    public String getSportType() {
-        return sportType;
-    }
-
     public void setSportType(String sportType) {
         this.sportType = sportType;
     }
@@ -297,14 +293,6 @@ public class Track {
 
     public double getAvgTemperature() {
         return avgTemperature;
-    }
-
-    public void setAvgTemperature(double avgTemperature) {
-        this.avgTemperature = avgTemperature;
-    }
-
-    public SlopeSegment getAltimetricProfile() {
-        return altimetricProfile;
     }
 
     public void setAltimetricProfile(SlopeSegment altimetricProfile) {
@@ -330,12 +318,9 @@ public class Track {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Track)) return false;
-
-        Track track = (Track) o;
+        if (!(o instanceof Track track)) return false;
 
         return fileName.equals(track.fileName);
-
     }
 
     @Override

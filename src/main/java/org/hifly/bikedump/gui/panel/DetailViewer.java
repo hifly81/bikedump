@@ -4,8 +4,9 @@ import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.gps.SlopeSegment;
 import org.hifly.bikedump.domain.gps.Waypoint;
 import org.hifly.bikedump.domain.gps.WaypointSegment;
-import org.hifly.bikedump.graph.WaypointElevationGraph;
-import org.hifly.bikedump.graph.WaypointGraph;
+import org.hifly.bikedump.gui.graph.ClimbExtractor;
+import org.hifly.bikedump.gui.graph.WaypointElevationGraph;
+import org.hifly.bikedump.gui.graph.WaypointGraph;
 import org.hifly.bikedump.gui.Bikedump;
 import org.hifly.bikedump.gui.dialog.GraphViewer;
 import org.hifly.bikedump.gui.panel.components.MetricCard;
@@ -404,9 +405,9 @@ public class DetailViewer extends JScrollPane {
 
         SlopeSegment slope = slopes.get(slopeIndex);
         List<Waypoint> slopeWaypoints = slope.getWaypoints();
-
+        List<Waypoint> climbPts = ClimbExtractor.extractBestClimbWaypoints(slopeWaypoints);
         WaypointGraph waypointElevationGraph =
-                new WaypointElevationGraph(slopeWaypoints, true, false, true);
+                new WaypointElevationGraph(climbPts, true, false, true);
         new GraphViewer(currentFrame, Arrays.asList(waypointElevationGraph));
     }
 

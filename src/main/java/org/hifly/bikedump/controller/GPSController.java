@@ -23,13 +23,14 @@ import java.nio.file.Paths;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class GPSController {
 
     protected static Logger log = LoggerFactory.getLogger(GPSController.class);
-    private static DocumentBuilderFactory factory;
-    private static XPath xpath;
+    private static final DocumentBuilderFactory factory;
+    private static final XPath xpath;
     private static final String FILE_URI = "file://";
 
     static {
@@ -51,9 +52,9 @@ public class GPSController {
             if (evaluation != null)
                 gpxVersion = (String) evaluation;
             else
-                log.error("file is not GPX:" + filename);
+                log.error("file is not GPX:{}", filename);
 
-            switch (gpxVersion) {
+            switch (Objects.requireNonNull(gpxVersion)) {
                 case "1.1":
                     doc = new GPXDocument();
                     break;
@@ -86,9 +87,8 @@ public class GPSController {
             }
 
         } catch (SAXParseException sax) {
-            log.error("file is not GPX [" + sax.getMessage() + "]:" + filename);
+            log.error("file is not GPX [{}]:{}", sax.getMessage(), filename);
         } catch (Exception ex) {
-            ex.printStackTrace();
             log.error("can't load [" + ex.getMessage() + "]:" + filename);
             sb.append("can't load:").append(filename);
         }
@@ -133,8 +133,6 @@ public class GPSController {
         DocumentBuilder builder = factory.newDocumentBuilder();
         Path path = Paths.get(filename);
         String filenamePart = path.getFileName().toString();
-        //TODO consider URI from external sources
         return builder.parse(FILE_URI + StreamUtility.getPathFromAbsoulutePath(filename) + StreamUtility.encodeFilenameOmittingWhiteSpaces(filenamePart, "UTF-8"));
-
     }
 }

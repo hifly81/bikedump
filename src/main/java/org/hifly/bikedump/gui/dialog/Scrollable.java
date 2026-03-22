@@ -33,10 +33,8 @@ public class Scrollable {
         dialog.setLocation((dim.width-dialog.getWidth())/2, (dim.height-dialog.getHeight())/2);
     }
 
-    public int showMessage(){
+    public void showMessage(){
         // show the dialog - this will block until setVisible(false) occurs
         dialog.setVisible(true);
-        // return whatever data is required
-        return dialogResult;
     }
 }

@@ -3,7 +3,7 @@ package org.hifly.bikedump.gui.events;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.TrackSelected;
 import org.hifly.bikedump.gui.Bikedump;
-import org.hifly.bikedump.gui.panel.TrackTable;
+import org.hifly.bikedump.gui.table.TrackTable;
 import org.hifly.bikedump.storage.DataHolder;
 
 import javax.swing.event.ListSelectionEvent;

@@ -2,11 +2,13 @@ package org.hifly.bikedump.gui.dialog;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.Serial;
 
 import static org.hifly.bikedump.utility.Constants.PROGRAM_NAME;
 
 public class About extends JDialog {
 
+    @Serial
     private static final long serialVersionUID = 16L;
 
     public About() {
@@ -35,7 +37,6 @@ public class About extends JDialog {
         textPanel.add(pane);
 
         basic.add(textPanel);
-
 
         setTitle(PROGRAM_NAME);
         setSize(new Dimension(450, 350));

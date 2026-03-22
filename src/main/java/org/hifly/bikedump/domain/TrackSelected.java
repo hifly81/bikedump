@@ -6,10 +6,6 @@ public class TrackSelected {
     private String filename;
     private String name;
 
-    public TrackSelected(String filename) {
-        this.filename = filename;
-    }
-
     public TrackSelected(String filename, String name) {
         this.filename = filename;
         this.name = name;
@@ -18,12 +14,9 @@ public class TrackSelected {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof TrackSelected)) return false;
-
-        TrackSelected that = (TrackSelected) o;
+        if (!(o instanceof TrackSelected that)) return false;
 
         return filename.equals(that.filename);
-
     }
 
     @Override
@@ -33,10 +26,6 @@ public class TrackSelected {
 
     public String getFilename() {
         return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
     }
 
     public String getName() {
