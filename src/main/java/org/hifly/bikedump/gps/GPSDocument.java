@@ -57,7 +57,6 @@ public abstract class GPSDocument {
                 totalEffectiveSpeedPoints++;
             } else {
                 //log.warn(gpsFile+": found a spike in speed for coordinate ["+currentLat+","+currentLon+"]:"+speed);
-
             }
             totalSpeed += speed;
             totalCalculatedSpeedPoints++;
@@ -89,7 +88,7 @@ public abstract class GPSDocument {
             totalTimeDiff += diffMillis;
             Double eleLast = elevationMap != null? elevationMap.get(GPSUtility.getKeyForCoordinatesMap(lastLat + "-" + lastLon)) : lastCalcEle.doubleValue();
             if (eleCurrent != null && eleLast != null) {
-                Double eleGained = eleCurrent - eleLast;
+                double eleGained = eleCurrent - eleLast;
                 if (eleGained > 0)
                     totalElevation += eleGained;
                 if (eleGained < 0)
@@ -134,7 +133,7 @@ public abstract class GPSDocument {
 
     protected void addCalculatedElevationElement(BigDecimal eleCalcCurrent, BigDecimal eleCalcLast) {
         if (eleCalcCurrent != null && eleCalcLast != null) {
-            Double eleGained = eleCalcCurrent.doubleValue() - eleCalcLast.doubleValue();
+            double eleGained = eleCalcCurrent.doubleValue() - eleCalcLast.doubleValue();
             if (eleGained > 0)
                 totalCalculatedElevation += eleGained;
 

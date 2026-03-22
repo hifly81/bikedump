@@ -1,8 +1,10 @@
 package org.hifly.bikedump.gui.menu;
 
 import org.hifly.bikedump.domain.gps.SlopeSegment;
-import org.hifly.bikedump.graph.WaypointElevationGraph;
-import org.hifly.bikedump.graph.WaypointGraph;
+import org.hifly.bikedump.domain.gps.Waypoint;
+import org.hifly.bikedump.gui.graph.ClimbExtractor;
+import org.hifly.bikedump.gui.graph.WaypointElevationGraph;
+import org.hifly.bikedump.gui.graph.WaypointGraph;
 import org.hifly.bikedump.gui.dialog.About;
 import org.hifly.bikedump.gui.dialog.GraphViewer;
 import org.hifly.bikedump.gui.events.QuitHandler;
@@ -240,8 +242,9 @@ public class TopMenu extends JMenuBar {
                     temp.setToolTipText(climbName);
                     climbsItem.add(temp);
                     temp.addActionListener(event -> {
+                        List<Waypoint> climbPts = ClimbExtractor.extractBestClimbWaypoints(slope.getWaypoints());
                         WaypointGraph waypointElevationGraph =
-                                new WaypointElevationGraph(slope.getWaypoints(), true, false, true);
+                                new WaypointElevationGraph(climbPts, true, false, true);
                         new GraphViewer(currentFrame, Arrays.asList(waypointElevationGraph));
                     });
                 }

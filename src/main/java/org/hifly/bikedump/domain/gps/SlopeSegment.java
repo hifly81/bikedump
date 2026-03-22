@@ -2,12 +2,14 @@ package org.hifly.bikedump.domain.gps;
 
 import org.hifly.bikedump.utility.TimeUtility;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 public class SlopeSegment implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 2L;
 
     protected double startLatitude;
@@ -34,32 +36,16 @@ public class SlopeSegment implements Serializable {
 
     protected List<Waypoint> waypoints;
 
-    public double getStartLatitude() {
-        return startLatitude;
-    }
-
     public void setStartLatitude(double startLatitude) {
         this.startLatitude = startLatitude;
-    }
-
-    public double getEndLatitude() {
-        return endLatitude;
     }
 
     public void setEndLatitude(double endLatitude) {
         this.endLatitude = endLatitude;
     }
 
-    public double getStartLongitude() {
-        return startLongitude;
-    }
-
     public void setStartLongitude(double startLongitude) {
         this.startLongitude = startLongitude;
-    }
-
-    public double getEndLongitude() {
-        return endLongitude;
     }
 
     public void setEndLongitude(double endLongitude) {
@@ -146,14 +132,6 @@ public class SlopeSegment implements Serializable {
         this.avgSpeed = avgSpeed;
     }
 
-    public double getMaximumGradient() {
-        return maximumGradient;
-    }
-
-    public void setMaximumGradient(double maximumGradient) {
-        this.maximumGradient = maximumGradient;
-    }
-
     public List<Waypoint> getWaypoints() {
         return waypoints;
     }
@@ -184,14 +162,6 @@ public class SlopeSegment implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String toString() {

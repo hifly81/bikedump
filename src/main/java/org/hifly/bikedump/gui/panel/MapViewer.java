@@ -7,7 +7,7 @@ import org.hifly.bikedump.gui.marker.NamedDotMarker;
 import org.hifly.bikedump.gui.marker.TooltipMarker;
 import org.hifly.bikedump.gui.panel.tiles.HumanitarianTileSource;
 import org.hifly.bikedump.storage.GeoMapStorage;
-import org.hifly.bikedump.util.OfflineTileSource;
+import org.hifly.bikedump.utility.OfflineTileSource;
 import org.hifly.bikedump.utility.GPSUtility;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
@@ -62,12 +62,6 @@ public class MapViewer extends JMapViewer implements MouseListener, MouseMotionL
             case HILL -> blend(base, Color.WHITE, 0.20f);     // mid
             case MOUNTAIN -> blend(base, Color.BLACK, 0.25f); // darker
         };
-    }
-
-    // TODO extremely slow even with 4 routes
-    public MapViewer(List<RouteOverlay> routes, int zoomLevel, double initialLat, double initialLon) {
-        this(routes, zoomLevel);
-        setDisplayPosition((int) initialLat, (int) initialLon, zoomLevel);
     }
 
     public MapViewer(List<RouteOverlay> routes, int zoomLevel) {

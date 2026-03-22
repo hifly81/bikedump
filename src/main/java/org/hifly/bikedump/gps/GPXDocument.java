@@ -1,6 +1,7 @@
 package org.hifly.bikedump.gps;
 
 import com.topografix.gpx.x1.x1.*;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.hifly.bikedump.domain.Author;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.utility.GPSUtility;
@@ -109,19 +110,7 @@ public class GPXDocument extends GPSDocument {
         resultTrack.setHeartFrequency(totalHeart / heart);
         resultTrack.setHeartMax(maxHeart);
 
-        Author author = new Author();
-        if (gpx.getMetadata() != null) {
-            if (gpx.getMetadata().getAuthor() != null) {
-                author.setName(gpx.getMetadata().getAuthor().getName());
-            }
-            if (gpx.getMetadata().getAuthor() != null && gpx.getMetadata().getAuthor().getEmail() != null) {
-                author.setEmail(
-                        gpx.getMetadata().getAuthor().getEmail().getId()
-                                + "@"
-                                + gpx.getMetadata().getAuthor().getEmail().getDomain()
-                );
-            }
-        }
+        Author author = getAuthor(gpx);
         resultTrack.setAuthor(author);
 
         resultTrack.setAltimetricProfile(SlopeUtility.totalAltimetricProfile(waypoints));
@@ -138,6 +127,23 @@ public class GPXDocument extends GPSDocument {
             resultTrack.setStatsNewKm(GPSUtility.calculateStatsInUnit(resultTrack.getCoordinatesNewKm()));
 
         return resultTrack;
+    }
+
+    private static @NonNull Author getAuthor(GpxType gpx) {
+        Author author = new Author();
+        if (gpx.getMetadata() != null) {
+            if (gpx.getMetadata().getAuthor() != null) {
+                author.setName(gpx.getMetadata().getAuthor().getName());
+            }
+            if (gpx.getMetadata().getAuthor() != null && gpx.getMetadata().getAuthor().getEmail() != null) {
+                author.setEmail(
+                        gpx.getMetadata().getAuthor().getEmail().getId()
+                                + "@"
+                                + gpx.getMetadata().getAuthor().getEmail().getDomain()
+                );
+            }
+        }
+        return author;
     }
 
 

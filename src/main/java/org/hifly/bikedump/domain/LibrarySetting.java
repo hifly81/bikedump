@@ -1,10 +1,12 @@
 package org.hifly.bikedump.domain;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
 public class LibrarySetting implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 5L;
 
     private List<String> scannedDirs;

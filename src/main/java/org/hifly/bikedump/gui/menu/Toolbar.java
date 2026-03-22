@@ -1,17 +1,14 @@
 package org.hifly.bikedump.gui.menu;
 
-import org.hifly.bikedump.graph.WaypointAvgSpeedGraph;
-import org.hifly.bikedump.graph.WaypointElevationGainedGraph;
-import org.hifly.bikedump.graph.WaypointElevationGraph;
-import org.hifly.bikedump.graph.WaypointTimeGraph;
 import org.hifly.bikedump.gui.Bikedump;
 import org.hifly.bikedump.gui.dialog.GraphViewer;
+import org.hifly.bikedump.gui.graph.*;
 import org.hifly.bikedump.gui.panel.WorkoutCalendar;
 import org.hifly.bikedump.report.PdfReport;
 import org.hifly.bikedump.storage.DataHolder;
 import org.hifly.bikedump.domain.Track;
 import org.hifly.bikedump.domain.gps.WaypointSegment;
-import org.hifly.bikedump.gui.panel.TrackTable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,15 +34,9 @@ public class Toolbar extends JToolBar {
     }
 
     private void addButtons() {
-        URL backImageUrl = getClass().getResource("/img/home.png");
-        ImageIcon backImageIcon = new ImageIcon(backImageUrl);
-        Image img = backImageIcon.getImage();
-        img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
-        backImageIcon = new ImageIcon(img);
-        JButton backButton = makeNavigationButton("Home","Home","Home",backImageIcon);
         URL graphImageUrl = getClass().getResource("/img/bar-chart-icon.png");
         ImageIcon graphImageIcon = new ImageIcon(graphImageUrl);
-        img = graphImageIcon.getImage();
+        Image img = graphImageIcon.getImage();
         img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
         graphImageIcon = new ImageIcon(img);
         JButton graphButton = makeNavigationButton("Graph","Graph","Graph",graphImageIcon);
@@ -66,27 +57,8 @@ public class Toolbar extends JToolBar {
         img = webImageIcon.getImage();
         img = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
 
-        add(backButton);
-        backButton.addActionListener(event -> {
-            if (currentFrame.getFolderMapScrollViewer() != null
-                    && currentFrame.getFolderTableViewer() != null
-                    && currentFrame.getHomeAggregateDetailViewer() != null) {
-
-                if (currentFrame.trackTable != null) {
-                    currentFrame.trackTable.clearSelection();
-                }
-                DataHolder.tracksSelected.clear();
-
-                currentFrame.repaintPanels(
-                        currentFrame.getFolderTableViewer(),
-                        currentFrame.getFolderMapScrollViewer(),
-                        currentFrame.getHomeAggregateDetailViewer()
-                );
-            }
-        });
-
         add(graphButton);
-        graphButton.addActionListener(event -> {
+        graphButton.addActionListener(event -> SwingUtilities.invokeLater(() -> {
             if (currentFrame.trackTable == null) {
                 JOptionPane.showMessageDialog(currentFrame,
                         "No track table available",
@@ -95,36 +67,17 @@ public class Toolbar extends JToolBar {
                 return;
             }
 
-            int[] selectedRows = currentFrame.trackTable.getSelectedRows();
+            // Ensure selection is committed/focus is correct
+            currentFrame.trackTable.requestFocusInWindow();
 
-            if (selectedRows == null || selectedRows.length == 0) {
-                JOptionPane.showMessageDialog(currentFrame,
-                        "Select one track to show graphs.",
-                        "Graphs",
-                        JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            if (selectedRows.length > 1) {
-                JOptionPane.showMessageDialog(currentFrame,
-                        "Select only one track to show graphs.",
-                        "Graphs",
-                        JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-
-            int viewRow = selectedRows[0];
-            int modelRow = currentFrame.trackTable.convertRowIndexToModel(viewRow);
-
-            Track selectedTrack = ((TrackTable.TrackTableModel) currentFrame.trackTable.getModel()).getTrackAt(modelRow);
-
+            Track selectedTrack = currentFrame.getLastSelectedTrackForGraphs();
             if (selectedTrack == null) {
                 JOptionPane.showMessageDialog(currentFrame,
-                        "Can't determine selected track.",
+                        "Select exactly one track to show graphs.",
                         "Graphs",
-                        JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-
 
             if (DataHolder.tracksLoaded == null || DataHolder.tracksLoaded.isEmpty()) {
                 JOptionPane.showMessageDialog(currentFrame,
@@ -134,15 +87,15 @@ public class Toolbar extends JToolBar {
                 return;
             }
 
-            // Build waypoint segments ONLY for selected tracks
+            // Build waypoint segments for the selected track (keep FULL track for correct X axis)
             List<List<WaypointSegment>> selectedLists = new ArrayList<>();
+            ClimbRange climbRange = null;
 
-            for (int viewRow2: selectedRows) {
-                int modelRow2 = currentFrame.trackTable.convertRowIndexToModel(viewRow2);
-                Track track = ((TrackTable.TrackTableModel) currentFrame.trackTable.getModel()).getTrackAt(modelRow2);
-                if (track != null && track.getCoordinatesNewKm() != null && !track.getCoordinatesNewKm().isEmpty()) {
-                    selectedLists.add(new ArrayList<>(track.getCoordinatesNewKm().values()));
-                }
+            if (selectedTrack.getCoordinatesNewKm() != null && !selectedTrack.getCoordinatesNewKm().isEmpty()) {
+                List<WaypointSegment> segsAll = new ArrayList<>(selectedTrack.getCoordinatesNewKm().values());
+                segsAll.sort(java.util.Comparator.comparingDouble(WaypointSegment::getUnit));
+                selectedLists.add(segsAll);
+                climbRange = ClimbExtractor.extractBestClimbRangeFromSegments(segsAll);
             }
 
             if (selectedLists.isEmpty()) {
@@ -152,16 +105,21 @@ public class Toolbar extends JToolBar {
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            WaypointGraph waypointElevationGraph = new WaypointElevationGraph(
+                    selectedLists,
+                    true,
+                    climbRange != null ? climbRange.startKm : null,
+                    climbRange != null ? climbRange.endKm : null
+            );
 
-            // Use the same graph logic, but based on selection
-            WaypointElevationGraph waypointElevationGraph = new WaypointElevationGraph(selectedLists);
+
             WaypointAvgSpeedGraph waypointAvgSpeedGraph = new WaypointAvgSpeedGraph(selectedLists);
             WaypointTimeGraph waypointTimeGraph = new WaypointTimeGraph(selectedLists);
-            WaypointElevationGainedGraph waypointElevationGainedGraph = new WaypointElevationGainedGraph(selectedLists);
+            WaypointElevationHistogramGraph waypointElevationDistanceGraph = new WaypointElevationHistogramGraph(selectedLists, climbRange);
 
             new GraphViewer(currentFrame,
-                    Arrays.asList(waypointElevationGraph, waypointAvgSpeedGraph, waypointTimeGraph, waypointElevationGainedGraph));
-        });
+                    Arrays.asList(waypointElevationGraph, waypointAvgSpeedGraph, waypointTimeGraph, waypointElevationDistanceGraph));
+        }));
 
         add(reportButton);
         reportButton.addActionListener(event -> {
@@ -205,8 +163,6 @@ public class Toolbar extends JToolBar {
         calendarButton.addActionListener(event -> new WorkoutCalendar(currentFrame));
 
     }
-
-
 
     private JButton makeNavigationButton(String actionCommand, String toolTipText, String altText, ImageIcon icon) {
         JButton button;

@@ -2,8 +2,9 @@ package org.hifly.bikedump.gui.events;
 
 import org.hifly.bikedump.domain.gps.SlopeSegment;
 import org.hifly.bikedump.domain.gps.Waypoint;
-import org.hifly.bikedump.graph.WaypointElevationGraph;
-import org.hifly.bikedump.graph.WaypointGraph;
+import org.hifly.bikedump.gui.graph.ClimbExtractor;
+import org.hifly.bikedump.gui.graph.WaypointElevationGraph;
+import org.hifly.bikedump.gui.graph.WaypointGraph;
 import org.hifly.bikedump.gui.Bikedump;
 import org.hifly.bikedump.gui.dialog.GraphViewer;
 import org.hifly.bikedump.storage.ClimbStorage;
@@ -49,9 +50,9 @@ public class LinkAdapter extends MouseAdapter implements MouseMotionListener {
                     try {
                         if (href.contains("climbProfile")) {
                             List<Waypoint> slopeWaypoints = altimetricProfile.getWaypoints();
-                            //open graph
+                            List<Waypoint> climbPts = ClimbExtractor.extractBestClimbWaypoints(slopeWaypoints);
                             WaypointGraph waypointElevationGraph =
-                                    new WaypointElevationGraph(slopeWaypoints, true, false, false);
+                                    new WaypointElevationGraph(climbPts, true, false, false);
                             new GraphViewer(currentFrame, Arrays.asList(waypointElevationGraph));
                         } else {
                             SlopeSegment slope;
@@ -82,14 +83,14 @@ public class LinkAdapter extends MouseAdapter implements MouseMotionListener {
                                 //TODO verify climbname and verify if already exist
                                 slope.setName(climbName);
                                 ClimbStorage.saveClimb(slope, climbName);
-                                //TODO refresh menu not working
+
                                 Bikedump bikedump = (Bikedump)this.currentFrame;
                                 bikedump.topMenu.getClimbs().validate();
                                 bikedump.topMenu.getClimbs().repaint();
                             } else {
-                                //open graph
+                                List<Waypoint> climbPts = ClimbExtractor.extractBestClimbWaypoints(slopeWaypoints);
                                 WaypointGraph waypointElevationGraph =
-                                        new WaypointElevationGraph(slopeWaypoints, true, false, true);
+                                        new WaypointElevationGraph(climbPts, true, false, true);
                                 new GraphViewer(currentFrame, Arrays.asList(waypointElevationGraph));
                             }
                         }

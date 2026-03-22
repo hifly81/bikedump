@@ -3,10 +3,13 @@ package org.hifly.bikedump.domain;
 import org.hifly.bikedump.utility.Constants;
 import org.hifly.bikedump.utility.ObfuscationUtility;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 public class StravaPref implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private String accessToken;
@@ -21,7 +24,6 @@ public class StravaPref implements Serializable {
     private Date lastSuccessfulSyncAt;
     private long lastSyncAfterEpochSeconds = 0;
 
-    // Credentials
     private String clientId;
     // store obfuscated, not plain
     private String clientSecretObf;
@@ -67,7 +69,6 @@ public class StravaPref implements Serializable {
     public String getRefreshToken() { return refreshToken; }
     public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
 
-    public long getExpiresAtEpochSeconds() { return expiresAtEpochSeconds; }
     public void setExpiresAtEpochSeconds(long expiresAtEpochSeconds) { this.expiresAtEpochSeconds = expiresAtEpochSeconds; }
 
     public int getCallbackPort() { return callbackPort; }
@@ -82,7 +83,6 @@ public class StravaPref implements Serializable {
     public long getAutoSyncIntervalMillis() { return autoSyncIntervalMillis; }
     public void setAutoSyncIntervalMillis(long autoSyncIntervalMillis) { this.autoSyncIntervalMillis = autoSyncIntervalMillis; }
 
-    public Date getLastSuccessfulSyncAt() { return lastSuccessfulSyncAt; }
     public void setLastSuccessfulSyncAt(Date lastSuccessfulSyncAt) { this.lastSuccessfulSyncAt = lastSuccessfulSyncAt; }
 
     public long getLastSyncAfterEpochSeconds() { return lastSyncAfterEpochSeconds; }
