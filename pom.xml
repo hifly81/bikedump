@@ -20,14 +20,6 @@
         <flatlaf.version>3.5.4</flatlaf.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>josm</id>
-            <name>JOSM repo</name>
-            <url>https://josm.openstreetmap.de/nexus/content/repositories/releases/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
 
         <dependency>
